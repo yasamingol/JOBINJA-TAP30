@@ -5,7 +5,7 @@ let allProjects = [];
 let allBids = [];
 
 //need to to convert all classes to different files
-/*********************************************Acount-Class***********************************************************/
+/*********************************************Account-Class***********************************************************/
 class Account {
     constructor(username, skills) {
         this.username = username;
@@ -24,7 +24,7 @@ function getAccountByUsername(username) {
     console.log("this user does not exist");
 }
 
-/*********************************************Projecct-Class**********************************************************/
+/*********************************************Project-Class**********************************************************/
 class Project {
     constructor(title, skills, budget) {
         this.title = title;
