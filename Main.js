@@ -54,17 +54,9 @@ class Bid {
 
 /***********************************************Functions*********************************************************/
 function calculateUserSkill(username, jobname) {
-    let account = getAccountByUsername(username);
-    let project = getProjectByTitle(jobname);
-    for (let i = 0; i < getMapSize(account.skills); i++) {
-
-    }
-
 }
 
 function calculateBestBid() {
-
-
 }
 
 function getMapSize(x) {
@@ -75,12 +67,16 @@ function getMapSize(x) {
 
     return len;
 }
+function mapToObj(map){
+    const obj = {}
+    for (let [k,v] of map)
+        obj[k] = v
+    return obj
+}
 
-function serialize(element,name){
+function serialize(name, jsonContent) {
     const fs = require('fs');
-    const jsonContent = JSON.stringify(element);
-
-    fs.appendFile(name+".json", jsonContent, 'utf8', function (err) {
+    fs.appendFile(name + ".json", jsonContent, 'utf8', function (err) {
         if (err) {
             return console.log(err);
         }
@@ -90,11 +86,50 @@ function serialize(element,name){
 
 }
 
-function serializeALLElements(arr,name){
-    for(let i=0; i<arr.length; i++){
-        serialize(arr[i],name+"_"+i);
-    }
+function serializeAccounts() {
+    for (let i = 0; i < allAccounts.length; i++) {
+        let account = allAccounts[i];
+        const myJson = {};
+        myJson.username = account.username;
+        myJson.skills = mapToObj(account.skills);
+        const json = JSON.stringify(myJson);
+        serialize("./DataBase/Accounts/allAccounts" + "_" + i, json);
 
+
+    }
+}
+
+function serializeProjects() {
+    for (let i = 0; i < allProjects.length; i++) {
+        let project = allProjects[i];
+        const myJson = {};
+        myJson.title = project.title;
+        myJson.skills = mapToObj(project.skills);
+        myJson.budget = project.budget;
+        const json = JSON.stringify(myJson);
+        serialize("./DataBase/Projects/allProjects" + "_" + i, json);
+
+    }
+}
+
+function serializeBides() {
+    for (let i = 0; i < allBids.length; i++) {
+        let bid = allBids[i];
+        const myJson = {};
+        myJson.username = bid.username;
+        myJson.projectaTitle = bid.projectaTitle;
+        myJson.bidAmount = bid.bidAmount;
+        const json = JSON.stringify(myJson);
+        serialize("./DataBase/Bids/allBids" + "_" + i, json);
+
+
+    }
+}
+
+function deserialize() {
+}
+
+function deserializeAllElements() {
 }
 
 /***********************************************Menus*************************************************************/
@@ -150,7 +185,8 @@ while (!commandIsValid) {
         let arr = [];
         console.log("welcome to  bid menu!\nyou can add a new bid using : bid <bid_info>");
         const command = prompt("");
-        arr = command.split(" ");4
+        arr = command.split(" ");
+        4
         let biddingUser = arr[1];
         let projectTitle = arr[2];
         let bidAmount = arr[3];
@@ -169,15 +205,8 @@ while (!commandIsValid) {
 }
 
 //serializing
-serializeALLElements(allAccounts,"./DataBase/Accounts/allAccounts");
-serializeALLElements(allProjects,"./DataBase/Projects/allProjects");
-serializeALLElements(allBids,"./DataBase/Bids/allBids");
-
-
-
-// console.log(allProjects);
-// console.log(allAccounts);
-// console.log(allBids);
-
+serializeAccounts();
+serializeProjects();
+serializeBides();
 
 
