@@ -169,7 +169,7 @@ while (!commandIsValid) {
 
     if (selectedMenu === "1") {
         let arr = [];
-        console.log("\nWelcome to Register_Menu! You can create a new account using : register <user_info> ");
+        console.log("\nWelcome to register menu! You can create a new account using : register <user_info> ");
         const command = prompt("");
         arr = command.split(" ");
         let username = arr[1];
