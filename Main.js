@@ -59,6 +59,28 @@ function calculateUserSkill(username, jobname) {
 function calculateBestBid() {
 }
 
+function checkIfSkilledEnough(userName, projectName) {
+    let isSkilled = true;
+    let account = getAccountByUsername(userName);
+    let project = getProjectByTitle(projectName);
+    project.skills.forEach((value1, key1) => {
+        if (account.skills.has(key1)) {
+            if (parseInt(account.skills.get(key1)) < parseInt(value1)) {
+                isSkilled = false;
+            }
+        } else isSkilled = false;
+    })
+    return isSkilled;
+}
+
+function checkIfBidEnough(projectName, userBidAmount) {
+    let mainBidAmount = getProjectByTitle(projectName).bidAmount;
+    if (parseInt(userBidAmount) <= parseInt(mainBidAmount)) return true;
+    else return false;
+
+
+}
+
 function getMapSize(x) {
     let len = 0;
     for (let count in x) {
@@ -67,12 +89,15 @@ function getMapSize(x) {
 
     return len;
 }
-function mapToObj(map){
+
+function mapToObj(map) {
     const obj = {}
-    for (let [k,v] of map)
+    for (let [k, v] of map)
         obj[k] = v
     return obj
 }
+
+/***********************************************Serialize/Deserialize**************************************************/
 
 function serialize(name, jsonContent) {
     const fs = require('fs');
@@ -150,7 +175,6 @@ while (!commandIsValid) {
         let username = arr[1];
         let skills = new Map;
 
-
         for (let i = 2; i < arr.length; i++) {
             let arrSkiles = [];
             arrSkiles = arr[i].split(":");
@@ -158,8 +182,6 @@ while (!commandIsValid) {
 
         }
         new Account(username, skills);
-
-
         console.log("registered successfully!\n");
 
 
@@ -176,22 +198,26 @@ while (!commandIsValid) {
             let arrSkiles = [];
             arrSkiles = arr[i].split(":");
             skills.set(arrSkiles[0], arrSkiles[1]);
-
         }
         new Project(title, skills, budget);
         console.log("project built successfully!\n");
+
 
     } else if (selectedMenu === "3") {
         let arr = [];
         console.log("welcome to  bid menu!\nyou can add a new bid using : bid <bid_info>");
         const command = prompt("");
         arr = command.split(" ");
-        4
         let biddingUser = arr[1];
         let projectTitle = arr[2];
         let bidAmount = arr[3];
-        new Bid(biddingUser, projectTitle, bidAmount);
-        console.log("bid created successfully!\n");
+        if (checkIfSkilledEnough(biddingUser, projectTitle) && checkIfBidEnough(projectTitle, bidAmount)) {
+            new Bid(biddingUser, projectTitle, bidAmount);
+            console.log("bid created successfully!\n");
+        } else {
+            console.log("cannot bid! not skilled enough.");
+        }
+
 
     } else if (selectedMenu === "4") {
         console.log("welcome to  auction menu!\nyou can end auction using : auction <project_identifier>");
