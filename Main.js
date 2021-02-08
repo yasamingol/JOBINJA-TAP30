@@ -26,10 +26,11 @@ function getAccountByUsername(username) {
 
 /*********************************************Project-Class**********************************************************/
 class Project {
-    constructor(title, skills, budget) {
+    constructor(title, skills, budget, listOfBids) {
         this.title = title;
         this.skills = skills;
         this.budget = budget;
+        this.listOfBids = listOfBids;
         allProjects[allProjects.length] = this;
     }
 }
@@ -59,43 +60,49 @@ class Bid {
 //deserializing
 
 const prompt = require('prompt-sync')();
-console.log("Welcome to JobInja!")
+const colors = require('colors');
+console.log("Welcome to JobInja!".red)
 
 let commandIsValid = false;
 while (!commandIsValid) {
     let arr = [];
-    console.log(" MENUS : \n 1.register \n 2.addProjecct \n 3.bid \n 4.auction \n 5.exit");
+    console.log(" MENUS : ".cyan + "\n 1.register \n 2.addProjecct \n 3.bid \n 4.auction \n 5.exit");
     const selectedMenu = prompt("Please enter the menu number you want to enter : ");
 
 
     if (selectedMenu === "1") {
-        console.log("\nWelcome to register menu! You can create a new account using : register <user_info> ");
+        console.log("\nWelcome to register menu! You can create a new account using : " + "register <user_info> ".green);
         const command = prompt("");
         arr = command.split(" ");
         register(arr);
 
 
     } else if (selectedMenu === "2") {
-        console.log("welcome to  addProject menu!\nyou can add a new project using : addProject <project_info>");
+        console.log("\nwelcome to  addProject menu!\nyou can add a new project using : " + "addProject <project_info>".green);
         const command = prompt("");
         arr = command.split(" ");
         addProject(arr);
 
 
     } else if (selectedMenu === "3") {
-        console.log("welcome to  bid menu!\nyou can add a new bid using : bid <bid_info>");
+        console.log("\nwelcome to  bid menu!\nyou can add a new bid using : " + "bid <bid_info>".green);
         const command = prompt("");
         arr = command.split(" ");
         addBid(arr);
 
 
     } else if (selectedMenu === "4") {
-        console.log("welcome to  auction menu!\nyou can end auction using : auction <project_identifier>");
+        console.log("\nwelcome to  auction menu!\nyou can end auction using : " + "auction <project_identifier>".green);
+        const command = prompt("");
+        arr = command.split(" ");
+        let projectTitle = arr[1];
+        console.log("\nThe winner of the auction is : ".red+calculateBestBid(projectTitle).red);
+
 
     } else if (selectedMenu === "5") {
         console.log("exit");
         commandIsValid = true;
-    } else console.log("command is invalid! try again")
+    } else console.log("command is invalid! try again".red);
 
 
 }
@@ -118,7 +125,7 @@ function register(arr) {
 
     }
     new Account(username, skills);
-    console.log("registered successfully!\n");
+    console.log("registered successfully!\n".red);
 
 }
 
@@ -132,19 +139,23 @@ function addProject(arr) {
         arrSkiles = arr[i].split(":");
         skills.set(arrSkiles[0], arrSkiles[1]);
     }
-    new Project(title, skills, budget);
-    console.log("project built successfully!\n");
+    new Project(title, skills, budget, []);
+    console.log("project built successfully!\n".red);
 }
 
 function addBid(arr) {
     let biddingUser = arr[1];
     let projectTitle = arr[2];
     let bidAmount = arr[3];
-    if (checkIfSkilledEnough(biddingUser, projectTitle) && checkIfBidEnough(projectTitle, bidAmount)) {
-        new Bid(biddingUser, projectTitle, bidAmount);
-        console.log("bid created successfully!\n");
+    if (checkIfSkilledEnough(biddingUser, projectTitle)) {
+        if (checkIfBidEnough(projectTitle, bidAmount)) {
+            let bid = new Bid(biddingUser, projectTitle, bidAmount);
+            getProjectByTitle(projectTitle).listOfBids.push(bid);
+            console.log("bid created successfully!\n".red);
+            console.log(getProjectByTitle(projectTitle).listOfBids);
+        } else console.log("cannot bid! bid amount not acceptable".red);
     } else {
-        console.log("cannot bid! not skilled enough.");
+        console.log("cannot bid! not skilled enough.".red);
     }
 }
 
@@ -164,17 +175,38 @@ function checkIfSkilledEnough(userName, projectName) {
 }
 
 function checkIfBidEnough(projectName, userBidAmount) {
-    let mainBidAmount = getProjectByTitle(projectName).bidAmount;
+    let mainBidAmount = getProjectByTitle(projectName).budget;
     if (parseInt(userBidAmount) <= parseInt(mainBidAmount)) return true;
     else return false;
 }
 
 
-
-function calculateUserSkill(username, jobname) {
+function calculateUserSkill(bid) {
+    let project = getProjectByTitle(bid.projectaTitle);
+    let account = getAccountByUsername(bid.username);
+    let jobOffer = project.budget;
+    let userOffer = bid.bidAmount;
+    let skillSum = 0;
+    project.skills.forEach((value,key) => {
+        let jobSkill = parseInt(value);
+        let userSkill = parseInt(account.skills.get(key));
+        skillSum += 1000*((userSkill-jobSkill)*(userSkill-jobSkill));
+    })
+    return skillSum+(jobOffer-userOffer);
 }
 
-function calculateBestBid() {
+function calculateBestBid(projectTitle) {
+    let bestBid = 0;
+    let bestBidsAccount;
+    let project = getProjectByTitle(projectTitle);
+    project.listOfBids.forEach((bid) => {
+        let userSkill = parseInt(calculateUserSkill(bid));
+        if(userSkill > bestBid){
+            bestBid = userSkill;
+            bestBidsAccount = getAccountByUsername(bid.username);
+        }
+    });
+    return bestBidsAccount.username;
 }
 
 
@@ -203,7 +235,7 @@ function serialize(name, jsonContent) {
             return console.log(err);
         }
 
-        console.log("The file was saved!");
+        console.log("The file was saved!".red);
     });
 
 }
@@ -246,6 +278,9 @@ function serializeBides() {
 
 
     }
+}
+function serializeAuctions(){
+
 }
 
 function deserialize() {
