@@ -3,6 +3,7 @@
 let allAccounts = [];
 let allProjects = [];
 let allBids = [];
+let allAuctions = [];
 
 //need to to convert all classes to different files
 /*********************************************Account-Class***********************************************************/
@@ -55,6 +56,15 @@ class Bid {
     }
 }
 
+/*********************************************Auction-Class***********************************************************/
+class Auction{
+    constructor(projectTitle,accountWinner) {
+        this.projectTitle = projectTitle;
+        this.accuntWinner = accountWinner;
+        allAuctions[allAuctions.length] = this;
+    }
+}
+
 
 /***********************************************Menus****************************************************************/
 //deserializing
@@ -95,8 +105,7 @@ while (!commandIsValid) {
         console.log("\nwelcome to  auction menu!\nyou can end auction using : " + "auction <project_identifier>".green);
         const command = prompt("");
         arr = command.split(" ");
-        let projectTitle = arr[1];
-        console.log("\nThe winner of the auction is : ".red+calculateBestBid(projectTitle).red);
+        holdAuction(arr);
 
 
     } else if (selectedMenu === "5") {
@@ -111,6 +120,7 @@ while (!commandIsValid) {
 serializeAccounts();
 serializeProjects();
 serializeBides();
+serializeAuctions();
 
 
 /***********************************************Functions*********************************************************/
@@ -157,6 +167,12 @@ function addBid(arr) {
     } else {
         console.log("cannot bid! not skilled enough.".red);
     }
+}
+function holdAuction(arr){
+    let projectTitle = arr[1];
+    let accountWinner = calculateBestBid(projectTitle);
+    new Auction(projectTitle,accountWinner);
+    console.log("\nThe winner of the auction is : ".red+accountWinner.red);
 }
 
 
@@ -234,7 +250,6 @@ function serialize(name, jsonContent) {
         if (err) {
             return console.log(err);
         }
-
         console.log("The file was saved!".red);
     });
 
@@ -280,6 +295,16 @@ function serializeBides() {
     }
 }
 function serializeAuctions(){
+    for(let i=0 ; i<allAuctions.length;i++){
+        let auction = allAuctions[i];
+        const myJson = {};
+        myJson.projecTitle = auction.projectTitle;
+        myJson.usernameWinner = auction.accuntWinner;
+        const json = JSON.stringify(myJson);
+        serialize("./DataBase/Auction/allAuctions" + "_" + i, json);
+
+
+    }
 
 }
 
