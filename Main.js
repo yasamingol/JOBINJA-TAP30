@@ -103,15 +103,19 @@ function addProject(arr) {
         arrSkiles = arr[i].split(":");
         skills.set(arrSkiles[0], arrSkiles[1]);
     }
-    new projectClass(title, skills, budget, [], deadline);
+    new projectClass(title, skills, budget, [], deadline,true);
     console.log("project built successfully!\n".red);
 }
+
 
 function addBid(arr) {
     let biddingUser = arr[1];
     let projectTitle = arr[2];
     let bidAmount = arr[3];
-    if (!checkIfSkilledEnough(biddingUser, projectTitle)) {
+    if(!projectClass.getProjectByTitle(projectTitle).isAvailable){
+        console.log("cannot bid! project has already been taken.".red);
+    }
+    else if (!checkIfSkilledEnough(biddingUser, projectTitle)) {
         console.log("cannot bid! not skilled enough.".red);
     }
     else if (!checkIfBidEnough(projectTitle, bidAmount)) {
@@ -127,10 +131,12 @@ function addBid(arr) {
     }
 }
 
+
 function holdAuction(arr) {
     let projectTitle = arr[1];
     let accountWinner = calculateBestBid(projectTitle);
     new auctionClass(projectTitle, accountWinner);
+    projectClass.getProjectByTitle(projectTitle).isAvailable = false;
     console.log("\nThe winner of the auction is : ".red + accountWinner.red);
 }
 
