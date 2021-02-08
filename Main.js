@@ -82,9 +82,10 @@ while (!commandIsValid) {
 
 
     } else if (selectedMenu === "8") {
-        console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" + "removeSkill <your_username> <other_username> <skill:rate>".green);
+        console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" + "confirmSkill <your_username> <other_username> <skill>".green);
         const command = prompt("");
         arr = command.split(" ");
+        confirmSkill(arr);
 
 
     } else if (selectedMenu === "9") {
@@ -117,7 +118,7 @@ function register(arr) {
 
 }
 
-//addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)>
+
 function addProject(arr) {
     let title = arr[1];
     let skills = new Map;
@@ -178,6 +179,17 @@ function removeSkill(arr){
     console.log("skill removed successfully!\n".red);
 }
 
+function confirmSkill(arr){
+    let otherUser = accountClass.getAccountByUsername(arr[2]);
+    let skillName = arr[3];
+    let skillRate = otherUser.skills.get(skillName);
+    otherUser.skills.delete(skillName);
+    otherUser.skills.set(skillName,parseInt(skillRate)+1);
+    console.log(arr[1]+" confirmed "+arr[2]+" s "+ arr[3] + " skill\n ".red);
+
+}
+
+
 function assignProject(username, projectName) {
     let account = accountClass.getAccountByUsername(username);
     account.asignedProjectList.push(projectName);
@@ -199,11 +211,7 @@ function checkIfSkilledEnough(userName, projectName) {
 
 }
 
-function checkIfBidEnough(projectName, userBidAmount) {
-    let mainBidAmount = projectClass.getProjectByTitle(projectName).budget;
-    if (parseInt(userBidAmount) <= parseInt(mainBidAmount)) return true;
-    else return false;
-}
+
 
 function checkIfBidEnough(projectName, userBidAmount) {
     let mainBidAmount = projectClass.getProjectByTitle(projectName).budget;
