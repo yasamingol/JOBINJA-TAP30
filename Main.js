@@ -1,11 +1,23 @@
+/****************************************************Preperation******************************************************/
 //importing classes
 const accountClass = require("./Account");
 const projectClass = require("./Project");
 const bidClass = require("./Bid");
 const auctionClass = require("./Auction");
 
+
+//reading all commands form file
+let allCommands = [];
+let counter = -1;
+const fs = require('fs');
+let content;
+readFromFile("/home/tapsi/IdeaProjects/concurency/testCases");
+allCommands = content.split("\n");
+
+
 //deserializing
 
+/****************************************************MENUS************************************************************/
 const prompt = require('prompt-sync')();
 const colors = require('colors');
 console.log("Welcome to JobInja!".red)
@@ -13,34 +25,34 @@ console.log("Welcome to JobInja!".red)
 let commandIsValid = false;
 while (!commandIsValid) {
     let arr = [];
-    console.log(" MENUS : ".cyan + "\n 1.register \n 2.addProjecct \n 3.bid \n 4.auction \n 5.exit");
-    const selectedMenu = prompt("Please enter the menu number you want to enter : ");
+    console.log(" MENUS : ".cyan + "\n 1.register \n 2.addProjecct \n 3.bid \n 4.auction \n 5.exit \n Please enter the menu number you want to enter : ");
+    const selectedMenu = readOneLine();
 
 
     if (selectedMenu === "1") {
         console.log("\nWelcome to register menu! You can create a new account using : " + "register <username> <skill:rate> ".green);
-        const command = prompt("");
+        const command = readOneLine();
         arr = command.split(" ");
         register(arr);
 
 
     } else if (selectedMenu === "2") {
         console.log("\nwelcome to  addProject menu!\nyou can add a new project using : " + "addProject <projectTitle> <skill:rate> <budget>".green);
-        const command = prompt("");
+        const command = readOneLine();
         arr = command.split(" ");
         addProject(arr);
 
 
     } else if (selectedMenu === "3") {
         console.log("\nwelcome to  bid menu!\nyou can add a new bid using : " + "bid <username> <projectTitle> <bidAmount>".green);
-        const command = prompt("");
+        const command = readOneLine();
         arr = command.split(" ");
         addBid(arr);
 
 
     } else if (selectedMenu === "4") {
         console.log("\nwelcome to  auction menu!\nyou can end auction using : " + "auction <username> <projectTitle>".green);
-        const command = prompt("");
+        const command = readOneLine();
         arr = command.split(" ");
         holdAuction(arr);
 
@@ -58,7 +70,6 @@ serializeAccounts();
 serializeProjects();
 serializeBides();
 serializeAuctions();
-
 
 
 /***********************************************Main-Functions*********************************************************/
@@ -105,11 +116,11 @@ function addBid(arr) {
     }
 }
 
-function holdAuction(arr){
+function holdAuction(arr) {
     let projectTitle = arr[1];
     let accountWinner = calculateBestBid(projectTitle);
-    new auctionClass(projectTitle,accountWinner);
-    console.log("\nThe winner of the auction is : ".red+accountWinner.red);
+    new auctionClass(projectTitle, accountWinner);
+    console.log("\nThe winner of the auction is : ".red + accountWinner.red);
 }
 
 
@@ -140,12 +151,12 @@ function calculateUserSkill(bid) {
     let jobOffer = project.budget;
     let userOffer = bid.bidAmount;
     let skillSum = 0;
-    project.skills.forEach((value,key) => {
+    project.skills.forEach((value, key) => {
         let jobSkill = parseInt(value);
         let userSkill = parseInt(account.skills.get(key));
-        skillSum += 1000*((userSkill-jobSkill)*(userSkill-jobSkill));
+        skillSum += 1000 * ((userSkill - jobSkill) * (userSkill - jobSkill));
     })
-    return skillSum+(jobOffer-userOffer);
+    return skillSum + (jobOffer - userOffer);
 }
 
 function calculateBestBid(projectTitle) {
@@ -154,7 +165,7 @@ function calculateBestBid(projectTitle) {
     let project = projectClass.getProjectByTitle(projectTitle);
     project.listOfBids.forEach((bid) => {
         let userSkill = parseInt(calculateUserSkill(bid));
-        if(userSkill > bestBid){
+        if (userSkill > bestBid) {
             bestBid = userSkill;
             bestBidsAccount = accountClass.getAccountByUsername(bid.username);
         }
@@ -179,24 +190,19 @@ function mapToObj(map) {
         obj[k] = v
     return obj
 }
-function findAllFilesInDictionary(dirPath, arrayOfFiles){
-    const fs = require("fs")
 
-    const getAllDirFiles = function(dirPath, arrayOfFiles) {
-        let files = fs.readdirSync(dirPath)
-
-        arrayOfFiles = arrayOfFiles || []
-
-        files.forEach(function(file) {
-            if (fs.statSync(dirPath + "/" + file).isDirectory()) {
-                arrayOfFiles = getAllDirFiles(dirPath + "/" + file, arrayOfFiles)
-            } else {
-                arrayOfFiles.push(file)
-            }
-        })
-
-        console.log(arrayOfFiles);
+function readFromFile(address) {
+    try {
+        content = fs.readFileSync(address, {encoding: 'utf8'});
+    } catch (err) {
+        // An error occurred
+        console.error(err);
     }
+}
+
+function readOneLine() {
+    counter++;
+    return allCommands[counter];
 }
 
 /***********************************************Serialize/Deserialize**************************************************/
@@ -251,8 +257,9 @@ function serializeBides() {
 
     }
 }
-function serializeAuctions(){
-    for(let i=0 ; i<auctionClass.allAuctions.length;i++){
+
+function serializeAuctions() {
+    for (let i = 0; i < auctionClass.allAuctions.length; i++) {
         let auction = auctionClass.allAuctions[i];
         const myJson = {};
         myJson.projecTitle = auction.projectTitle;
