@@ -162,7 +162,6 @@ function addBid(arr) {
             let bid = new Bid(biddingUser, projectTitle, bidAmount);
             getProjectByTitle(projectTitle).listOfBids.push(bid);
             console.log("bid created successfully!\n".red);
-            console.log(getProjectByTitle(projectTitle).listOfBids);
         } else console.log("cannot bid! bid amount not acceptable".red);
     } else {
         console.log("cannot bid! not skilled enough.".red);
