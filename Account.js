@@ -1,9 +1,10 @@
 
 class Account {
     static  allAccounts = [];
-    constructor(username, skills) {
+    constructor(username, skills,asignedProjectList) {
         this.username = username;
         this.skills = skills;
+        this.asignedProjectList = asignedProjectList;
         Account.allAccounts[Account.allAccounts.length] = this;
     }
 

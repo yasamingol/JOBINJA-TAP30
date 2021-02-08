@@ -87,7 +87,7 @@ function register(arr) {
         skills.set(arrSkiles[0], arrSkiles[1]);
 
     }
-    new accountClass(username, skills);
+    new accountClass(username, skills,[]);
     console.log("registered successfully!\n".red);
 
 }
@@ -137,7 +137,12 @@ function holdAuction(arr) {
     let accountWinner = calculateBestBid(projectTitle);
     new auctionClass(projectTitle, accountWinner);
     projectClass.getProjectByTitle(projectTitle).isAvailable = false;
+    assignProject(accountWinner,projectTitle);
     console.log("\nThe winner of the auction is : ".red + accountWinner.red);
+}
+function assignProject(username,projectName){
+    let account = accountClass.getAccountByUsername(username);
+    account.asignedProjectList.push(projectName);
 }
 
 
@@ -262,6 +267,7 @@ function serializeAccounts() {
         const myJson = {};
         myJson.username = account.username;
         myJson.skills = mapToObj(account.skills);
+        myJson.asignedProjectList = account.asignedProjectList;
         const json = JSON.stringify(myJson);
         serialize("./DataBase/Accounts/allAccounts" + "_" + i, json);
 
@@ -277,6 +283,7 @@ function serializeProjects() {
         myJson.skills = mapToObj(project.skills);
         myJson.budget = project.budget;
         myJson.deadline = project.deadline;
+        myJson.isAvailable = project.isAvailable;
         const json = JSON.stringify(myJson);
         serialize("./DataBase/Projects/allProjects" + "_" + i, json);
 
