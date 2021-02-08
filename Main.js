@@ -1,72 +1,9 @@
-/**********************************************Classes***************************************************************/
-//need to convert this to a static field for account class
-let allAccounts = [];
-let allProjects = [];
-let allBids = [];
-let allAuctions = [];
+//importing classes
+const accountClass = require("./Account");
+const projectClass = require("./Project");
+const bidClass = require("./Bid");
+const auctionClass = require("./Auction");
 
-//need to to convert all classes to different files
-/*********************************************Account-Class***********************************************************/
-class Account {
-    constructor(username, skills) {
-        this.username = username;
-        this.skills = skills;
-        allAccounts[allAccounts.length] = this;
-
-    }
-}
-
-function getAccountByUsername(username) {
-    for (let i = 0; i < allAccounts.length; i++) {
-        if (allAccounts[i].username === username) {
-            return allAccounts[i];
-        }
-    }
-    console.log("this user does not exist");
-}
-
-/*********************************************Project-Class**********************************************************/
-class Project {
-    constructor(title, skills, budget, listOfBids) {
-        this.title = title;
-        this.skills = skills;
-        this.budget = budget;
-        this.listOfBids = listOfBids;
-        allProjects[allProjects.length] = this;
-    }
-}
-
-function getProjectByTitle(title) {
-    for (let i = 0; i < allProjects.length; i++) {
-        if (allProjects[i].title === title) {
-            return allProjects[i];
-        }
-    }
-    console.log("this project does not exist");
-}
-
-/************************************************Bid-Class***********************************************************/
-
-class Bid {
-    constructor(username, projectTitle, bidAmount) {
-        this.username = username;
-        this.projectaTitle = projectTitle;
-        this.bidAmount = bidAmount;
-        allBids[allBids.length] = this;
-    }
-}
-
-/*********************************************Auction-Class***********************************************************/
-class Auction{
-    constructor(projectTitle,accountWinner) {
-        this.projectTitle = projectTitle;
-        this.accuntWinner = accountWinner;
-        allAuctions[allAuctions.length] = this;
-    }
-}
-
-
-/***********************************************Menus****************************************************************/
 //deserializing
 
 const prompt = require('prompt-sync')();
@@ -81,28 +18,28 @@ while (!commandIsValid) {
 
 
     if (selectedMenu === "1") {
-        console.log("\nWelcome to register menu! You can create a new account using : " + "register <user_info> ".green);
+        console.log("\nWelcome to register menu! You can create a new account using : " + "register <username> <skill:rate> ".green);
         const command = prompt("");
         arr = command.split(" ");
         register(arr);
 
 
     } else if (selectedMenu === "2") {
-        console.log("\nwelcome to  addProject menu!\nyou can add a new project using : " + "addProject <project_info>".green);
+        console.log("\nwelcome to  addProject menu!\nyou can add a new project using : " + "addProject <projectTitle> <skill:rate> <budget>".green);
         const command = prompt("");
         arr = command.split(" ");
         addProject(arr);
 
 
     } else if (selectedMenu === "3") {
-        console.log("\nwelcome to  bid menu!\nyou can add a new bid using : " + "bid <bid_info>".green);
+        console.log("\nwelcome to  bid menu!\nyou can add a new bid using : " + "bid <username> <projectTitle> <bidAmount>".green);
         const command = prompt("");
         arr = command.split(" ");
         addBid(arr);
 
 
     } else if (selectedMenu === "4") {
-        console.log("\nwelcome to  auction menu!\nyou can end auction using : " + "auction <project_identifier>".green);
+        console.log("\nwelcome to  auction menu!\nyou can end auction using : " + "auction <username> <projectTitle>".green);
         const command = prompt("");
         arr = command.split(" ");
         holdAuction(arr);
@@ -123,18 +60,18 @@ serializeBides();
 serializeAuctions();
 
 
-/***********************************************Functions*********************************************************/
+
+/***********************************************Main-Functions*********************************************************/
 function register(arr) {
     let username = arr[1];
     let skills = new Map;
-
     for (let i = 2; i < arr.length; i++) {
         let arrSkiles = [];
         arrSkiles = arr[i].split(":");
         skills.set(arrSkiles[0], arrSkiles[1]);
 
     }
-    new Account(username, skills);
+    new accountClass(username, skills);
     console.log("registered successfully!\n".red);
 
 }
@@ -149,7 +86,7 @@ function addProject(arr) {
         arrSkiles = arr[i].split(":");
         skills.set(arrSkiles[0], arrSkiles[1]);
     }
-    new Project(title, skills, budget, []);
+    new projectClass(title, skills, budget, []);
     console.log("project built successfully!\n".red);
 }
 
@@ -159,26 +96,27 @@ function addBid(arr) {
     let bidAmount = arr[3];
     if (checkIfSkilledEnough(biddingUser, projectTitle)) {
         if (checkIfBidEnough(projectTitle, bidAmount)) {
-            let bid = new Bid(biddingUser, projectTitle, bidAmount);
-            getProjectByTitle(projectTitle).listOfBids.push(bid);
+            let bid = new bidClass(biddingUser, projectTitle, bidAmount);
+            projectClass.getProjectByTitle(projectTitle).listOfBids.push(bid);
             console.log("bid created successfully!\n".red);
         } else console.log("cannot bid! bid amount not acceptable".red);
     } else {
         console.log("cannot bid! not skilled enough.".red);
     }
 }
+
 function holdAuction(arr){
     let projectTitle = arr[1];
     let accountWinner = calculateBestBid(projectTitle);
-    new Auction(projectTitle,accountWinner);
+    new auctionClass(projectTitle,accountWinner);
     console.log("\nThe winner of the auction is : ".red+accountWinner.red);
 }
 
 
 function checkIfSkilledEnough(userName, projectName) {
     let isSkilled = true;
-    let account = getAccountByUsername(userName);
-    let project = getProjectByTitle(projectName);
+    let account = accountClass.getAccountByUsername(userName);
+    let project = projectClass.getProjectByTitle(projectName);
     project.skills.forEach((value1, key1) => {
         if (account.skills.has(key1)) {
             if (parseInt(account.skills.get(key1)) < parseInt(value1)) {
@@ -190,15 +128,15 @@ function checkIfSkilledEnough(userName, projectName) {
 }
 
 function checkIfBidEnough(projectName, userBidAmount) {
-    let mainBidAmount = getProjectByTitle(projectName).budget;
+    let mainBidAmount = projectClass.getProjectByTitle(projectName).budget;
     if (parseInt(userBidAmount) <= parseInt(mainBidAmount)) return true;
     else return false;
 }
 
 
 function calculateUserSkill(bid) {
-    let project = getProjectByTitle(bid.projectaTitle);
-    let account = getAccountByUsername(bid.username);
+    let project = projectClass.getProjectByTitle(bid.projectaTitle);
+    let account = accountClass.getAccountByUsername(bid.username);
     let jobOffer = project.budget;
     let userOffer = bid.bidAmount;
     let skillSum = 0;
@@ -213,17 +151,18 @@ function calculateUserSkill(bid) {
 function calculateBestBid(projectTitle) {
     let bestBid = 0;
     let bestBidsAccount;
-    let project = getProjectByTitle(projectTitle);
+    let project = projectClass.getProjectByTitle(projectTitle);
     project.listOfBids.forEach((bid) => {
         let userSkill = parseInt(calculateUserSkill(bid));
         if(userSkill > bestBid){
             bestBid = userSkill;
-            bestBidsAccount = getAccountByUsername(bid.username);
+            bestBidsAccount = accountClass.getAccountByUsername(bid.username);
         }
     });
     return bestBidsAccount.username;
 }
 
+/***********************************************Tool-Functions*********************************************************/
 
 function getMapSize(x) {
     let len = 0;
@@ -240,6 +179,25 @@ function mapToObj(map) {
         obj[k] = v
     return obj
 }
+function findAllFilesInDictionary(dirPath, arrayOfFiles){
+    const fs = require("fs")
+
+    const getAllDirFiles = function(dirPath, arrayOfFiles) {
+        let files = fs.readdirSync(dirPath)
+
+        arrayOfFiles = arrayOfFiles || []
+
+        files.forEach(function(file) {
+            if (fs.statSync(dirPath + "/" + file).isDirectory()) {
+                arrayOfFiles = getAllDirFiles(dirPath + "/" + file, arrayOfFiles)
+            } else {
+                arrayOfFiles.push(file)
+            }
+        })
+
+        console.log(arrayOfFiles);
+    }
+}
 
 /***********************************************Serialize/Deserialize**************************************************/
 
@@ -255,8 +213,8 @@ function serialize(name, jsonContent) {
 }
 
 function serializeAccounts() {
-    for (let i = 0; i < allAccounts.length; i++) {
-        let account = allAccounts[i];
+    for (let i = 0; i < accountClass.allAccounts.length; i++) {
+        let account = accountClass.allAccounts[i];
         const myJson = {};
         myJson.username = account.username;
         myJson.skills = mapToObj(account.skills);
@@ -268,8 +226,8 @@ function serializeAccounts() {
 }
 
 function serializeProjects() {
-    for (let i = 0; i < allProjects.length; i++) {
-        let project = allProjects[i];
+    for (let i = 0; i < projectClass.allProjects.length; i++) {
+        let project = projectClass.allProjects[i];
         const myJson = {};
         myJson.title = project.title;
         myJson.skills = mapToObj(project.skills);
@@ -281,8 +239,8 @@ function serializeProjects() {
 }
 
 function serializeBides() {
-    for (let i = 0; i < allBids.length; i++) {
-        let bid = allBids[i];
+    for (let i = 0; i < bidClass.allBids.length; i++) {
+        let bid = bidClass.allBids[i];
         const myJson = {};
         myJson.username = bid.username;
         myJson.projectaTitle = bid.projectaTitle;
@@ -294,8 +252,8 @@ function serializeBides() {
     }
 }
 function serializeAuctions(){
-    for(let i=0 ; i<allAuctions.length;i++){
-        let auction = allAuctions[i];
+    for(let i=0 ; i<auctionClass.allAuctions.length;i++){
+        let auction = auctionClass.allAuctions[i];
         const myJson = {};
         myJson.projecTitle = auction.projectTitle;
         myJson.usernameWinner = auction.accuntWinner;
@@ -307,8 +265,9 @@ function serializeAuctions(){
 
 }
 
-function deserialize() {
+function deserialize(arr) {
+
 }
 
-function deserializeAllElements() {
+function deserializeAllAccounts() {
 }
