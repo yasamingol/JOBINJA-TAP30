@@ -1,10 +1,11 @@
 class Project {
     static allProjects = [];
-    constructor(title, skills, budget, listOfBids) {
+    constructor(title, skills, budget, listOfBids,deadline) {
         this.title = title;
         this.skills = skills;
         this.budget = budget;
         this.listOfBids = listOfBids;
+        this.deadline = deadline;
         Project.allProjects[Project.allProjects.length] = this;
     }
     static getProjectByTitle(title) {
