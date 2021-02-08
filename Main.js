@@ -17,7 +17,7 @@ allCommands = content.split("\n");
 
 //deserializing
 
-/****************************************************MENUS************************************************************/
+/****************************************************Main-MENUS************************************************************/
 const prompt = require('prompt-sync')();
 const colors = require('colors');
 console.log("Welcome to JobInja!".red)
@@ -25,7 +25,7 @@ console.log("Welcome to JobInja!".red)
 let commandIsValid = false;
 while (!commandIsValid) {
     let arr = [];
-    console.log(" MENUS : ".cyan + "\n 1.register \n 2.addProjecct \n 3.bid \n 4.auction \n 5.exit \n Please enter the menu number you want to enter : ");
+    console.log(" MENUS : ".cyan + "\n 1.register \n 2.login \n 3.addProjecct \n 4.bid \n 5.auction \n 6.addSkill \n 7.removeSkill \n 8.confirmSkills \n 9.exit \n Please enter the menu number you want to enter : ");
     // const selectedMenu = readOneLine();
     const selectedMenu = prompt("");
 
@@ -39,6 +39,10 @@ while (!commandIsValid) {
 
 
     } else if (selectedMenu === "2") {
+        console.log("\nWelcome to login menu! You log into your accout : " + "register <username> <skill:rate> ".green);
+
+
+    } else if (selectedMenu === "3") {
         console.log("\nwelcome to  addProject menu!\nyou can add a new project using : " + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)>".green);
         // const command = readOneLine();
         const command = prompt("");
@@ -46,7 +50,7 @@ while (!commandIsValid) {
         addProject(arr);
 
 
-    } else if (selectedMenu === "3") {
+    } else if (selectedMenu === "4") {
         console.log("\nwelcome to  bid menu!\nyou can add a new bid using : " + "bid <username> <projectTitle> <bidAmount>".green);
         // const command = readOneLine();
         const command = prompt("");
@@ -54,7 +58,7 @@ while (!commandIsValid) {
         addBid(arr);
 
 
-    } else if (selectedMenu === "4") {
+    } else if (selectedMenu === "5") {
         console.log("\nwelcome to  auction menu!\nyou can end auction using : " + "auction <username> <projectTitle>".green);
         // const command = readOneLine();
         const command = prompt("");
@@ -62,7 +66,28 @@ while (!commandIsValid) {
         holdAuction(arr);
 
 
-    } else if (selectedMenu === "5") {
+    } else if (selectedMenu === "6") {
+        console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate>".green);
+        const command = prompt("");
+        arr = command.split(" ");
+        addSkill(arr);
+
+
+
+    } else if (selectedMenu === "7") {
+        console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using" + "removeSkill <username> <skill>".green);
+        const command = prompt("");
+        arr = command.split(" ");
+        removeSkill(arr);
+
+
+    } else if (selectedMenu === "8") {
+        console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" + "removeSkill <your_username> <other_username> <skill:rate>".green);
+        const command = prompt("");
+        arr = command.split(" ");
+
+
+    } else if (selectedMenu === "9") {
         console.log("exit");
         commandIsValid = true;
     } else console.log("command is invalid! try again".red);
@@ -87,10 +112,11 @@ function register(arr) {
         skills.set(arrSkiles[0], arrSkiles[1]);
 
     }
-    new accountClass(username, skills,[]);
+    new accountClass(username, skills, []);
     console.log("registered successfully!\n".red);
 
 }
+
 //addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)>
 function addProject(arr) {
     let title = arr[1];
@@ -103,7 +129,7 @@ function addProject(arr) {
         arrSkiles = arr[i].split(":");
         skills.set(arrSkiles[0], arrSkiles[1]);
     }
-    new projectClass(title, skills, budget, [], deadline,true);
+    new projectClass(title, skills, budget, [], deadline, true);
     console.log("project built successfully!\n".red);
 }
 
@@ -112,19 +138,15 @@ function addBid(arr) {
     let biddingUser = arr[1];
     let projectTitle = arr[2];
     let bidAmount = arr[3];
-    if(!projectClass.getProjectByTitle(projectTitle).isAvailable){
+    if (!projectClass.getProjectByTitle(projectTitle).isAvailable) {
         console.log("cannot bid! project has already been taken.".red);
-    }
-    else if (!checkIfSkilledEnough(biddingUser, projectTitle)) {
+    } else if (!checkIfSkilledEnough(biddingUser, projectTitle)) {
         console.log("cannot bid! not skilled enough.".red);
-    }
-    else if (!checkIfBidEnough(projectTitle, bidAmount)) {
+    } else if (!checkIfBidEnough(projectTitle, bidAmount)) {
         console.log("cannot bid! bid amount not acceptable".red);
-    }
-    else if (!checkIfValidDate(projectTitle)){
+    } else if (!checkIfValidDate(projectTitle)) {
         console.log("you cannot bid on this project! it has ended".red);
-    }
-    else {
+    } else {
         let bid = new bidClass(biddingUser, projectTitle, bidAmount);
         projectClass.getProjectByTitle(projectTitle).listOfBids.push(bid);
         console.log("bid created successfully!\n".red);
@@ -137,10 +159,26 @@ function holdAuction(arr) {
     let accountWinner = calculateBestBid(projectTitle);
     new auctionClass(projectTitle, accountWinner);
     projectClass.getProjectByTitle(projectTitle).isAvailable = false;
-    assignProject(accountWinner,projectTitle);
+    assignProject(accountWinner, projectTitle);
     console.log("\nThe winner of the auction is : ".red + accountWinner.red);
 }
-function assignProject(username,projectName){
+
+function addSkill(arr){
+    let account = accountClass.getAccountByUsername(arr[1]);
+    let arrSkiles = [];
+    arrSkiles = arr[2].split(":");
+    account.skills.set(arrSkiles[0], arrSkiles[1]);
+    console.log("skill added successfully!\n".red);
+}
+
+function removeSkill(arr){
+    let account = accountClass.getAccountByUsername(arr[1]);
+    let skillName = arr[2];
+    account.skills.delete(skillName);
+    console.log("skill removed successfully!\n".red);
+}
+
+function assignProject(username, projectName) {
     let account = accountClass.getAccountByUsername(username);
     account.asignedProjectList.push(projectName);
 }
