@@ -201,7 +201,7 @@ function confirmSkill(arr) {
         let skillRate = otherUser.skills.get(skillName);
         otherUser.skills.delete(skillName);
         otherUser.skills.set(skillName, parseInt(skillRate) + 1);
-        thisUser.skillConfirmationList.set(otherUser, skillName);
+        thisUser.skillConfirmationList.set(otherUser.username, skillName);
         console.log(arr[1] + " confirmed ".red + arr[2] + " s ((".red + arr[3] + ")) skill\n ".red);
     } else console.log("cannot confirm this skillSet! you have done it once before!".red);
 
