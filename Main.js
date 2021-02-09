@@ -74,6 +74,7 @@ while (!commandIsValid) {
 
 
 
+
     } else if (selectedMenu === "7") {
         console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using" + "removeSkill <username> <skill>".green);
         const command = prompt("");
@@ -107,13 +108,14 @@ serializeAuctions();
 function register(arr) {
     let username = arr[1];
     let skills = new Map;
+    let skillConfirmationList = new Map;
     for (let i = 2; i < arr.length; i++) {
         let arrSkiles = [];
         arrSkiles = arr[i].split(":");
         skills.set(arrSkiles[0], arrSkiles[1]);
 
     }
-    new accountClass(username, skills, []);
+    new accountClass(username, skills, [],skillConfirmationList);
     console.log("registered successfully!\n".red);
 
 }
@@ -180,12 +182,25 @@ function removeSkill(arr){
 }
 
 function confirmSkill(arr){
+    let thisUser = accountClass.getAccountByUsername(arr[1]);
     let otherUser = accountClass.getAccountByUsername(arr[2]);
     let skillName = arr[3];
-    let skillRate = otherUser.skills.get(skillName);
-    otherUser.skills.delete(skillName);
-    otherUser.skills.set(skillName,parseInt(skillRate)+1);
-    console.log(arr[1]+" confirmed "+arr[2]+" s "+ arr[3] + " skill\n ".red);
+    if(!checkIfConfirmedBefore(thisUser,otherUser,skillName)) {
+        let skillRate = otherUser.skills.get(skillName);
+        otherUser.skills.delete(skillName);
+        otherUser.skills.set(skillName, parseInt(skillRate) + 1);
+        thisUser.skillConfirmationList.set(otherUser,skillName);
+        console.log(arr[1] + " confirmed " + arr[2] + " s ((" + arr[3] + ")) skill\n ".red);
+    }else console.log("cannot confirm this skillSet! you have done it once before!".red);
+
+}
+function checkIfConfirmedBefore(user1,user2,skill){
+    if(user1.skillConfirmationList.has(user2,skill)){
+        let skillFound  = user1.skillConfirmationList.get(user2);
+        if(skillFound===skill){
+            return true;
+        }else return false
+    }else return false
 
 }
 
@@ -314,6 +329,7 @@ function serializeAccounts() {
         myJson.username = account.username;
         myJson.skills = mapToObj(account.skills);
         myJson.asignedProjectList = account.asignedProjectList;
+        myJson.skillConfirmationList = account.skillConfirmationList;
         const json = JSON.stringify(myJson);
         serialize("./DataBase/Accounts/allAccounts" + "_" + i, json);
 
