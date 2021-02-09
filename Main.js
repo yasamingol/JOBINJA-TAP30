@@ -24,8 +24,14 @@ console.log("Welcome to JobInja!".red)
 
 let commandIsValid = false;
 while (!commandIsValid) {
+
+    //checking the expiration date for auctions
+    holdAuctions();
+
+
+    //Menus
     let arr = [];
-    console.log(" MENUS : ".cyan + "\n 1.register \n 2.login \n 3.addProjecct \n 4.bid \n 5.auction \n 6.addSkill \n 7.removeSkill \n 8.confirmSkills \n 9.exit \n Please enter the menu number you want to enter : ");
+    console.log(" MENUS : ".cyan + "\n 1.register \n 2.login \n 3.addProjecct \n 4.bid \n 5.addSkill \n 6.removeSkill \n 7.confirmSkills \n 8.exit \n Please enter the menu number you want to enter : ");
     // const selectedMenu = readOneLine();
     const selectedMenu = prompt("");
 
@@ -59,37 +65,27 @@ while (!commandIsValid) {
 
 
     } else if (selectedMenu === "5") {
-        console.log("\nwelcome to  auction menu!\nyou can end auction using : " + "auction <username> <projectTitle>".green);
-        // const command = readOneLine();
-        const command = prompt("");
-        arr = command.split(" ");
-        holdAuction(arr);
-
-
-    } else if (selectedMenu === "6") {
         console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate>".green);
         const command = prompt("");
         arr = command.split(" ");
         addSkill(arr);
 
 
-
-
-    } else if (selectedMenu === "7") {
+    } else if (selectedMenu === "6") {
         console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using" + "removeSkill <username> <skill>".green);
         const command = prompt("");
         arr = command.split(" ");
         removeSkill(arr);
 
 
-    } else if (selectedMenu === "8") {
+    } else if (selectedMenu === "7") {
         console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" + "confirmSkill <your_username> <other_username> <skill>".green);
         const command = prompt("");
         arr = command.split(" ");
         confirmSkill(arr);
 
 
-    } else if (selectedMenu === "9") {
+    } else if (selectedMenu === "8") {
         console.log("exit");
         commandIsValid = true;
     } else console.log("command is invalid! try again".red);
@@ -115,7 +111,7 @@ function register(arr) {
         skills.set(arrSkiles[0], arrSkiles[1]);
 
     }
-    new accountClass(username, skills, [],skillConfirmationList);
+    new accountClass(username, skills, [], skillConfirmationList);
     console.log("registered successfully!\n".red);
 
 }
@@ -147,7 +143,7 @@ function addBid(arr) {
         console.log("cannot bid! not skilled enough.".red);
     } else if (!checkIfBidEnough(projectTitle, bidAmount)) {
         console.log("cannot bid! bid amount not acceptable".red);
-    } else if (!checkIfValidDate(projectTitle)) {
+    } else if (!checkIfValidDateToBid(projectTitle)) {
         console.log("you cannot bid on this project! it has ended".red);
     } else {
         let bid = new bidClass(biddingUser, projectTitle, bidAmount);
@@ -157,8 +153,8 @@ function addBid(arr) {
 }
 
 
-function holdAuction(arr) {
-    let projectTitle = arr[1];
+function holdAuction(projectName) {
+    let projectTitle = projectClass.getProjectByTitle(projectName);
     let accountWinner = calculateBestBid(projectTitle);
     new auctionClass(projectTitle, accountWinner);
     projectClass.getProjectByTitle(projectTitle).isAvailable = false;
@@ -166,7 +162,23 @@ function holdAuction(arr) {
     console.log("\nThe winner of the auction is : ".red + accountWinner.red);
 }
 
-function addSkill(arr){
+function holdAuctions() {
+    projectClass.allProjects.forEach((project) => {
+        let projectName = project.title;
+        if (isAuctionDate(projectName)) {
+            holdAuction(projectName);
+        }
+    })
+}
+
+function isAuctionDate(projectName) {
+    let projectDeadline = projectClass.getProjectByTitle(projectName).deadline;
+    let localDate = Date.now();
+    return projectDeadline <= localDate;
+
+}
+
+function addSkill(arr) {
     let account = accountClass.getAccountByUsername(arr[1]);
     let arrSkiles = [];
     arrSkiles = arr[2].split(":");
@@ -174,33 +186,34 @@ function addSkill(arr){
     console.log("skill added successfully!\n".red);
 }
 
-function removeSkill(arr){
+function removeSkill(arr) {
     let account = accountClass.getAccountByUsername(arr[1]);
     let skillName = arr[2];
     account.skills.delete(skillName);
     console.log("skill removed successfully!\n".red);
 }
 
-function confirmSkill(arr){
+function confirmSkill(arr) {
     let thisUser = accountClass.getAccountByUsername(arr[1]);
     let otherUser = accountClass.getAccountByUsername(arr[2]);
     let skillName = arr[3];
-    if(!checkIfConfirmedBefore(thisUser,otherUser,skillName)) {
+    if (!checkIfConfirmedBefore(thisUser, otherUser, skillName)) {
         let skillRate = otherUser.skills.get(skillName);
         otherUser.skills.delete(skillName);
         otherUser.skills.set(skillName, parseInt(skillRate) + 1);
-        thisUser.skillConfirmationList.set(otherUser,skillName);
+        thisUser.skillConfirmationList.set(otherUser, skillName);
         console.log(arr[1] + " confirmed " + arr[2] + " s ((" + arr[3] + ")) skill\n ".red);
-    }else console.log("cannot confirm this skillSet! you have done it once before!".red);
+    } else console.log("cannot confirm this skillSet! you have done it once before!".red);
 
 }
-function checkIfConfirmedBefore(user1,user2,skill){
-    if(user1.skillConfirmationList.has(user2,skill)){
-        let skillFound  = user1.skillConfirmationList.get(user2);
-        if(skillFound===skill){
+
+function checkIfConfirmedBefore(user1, user2, skill) {
+    if (user1.skillConfirmationList.has(user2, skill)) {
+        let skillFound = user1.skillConfirmationList.get(user2);
+        if (skillFound === skill) {
             return true;
-        }else return false
-    }else return false
+        } else return false
+    } else return false
 
 }
 
@@ -227,14 +240,13 @@ function checkIfSkilledEnough(userName, projectName) {
 }
 
 
-
 function checkIfBidEnough(projectName, userBidAmount) {
     let mainBidAmount = projectClass.getProjectByTitle(projectName).budget;
     if (parseInt(userBidAmount) <= parseInt(mainBidAmount)) return true;
     else return false;
 }
 
-function checkIfValidDate(projectName) {
+function checkIfValidDateToBid(projectName) {
     let projectDeadline = projectClass.getProjectByTitle(projectName).deadline;
     let localDate = Date.now();
     return projectDeadline >= localDate;
