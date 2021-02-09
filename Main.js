@@ -45,7 +45,7 @@ while (!commandIsValid) {
 
 
     } else if (selectedMenu === "2") {
-        console.log("\nWelcome to login menu! You log into your accout : " + "register <username> <skill:rate> ".green);
+        console.log("\nWelcome to login menu! You log into your accout : " + "login <username> <skill:rate> ".green);
 
 
     } else if (selectedMenu === "3") {
@@ -202,7 +202,7 @@ function confirmSkill(arr) {
         otherUser.skills.delete(skillName);
         otherUser.skills.set(skillName, parseInt(skillRate) + 1);
         thisUser.skillConfirmationList.set(otherUser, skillName);
-        console.log(arr[1] + " confirmed " + arr[2] + " s ((" + arr[3] + ")) skill\n ".red);
+        console.log(arr[1] + " confirmed ".red + arr[2] + " s ((".red + arr[3] + ")) skill\n ".red);
     } else console.log("cannot confirm this skillSet! you have done it once before!".red);
 
 }
@@ -341,7 +341,7 @@ function serializeAccounts() {
         myJson.username = account.username;
         myJson.skills = mapToObj(account.skills);
         myJson.asignedProjectList = account.asignedProjectList;
-        myJson.skillConfirmationList = account.skillConfirmationList;
+        myJson.skillConfirmationList = mapToObj(account.skillConfirmationList);
         const json = JSON.stringify(myJson);
         serialize("./DataBase/Accounts/allAccounts" + "_" + i, json);
 
