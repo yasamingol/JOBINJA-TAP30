@@ -1,11 +1,19 @@
 /****************************************************Preperation******************************************************/
-//testing branches ...
-
 //importing classes
 const accountClass = require("./Account");
 const projectClass = require("./Project");
 const bidClass = require("./Bid");
 const auctionClass = require("./Auction");
+
+
+
+//using API to get DATA
+
+
+
+
+
+
 
 
 //reading all commands form file
