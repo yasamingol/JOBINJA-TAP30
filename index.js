@@ -3,15 +3,11 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-
-
-
 //PORT
 const port = 3000;
 app.listen(port, () => console.log("listening on port 3000" ));
 
-//tabdil in array ha be khandane data as file
-
+/**************************************************Projects***********************************************************/
 const projects = [
     {
         id: 1,
@@ -28,86 +24,95 @@ const projects = [
     }
 
 ]
-const courses = [
-    {id: 1, name: "course1"},
-    {id: 2, name: "course2"},
-    {id: 3, name: "course3"}
-]
-
 
 //get
-app.get("/api/courses", (req, res) => {
+app.get("/api/projects", (req, res) => {
     res.send(projects);
 });
 
-app.get("/api/courses/:id", (req, res) => {
+app.get("/api/projects/:id", (req, res) => {
     const project = projects.find((c) => c.id === parseInt(req.params.id));
     if (!project) return res.status(404).send("The course with the given ID was not found!");
     else res.send(project);
-
 });
 
 
 
 //post
-app.post("/api/courses", (req, res) => {
-     const {error} = validateCourse(req.body);
+app.post("/api/projects", (req, res) => {
+     const {error} = validateProject(req.body);
      console.log("the error is "+error);
     if (error) return res.status(400).send(error.details[0].message);
 
-    const course = {
-        id: courses.length + 1,
-        name: req.body.name
+    const project = {
+        id: projects.length+1,
+        title: "snap",
+        skills: [
+            {"name": "C", "point": 5},
+            {"name": "REACT", "point": 8},
+            {"name": "HTML", "point": 2}
+        ],
+        budget:456,
+        listOfBids:[],
+        deadline:"2030/07/12",
+        isAvailable:true
     };
-    courses.push(course);
-    res.send(course);
+    projects.push(project);
+    res.send(project);
+});
+
+//delete
+app.delete("/api/projects/:id",(req,res) => {
+    const project = projects.find((c) => c.id === parseInt(req.params.id));
+    if (!project) return res.status(404).send("The course with the given ID was not found!");
+
+    const index = projects.indexOf(project);
+    projects.splice(index,1);
+
+    res.send(project);
+
 });
 
 //put
-app.put("/api/courses/:id", (req, res) => {
-    //Look up the course
-    //if not existing , return 404
-    const course = courses.find((c) => c.id === parseInt(req.params.id));
-    if (!course) return res.status(404).send("The course with the given ID was not found!");
+app.put("/api/projects/:id", (req, res) => {
+
+    const project = projects.find((c) => c.id === parseInt(req.params.id));
+    if (!project) return res.status(404).send("The course with the given ID was not found!");
 
 
     //validate
     //if invalid return 400
-    const {error} = validateCourse(req.body);
+    const {error} = validateProject(req.body);
     if (error) {
         return res.status(400).send(error.details[0].message);
     }
-
     // update the course
-    course.name = req.body.name;
+    project.title = req.body.title;
     //return the updated course
-    res.send(course);
-
-});
-
-//delete
-app.delete("/api/courses/:id",(req,res) => {
-    const course = courses.find((c) => c.id === parseInt(req.params.id));
-    if (!course) return res.status(404).send("The course with the given ID was not found!");
-
-    const index = courses.indexOf(course);
-    courses.splice(index,1);
-
-    res.send(course);
+    res.send(project);
 
 });
 
 
 //tools
-function validateCourse(course) {
+function validateProject(project) {
 
     const schema = Joi.object({
-        name: Joi.string().required()
+        title: Joi.string().required(),
+        skills: Joi.required(),
+        budget: Joi.number().required(),
+        deadline: Joi.required(),
+        isAvailable: Joi.boolean().required()
     });
-    return schema.validate(course);
+    return schema.validateAsync(project);
 
 
 }
+
+/**************************************************Skills*************************************************************/
+
+/**************************************************Accounts***********************************************************/
+
 
 
 
