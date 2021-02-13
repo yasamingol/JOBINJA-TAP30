@@ -4,30 +4,36 @@ const accountClass = require("./Account");
 const projectClass = require("./Project");
 const bidClass = require("./Bid");
 const auctionClass = require("./Auction");
-
+let allSkills = [];
 
 
 //using API to get DATA
-
-
-
-
-
-
-
+const request = require('request');
+request('http://localhost:3000/api/projects', function (error, response, body) {
+    console.error('error:', error); // Print the error if one occurred
+    console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+    deserializeAllProjects(JSON.parse(body));
+    console.log(projectClass.allProjects);
+});
+request('http://localhost:3000/api/skills',function (error, response, body) {
+    console.error('error:', error); // Print the error if one occurred
+    console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+    deserializeAllSkills(body);
+    console.log(allSkills);
+});
 
 //reading all commands form file
+/*
 let allCommands = [];
 let counter = -1;
 const fs = require('fs');
 let content;
 readFromFile("/home/tapsi/IdeaProjects/concurency/testCases");
 allCommands = content.split("\n");
-
-
-//deserializing
-
+*/
 /****************************************************Main-MENUS************************************************************/
+
+/*
 const prompt = require('prompt-sync')();
 const colors = require('colors');
 console.log("Welcome to JobInja!".red)
@@ -110,6 +116,9 @@ serializeBides();
 serializeAuctions();
 
 
+ */
+
+
 /***********************************************Main-Functions*********************************************************/
 function register(arr) {
     let username = arr[1];
@@ -162,6 +171,14 @@ function addBid(arr) {
     }
 }
 
+function holdAuctions() {
+    projectClass.allProjects.forEach((project) => {
+        let projectName = project.title;
+        if (isAuctionDate(projectName)) {
+            holdAuction(projectName);
+        }
+    })
+}
 
 function holdAuction(projectName) {
     let projectTitle = projectClass.getProjectByTitle(projectName);
@@ -172,14 +189,7 @@ function holdAuction(projectName) {
     console.log("\nThe winner of the auction is : ".red + accountWinner.red);
 }
 
-function holdAuctions() {
-    projectClass.allProjects.forEach((project) => {
-        let projectName = project.title;
-        if (isAuctionDate(projectName)) {
-            holdAuction(projectName);
-        }
-    })
-}
+
 
 function isAuctionDate(projectName) {
     let projectDeadline = projectClass.getProjectByTitle(projectName).deadline;
@@ -317,6 +327,15 @@ function mapToObj(map) {
     return obj
 }
 
+function objToMap(myObject) {
+    const map = new Map;
+    myObject.forEach((element) => {
+        map.set(element["name"], element["point"]);
+    });
+    return map;
+
+}
+
 function readFromFile(address) {
     try {
         content = fs.readFileSync(address, {encoding: 'utf8'});
@@ -331,7 +350,7 @@ function readOneLine() {
     return allCommands[counter];
 }
 
-/***********************************************Serialize/Deserialize**************************************************/
+/***********************************************Serialize**************************************************/
 
 function serialize(name, jsonContent) {
     const fs = require('fs');
@@ -374,6 +393,7 @@ function serializeProjects() {
     }
 }
 
+
 function serializeBides() {
     for (let i = 0; i < bidClass.allBids.length; i++) {
         let bid = bidClass.allBids[i];
@@ -401,10 +421,24 @@ function serializeAuctions() {
     }
 
 }
-
-function deserialize(arr) {
-
-}
+/***********************************************Deserialize**************************************************/
 
 function deserializeAllAccounts() {
 }
+
+function deserializeAllProjects(arr) {
+    //title, skills, budget, listOfBids,deadline,isAvailable
+    for (let i = 0; i < arr.length; i++) {
+        let title = arr[i].title;
+        let skillsArr = objToMap(arr[i].skills);
+        let budget = arr[i].budget;
+        let listOfBids = arr[i].listOfBids;
+        let deadline = arr[i].deadline;
+        let isAvailable = arr[i].isAvailable;
+        new projectClass(title, skillsArr, budget, listOfBids, deadline, isAvailable);
+    }
+}
+function deserializeAllSkills(body){
+    allSkills = JSON.parse(body);
+}
+
