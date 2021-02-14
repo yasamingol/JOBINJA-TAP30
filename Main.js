@@ -9,18 +9,10 @@ let allSkills = [];
 
 //using API to get DATA
 const request = require('request');
-request('http://localhost:3000/api/projects', function (error, response, body) {
-    console.error('error:', error); // Print the error if one occurred
-    console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-    deserializeAllProjects(JSON.parse(body));
-    console.log(projectClass.allProjects);
-});
-request('http://localhost:3000/api/skills',function (error, response, body) {
-    console.error('error:', error); // Print the error if one occurred
-    console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-    deserializeAllSkills(body);
-    console.log(allSkills);
-});
+getAllProjects(request);
+getAllSkills(request);
+getAllAccounts(request);
+
 
 //reading all commands form file
 /*
@@ -31,9 +23,9 @@ let content;
 readFromFile("/home/tapsi/IdeaProjects/concurency/testCases");
 allCommands = content.split("\n");
 */
-/****************************************************Main-MENUS************************************************************/
+/***************************************************Main-Menus********************************************************/
 
-/*
+
 const prompt = require('prompt-sync')();
 const colors = require('colors');
 console.log("Welcome to JobInja!".red)
@@ -114,10 +106,6 @@ serializeAccounts();
 serializeProjects();
 serializeBides();
 serializeAuctions();
-
-
- */
-
 
 /***********************************************Main-Functions*********************************************************/
 function register(arr) {
@@ -350,6 +338,35 @@ function readOneLine() {
     return allCommands[counter];
 }
 
+/***********************************************API-Client-Methods**************************************************/
+
+function getAllProjects(request){
+    request('http://localhost:3000/api/projects', function (error, response, body) {
+        console.error('error:', error);
+        console.log('statusCode:', response && response.statusCode);
+        deserializeAllProjects(JSON.parse(body));
+        console.log(projectClass.allProjects);
+    });
+}
+
+function getAllSkills(request){
+    request('http://localhost:3000/api/skills',function (error, response, body) {
+        console.error('error:', error);
+        console.log('statusCode:', response && response.statusCode);
+        deserializeAllSkills(body);
+        console.log(allSkills);
+    });
+}
+
+function getAllAccounts(request){
+    request('http://localhost:3000/api/accounts',function (error, response, body) {
+        console.error('error:', error);
+        console.log('statusCode:', response && response.statusCode);
+        deserializeAllAccounts(JSON.parse(body));
+        console.log(accountClass.allAccounts);
+    });
+}
+
 /***********************************************Serialize**************************************************/
 
 function serialize(name, jsonContent) {
@@ -423,11 +440,18 @@ function serializeAuctions() {
 }
 /***********************************************Deserialize**************************************************/
 
-function deserializeAllAccounts() {
+function deserializeAllAccounts(arr) {
+    // username, skills,asignedProjectList,skillConfirmationList
+    for(let i=0;i<arr.length;i++){
+        let username = arr[i].username;
+        let skillsArr = objToMap(arr[i].skills);
+        let asignedProjectList = arr[i].asignedProjectList;
+        let skillConfirmationList = arr[i].skillConfirmationList;
+        new accountClass(username,skillsArr,asignedProjectList,skillConfirmationList);
+    }
 }
 
 function deserializeAllProjects(arr) {
-    //title, skills, budget, listOfBids,deadline,isAvailable
     for (let i = 0; i < arr.length; i++) {
         let title = arr[i].title;
         let skillsArr = objToMap(arr[i].skills);
