@@ -10,26 +10,15 @@ let allSkills = [];
 //using API to get DATA
 const request = require('request');
 (async () => {
-    getAllProjectsFromServer(request);
-    getAllSkillsFromServer(request);
-    getAllAccountsFromServer(request);
+    getAllProjects(request);
+    getAllSkills(request);
+    getAllAccounts(request);
     setTimeout(function afterTwoSeconds() {
         loadMenus();
     }, 5000)
 
 
 })();
-
-
-//reading all commands form file
-/*
-let allCommands = [];
-let counter = -1;
-const fs = require('fs');
-let content;
-readFromFile("/home/tapsi/IdeaProjects/concurency/testCases");
-allCommands = content.split("\n");
-*/
 /***************************************************Main-Menus********************************************************/
 function loadMenus() {
 
@@ -48,9 +37,9 @@ function loadMenus() {
         //Menus
         let arr = [];
         console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
-                                       "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
-                                       "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.login" +
-                                       " \n 12.exit \n Please enter the menu number you want to enter : ");
+            "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
+            "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.login" +
+            " \n 12.exit \n Please enter the menu number you want to enter : ");
         const selectedMenu = prompt("");
 
 
@@ -68,7 +57,7 @@ function loadMenus() {
         } else if(selectedMenu === "3"){
             console.log("\nWelcome to ((view project)) menu!".cyan+ "command : <project-id>".green);
             command = prompt("");
-            getProjectByIdFromServer(command);
+            getProjectById(command);
 
         } else if(selectedMenu === "4"){
             console.log("\nView all accounts menu".cyan);
@@ -78,7 +67,7 @@ function loadMenus() {
         } else if(selectedMenu === "5"){
             console.log("Welcome to ((view account)) menu!".cyan+"command : <account-id>".green);
             command = prompt("");
-            getAccountByIDFromServer(command);
+            getAccountByID(command);
 
         } else if(selectedMenu === "6"){
 
@@ -133,7 +122,7 @@ function viewAllAccounts(){
 }
 /***********************************************API-Client-Methods**************************************************/
 
-function getAllProjectsFromServer(request) {
+function getAllProjects(request) {
     request('http://localhost:3000/api/projects', function (error, response, body) {
         console.error('error:', error);
         console.log('statusCode:', response && response.statusCode);
@@ -142,7 +131,7 @@ function getAllProjectsFromServer(request) {
     });
 }
 
-function getAllSkillsFromServer(request) {
+function getAllSkills(request) {
     request('http://localhost:3000/api/skills', function (error, response, body) {
         console.error('error:', error);
         console.log('statusCode:', response && response.statusCode);
@@ -151,7 +140,7 @@ function getAllSkillsFromServer(request) {
     });
 }
 
-function getAllAccountsFromServer(request) {
+function getAllAccounts(request) {
     request('http://localhost:3000/api/accounts', function (error, response, body) {
         console.error('error:', error);
         console.log('statusCode:', response && response.statusCode);
@@ -159,14 +148,14 @@ function getAllAccountsFromServer(request) {
         console.log(accountClass.allAccounts);
     });
 }
-function getProjectByIdFromServer(id){
+function getProjectById(id){
     request('http://localhost:3000/api/projects/'+id, function (error, response, body) {
         console.error('error:', error);
         console.log('statusCode:', response && response.statusCode);
         console.log(JSON.parse(body));
     });
 };
-function getAccountByIDFromServer(id){
+function getAccountByID(id){
     request('http://localhost:3000/api/accounts/'+id, function (error, response, body) {
         console.error('error:', error);
         console.log('statusCode:', response && response.statusCode);
@@ -390,20 +379,6 @@ function objToMap(myObject) {
 
 }
 
-function readFromFile(address) {
-    try {
-        content = fs.readFileSync(address, {encoding: 'utf8'});
-    } catch (err) {
-        // An error occurred
-        console.error(err);
-    }
-}
-
-function readOneLine() {
-    counter++;
-    return allCommands[counter];
-}
-
 /***************************************************Serialize*********************************************************/
 
 function serialize(name, jsonContent) {
@@ -510,4 +485,3 @@ function deserializeAllProjects(arr) {
 function deserializeAllSkills(body) {
     allSkills = JSON.parse(body);
 }
-

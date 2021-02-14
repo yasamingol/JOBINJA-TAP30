@@ -9,12 +9,22 @@ const port = 3000;
 app.listen(port, () => console.log("listening on port 3000"));
 
 /**************************************************Projects***********************************************************/
-//allProjetcs load from Server-DataBase
-const fs = require('fs');
-const projectsData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server-DataBase/projects-text',
-    {encoding:'utf8', flag:'r'});
-const projects = projectsData;
+const projects = [
+    {
+        id: 1,
+        title: "tap30",
+        skills: [
+            {"name": "Java", "point": 5},
+            {"name": "CSS", "point": 10},
+            {"name": "JS", "point": 20}
+        ],
+        budget: 4000,
+        listOfBids: [],
+        deadline: "2022/03/02",
+        isAvailable: true
+    }
 
+]
 //get
 app.get("/api/projects", (req, res) => {
     res.send(projects);
@@ -65,11 +75,8 @@ app.delete("/api/projects/:id", (req, res) => {
 /*
 //put
 app.put("/api/projects/:id", (req, res) => {
-
     const project = projects.find((c) => c.id === parseInt(req.params.id));
     if (!project) return res.status(404).send("The course with the given ID was not found!");
-
-
     //validate
     //if invalid return 400
     const {error} = validateProject(req.body);
@@ -80,16 +87,22 @@ app.put("/api/projects/:id", (req, res) => {
     project.title = req.body.title;
     //return the updated course
     res.send(project);
-
 });
-
  */
 
 /**************************************************Skills*************************************************************/
-//allSkills load from Server-DataBase
-const skillsData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server-DataBase/skills-text',
-    {encoding:'utf8', flag:'r'});
-const skills = skillsData;
+const skills = [
+    {id:1,name:"C"},
+    {id:2,name:"C++"},
+    {id:3,name:"JAVA"},
+    {id:4,name:"JS"},
+    {id:5,name:"HTML"},
+    {id:6,name:"CSS"},
+    {id:7,name:"REACT"},
+    {id:8,name:"PYTHON"},
+    {id:9,name:"GO"},
+    {id:10,name:"NODEJS"},
+]
 
 //get
 app.get("/api/skills", (req, res) => {
@@ -131,10 +144,20 @@ app.delete("/api/skills/:id", (req, res) => {
 
 });
 /**************************************************Accounts***********************************************************/
-////allAccounts load from Server-DataBase
-const accountsData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server-DataBase/accounts-text',
-    {encoding:'utf8', flag:'r'});
-const accounts = accountsData;
+//username, skills,asignedProjectList,skillConfirmationList
+const accounts = [
+    {
+        id: 1,
+        username: "yasamingol",
+        skills: [
+            {"name": "Java", "point": 50},
+            {"name": "CSS", "point": 11},
+            {"name": "JS", "point": 30}
+        ],
+        asignedProjectList: [],
+        skillConfirmationList: []
+    }
+]
 
 //get
 app.get("/api/accounts", (req, res) => {
@@ -160,7 +183,7 @@ app.post("/api/accounts", (req, res) => {
     const account = {
         id: projects.length + 1,
         username: req.body.username,
-        skills: req.body.skills,
+        skills: req.body.skills ,
         asignedProjectList: [],
         skillConfirmationList: []
     };
@@ -180,6 +203,7 @@ app.delete("/api/projects/:id", (req, res) => {
 });
 
 
+
 /***********************************************validation-functions**************************************************/
 function validateProject(project) {
 
@@ -195,18 +219,5 @@ function validateProject(project) {
 
 
 }
-
-function validateSkill(project) {
-}
-
-function validateAccount(project) {
-}
-
-/***********************************************Tool-functions********************************************************/
-
-
-
-
-
-
-
+function validateSkill(project) {}
+function validateAccount(project) {}
