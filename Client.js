@@ -11,12 +11,10 @@ let allSkills = [];
 //using API to get DATA
 const request = require('request');
 (async () => {
-    await getAllProjects(request);
-    await getAllSkills(request);
-    await getAllAccounts(request);
+    await getAllProjectsFromServer(request);
+    await getAllSkillsFromServer(request);
+    await getAllAccountsFromServer(request);
     await loadMenus();
-
-
 })();
 
 /***************************************************Main-Menus********************************************************/
@@ -93,8 +91,6 @@ async function loadMenus() {
     serializeProjects();
     serializeBides();
     serializeAuctions();
-
-
 }
 
 /***********************************************Main-Functions*********************************************************/
@@ -124,33 +120,29 @@ function viewAllAccounts() {
 
 /***********************************************API-Client-Methods**************************************************/
 
-async function getAllProjects(request) {
+async function getAllProjectsFromServer(request) {
     const promisifiedRequest = util.promisify(request);
     const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects');
     console.error('error:', error);
     console.log('statusCode:', response && response.statusCode);
     deserializeAllProjects(JSON.parse(body));
-    console.log(projectClass.allProjects);
 }
 
-async function getAllSkills(request) {
+async function getAllSkillsFromServer(request) {
     const promisifiedRequest = util.promisify(request);
     const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/skills');
     console.error('error:', error);
     console.log('statusCode:', response && response.statusCode);
     deserializeAllSkills(body);
-    console.log(allSkills);
 
 }
 
-async function getAllAccounts(request) {
+async function getAllAccountsFromServer(request) {
     const promisifiedRequest = util.promisify(request);
     const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/accounts');
     console.error('error:', error);
     console.log('statusCode:', response && response.statusCode);
     deserializeAllAccounts(JSON.parse(body));
-    console.log(accountClass.allAccounts);
-
 }
 
 async function getProjectById(request,id) {
