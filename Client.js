@@ -35,6 +35,7 @@ function loadMenus() {
 
     const prompt = require('prompt-sync')();
     const colors = require('colors');
+    let command;
     console.log("Welcome to JobInja!".red)
 
     let commandIsValid = false;
@@ -60,16 +61,24 @@ function loadMenus() {
 
         } else if(selectedMenu === "2"){
             console.log("\nWelcome to ((view available projects)) menu!".cyan+" command : <username> ".green);
-            const command = prompt("");
+            command = prompt("");
             viewAvailableProjects(command);
 
 
         } else if(selectedMenu === "3"){
-            const command = prompt("");
+            console.log("\nWelcome to ((view project)) menu!".cyan+ "command : <project-id>".green);
+            command = prompt("");
+            getProjectById(command);
 
         } else if(selectedMenu === "4"){
+            console.log("\nView all accounts menu".cyan);
+
+
 
         } else if(selectedMenu === "5"){
+            console.log("Welcome to ((view account)) menu!".cyan+"command : <account-id>".green);
+            command = prompt("");
+            getAccountByID(command);
 
         } else if(selectedMenu === "6"){
 
@@ -117,7 +126,55 @@ function viewAvailableProjects(command){
     if(!hasMinOneAvailable) console.log("There is no project available for you now!".red);
 
 }
+function viewAllAccounts(){
+    accountClass.allAccounts.forEach((account) => {
+        console.log(account.id+"."+account.username);
+    })
+}
+/***********************************************API-Client-Methods**************************************************/
 
+function getAllProjects(request) {
+    request('http://localhost:3000/api/projects', function (error, response, body) {
+        console.error('error:', error);
+        console.log('statusCode:', response && response.statusCode);
+        deserializeAllProjects(JSON.parse(body));
+        console.log(projectClass.allProjects);
+    });
+}
+
+function getAllSkills(request) {
+    request('http://localhost:3000/api/skills', function (error, response, body) {
+        console.error('error:', error);
+        console.log('statusCode:', response && response.statusCode);
+        deserializeAllSkills(body);
+        console.log(allSkills);
+    });
+}
+
+function getAllAccounts(request) {
+    request('http://localhost:3000/api/accounts', function (error, response, body) {
+        console.error('error:', error);
+        console.log('statusCode:', response && response.statusCode);
+        deserializeAllAccounts(JSON.parse(body));
+        console.log(accountClass.allAccounts);
+    });
+}
+function getProjectById(id){
+    request('http://localhost:3000/api/projects/'+id, function (error, response, body) {
+        console.error('error:', error);
+        console.log('statusCode:', response && response.statusCode);
+        console.log(JSON.parse(body));
+    });
+};
+function getAccountByID(id){
+    request('http://localhost:3000/api/accounts/'+id, function (error, response, body) {
+        console.error('error:', error);
+        console.log('statusCode:', response && response.statusCode);
+        console.log(JSON.parse(body));
+    });
+}
+
+/***********************************************OldMenu-Functions*****************************************************/
 function register(arr) {
     let username = arr[1];
     let skills = new Map;
@@ -347,7 +404,7 @@ function readOneLine() {
     return allCommands[counter];
 }
 
-/***********************************************Serialize**************************************************/
+/***************************************************Serialize*********************************************************/
 
 function serialize(name, jsonContent) {
     const fs = require('fs');
@@ -454,31 +511,3 @@ function deserializeAllSkills(body) {
     allSkills = JSON.parse(body);
 }
 
-/***********************************************API-Client-Methods**************************************************/
-
-function getAllProjects(request) {
-    request('http://localhost:3000/api/projects', function (error, response, body) {
-        console.error('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        deserializeAllProjects(JSON.parse(body));
-        console.log(projectClass.allProjects);
-    });
-}
-
-function getAllSkills(request) {
-    request('http://localhost:3000/api/skills', function (error, response, body) {
-        console.error('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        deserializeAllSkills(body);
-        console.log(allSkills);
-    });
-}
-
-function getAllAccounts(request) {
-    request('http://localhost:3000/api/accounts', function (error, response, body) {
-        console.error('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        deserializeAllAccounts(JSON.parse(body));
-        console.log(accountClass.allAccounts);
-    });
-}
