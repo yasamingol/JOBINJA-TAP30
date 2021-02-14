@@ -149,7 +149,6 @@ app.delete("/api/skills/:id", (req, res) => {
 
 });
 /**************************************************Accounts***********************************************************/
-//username, skills,asignedProjectList,skillConfirmationList
 const accounts = [
     {
         id: 1,

@@ -9,9 +9,16 @@ let allSkills = [];
 
 //using API to get DATA
 const request = require('request');
-getAllProjects(request);
-getAllSkills(request);
-getAllAccounts(request);
+(async () => {
+    getAllProjects(request);
+    getAllSkills(request);
+    getAllAccounts(request);
+    setTimeout(function afterTwoSeconds() {
+        loadMenus();
+    }, 6000)
+
+
+})();
 
 
 //reading all commands form file
@@ -24,88 +31,91 @@ readFromFile("/home/tapsi/IdeaProjects/concurency/testCases");
 allCommands = content.split("\n");
 */
 /***************************************************Main-Menus********************************************************/
+function loadMenus() {
+
+    const prompt = require('prompt-sync')();
+    const colors = require('colors');
+    console.log("Welcome to JobInja!".red)
+
+    let commandIsValid = false;
+    while (!commandIsValid) {
+
+        //checking the expiration date for auctions
+        holdAuctions();
 
 
-const prompt = require('prompt-sync')();
-const colors = require('colors');
-console.log("Welcome to JobInja!".red)
-
-let commandIsValid = false;
-while (!commandIsValid) {
-
-    //checking the expiration date for auctions
-    holdAuctions();
+        //Menus
+        let arr = [];
+        console.log(" MENUS : ".cyan + "\n 1.register \n 2.login \n 3.addProjecct \n 4.bid \n 5.addSkill \n 6.removeSkill \n 7.confirmSkills \n 8.exit \n Please enter the menu number you want to enter : ");
+        // const selectedMenu = readOneLine();
+        const selectedMenu = prompt("");
 
 
-    //Menus
-    let arr = [];
-    console.log(" MENUS : ".cyan + "\n 1.register \n 2.login \n 3.addProjecct \n 4.bid \n 5.addSkill \n 6.removeSkill \n 7.confirmSkills \n 8.exit \n Please enter the menu number you want to enter : ");
-    // const selectedMenu = readOneLine();
-    const selectedMenu = prompt("");
+        if (selectedMenu === "1") {
+            console.log("\nWelcome to register menu! You can create a new account using : " + "register <username> <skill:rate> ".green);
+            // const command = readOneLine();
+            const command = prompt("");
+            arr = command.split(" ");
+            register(arr);
 
 
-    if (selectedMenu === "1") {
-        console.log("\nWelcome to register menu! You can create a new account using : " + "register <username> <skill:rate> ".green);
-        // const command = readOneLine();
-        const command = prompt("");
-        arr = command.split(" ");
-        register(arr);
+        } else if (selectedMenu === "2") {
+            console.log("\nWelcome to login menu! You log into your accout : " + "login <username> <skill:rate> ".green);
 
 
-    } else if (selectedMenu === "2") {
-        console.log("\nWelcome to login menu! You log into your accout : " + "login <username> <skill:rate> ".green);
+        } else if (selectedMenu === "3") {
+            console.log("\nwelcome to  addProject menu!\nyou can add a new project using : " + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)>".green);
+            // const command = readOneLine();
+            const command = prompt("");
+            arr = command.split(" ");
+            addProject(arr);
 
 
-    } else if (selectedMenu === "3") {
-        console.log("\nwelcome to  addProject menu!\nyou can add a new project using : " + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)>".green);
-        // const command = readOneLine();
-        const command = prompt("");
-        arr = command.split(" ");
-        addProject(arr);
+        } else if (selectedMenu === "4") {
+            console.log("\nwelcome to  bid menu!\nyou can add a new bid using : " + "bid <username> <projectTitle> <bidAmount>".green);
+            // const command = readOneLine();
+            const command = prompt("");
+            arr = command.split(" ");
+            addBid(arr);
 
 
-    } else if (selectedMenu === "4") {
-        console.log("\nwelcome to  bid menu!\nyou can add a new bid using : " + "bid <username> <projectTitle> <bidAmount>".green);
-        // const command = readOneLine();
-        const command = prompt("");
-        arr = command.split(" ");
-        addBid(arr);
+        } else if (selectedMenu === "5") {
+            console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate>".green);
+            const command = prompt("");
+            arr = command.split(" ");
+            addSkill(arr);
 
 
-    } else if (selectedMenu === "5") {
-        console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate>".green);
-        const command = prompt("");
-        arr = command.split(" ");
-        addSkill(arr);
+        } else if (selectedMenu === "6") {
+            console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using" + "removeSkill <username> <skill>".green);
+            const command = prompt("");
+            arr = command.split(" ");
+            removeSkill(arr);
 
 
-    } else if (selectedMenu === "6") {
-        console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using" + "removeSkill <username> <skill>".green);
-        const command = prompt("");
-        arr = command.split(" ");
-        removeSkill(arr);
+        } else if (selectedMenu === "7") {
+            console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" + "confirmSkill <your_username> <other_username> <skill>".green);
+            const command = prompt("");
+            arr = command.split(" ");
+            confirmSkill(arr);
 
 
-    } else if (selectedMenu === "7") {
-        console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" + "confirmSkill <your_username> <other_username> <skill>".green);
-        const command = prompt("");
-        arr = command.split(" ");
-        confirmSkill(arr);
+        } else if (selectedMenu === "8") {
+            console.log("exit");
+            commandIsValid = true;
+        } else console.log("command is invalid! try again".red);
 
 
-    } else if (selectedMenu === "8") {
-        console.log("exit");
-        commandIsValid = true;
-    } else console.log("command is invalid! try again".red);
+    }
+
+//serializing
+    serializeAccounts();
+    serializeProjects();
+    serializeBides();
+    serializeAuctions();
 
 
 }
-
-//serializing
-serializeAccounts();
-serializeProjects();
-serializeBides();
-serializeAuctions();
 
 /***********************************************Main-Functions*********************************************************/
 function register(arr) {
@@ -176,7 +186,6 @@ function holdAuction(projectName) {
     assignProject(accountWinner, projectTitle);
     console.log("\nThe winner of the auction is : ".red + accountWinner.red);
 }
-
 
 
 function isAuctionDate(projectName) {
@@ -338,35 +347,6 @@ function readOneLine() {
     return allCommands[counter];
 }
 
-/***********************************************API-Client-Methods**************************************************/
-
-function getAllProjects(request){
-    request('http://localhost:3000/api/projects', function (error, response, body) {
-        console.error('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        deserializeAllProjects(JSON.parse(body));
-        console.log(projectClass.allProjects);
-    });
-}
-
-function getAllSkills(request){
-    request('http://localhost:3000/api/skills',function (error, response, body) {
-        console.error('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        deserializeAllSkills(body);
-        console.log(allSkills);
-    });
-}
-
-function getAllAccounts(request){
-    request('http://localhost:3000/api/accounts',function (error, response, body) {
-        console.error('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        deserializeAllAccounts(JSON.parse(body));
-        console.log(accountClass.allAccounts);
-    });
-}
-
 /***********************************************Serialize**************************************************/
 
 function serialize(name, jsonContent) {
@@ -438,16 +418,17 @@ function serializeAuctions() {
     }
 
 }
+
 /***********************************************Deserialize**************************************************/
 
 function deserializeAllAccounts(arr) {
     // username, skills,asignedProjectList,skillConfirmationList
-    for(let i=0;i<arr.length;i++){
+    for (let i = 0; i < arr.length; i++) {
         let username = arr[i].username;
         let skillsArr = objToMap(arr[i].skills);
         let asignedProjectList = arr[i].asignedProjectList;
         let skillConfirmationList = arr[i].skillConfirmationList;
-        new accountClass(username,skillsArr,asignedProjectList,skillConfirmationList);
+        new accountClass(username, skillsArr, asignedProjectList, skillConfirmationList);
     }
 }
 
@@ -462,7 +443,36 @@ function deserializeAllProjects(arr) {
         new projectClass(title, skillsArr, budget, listOfBids, deadline, isAvailable);
     }
 }
-function deserializeAllSkills(body){
+
+function deserializeAllSkills(body) {
     allSkills = JSON.parse(body);
 }
 
+/***********************************************API-Client-Methods**************************************************/
+
+function getAllProjects(request) {
+    request('http://localhost:3000/api/projects', function (error, response, body) {
+        console.error('error:', error);
+        console.log('statusCode:', response && response.statusCode);
+        deserializeAllProjects(JSON.parse(body));
+        console.log(projectClass.allProjects);
+    });
+}
+
+function getAllSkills(request) {
+    request('http://localhost:3000/api/skills', function (error, response, body) {
+        console.error('error:', error);
+        console.log('statusCode:', response && response.statusCode);
+        deserializeAllSkills(body);
+        console.log(allSkills);
+    });
+}
+
+function getAllAccounts(request) {
+    request('http://localhost:3000/api/accounts', function (error, response, body) {
+        console.error('error:', error);
+        console.log('statusCode:', response && response.statusCode);
+        deserializeAllAccounts(JSON.parse(body));
+        console.log(accountClass.allAccounts);
+    });
+}
