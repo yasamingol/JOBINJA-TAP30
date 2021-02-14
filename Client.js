@@ -4,23 +4,24 @@ const accountClass = require("./Account");
 const projectClass = require("./Project");
 const bidClass = require("./Bid");
 const auctionClass = require("./Auction");
+const util = require('util')
 let allSkills = [];
 
 
 //using API to get DATA
 const request = require('request');
 (async () => {
-    getAllProjects(request);
-    getAllSkills(request);
-    getAllAccounts(request);
-    setTimeout(function afterTwoSeconds() {
-        loadMenus();
-    }, 5000)
+    await getAllProjects(request);
+    await getAllSkills(request);
+    await getAllAccounts(request);
+    loadMenus();
+
 
 
 })();
+
 /***************************************************Main-Menus********************************************************/
-function loadMenus() {
+async function loadMenus() {
 
     const prompt = require('prompt-sync')();
     const colors = require('colors');
@@ -48,40 +49,39 @@ function loadMenus() {
             viewAllProjects();
 
 
-        } else if(selectedMenu === "2"){
-            console.log("\nWelcome to ((view available projects)) menu!".cyan+" command : <username> ".green);
+        } else if (selectedMenu === "2") {
+            console.log("\nWelcome to ((view available projects)) menu!".cyan + " command : <username> ".green);
             command = prompt("");
             viewAvailableProjects(command);
 
 
-        } else if(selectedMenu === "3"){
-            console.log("\nWelcome to ((view project)) menu!".cyan+ "command : <project-id>".green);
+        } else if (selectedMenu === "3") {
+            console.log("\nWelcome to ((view project)) menu!".cyan + "command : <project-id>".green);
             command = prompt("");
-            getProjectById(command);
+            await getProjectById(command);
 
-        } else if(selectedMenu === "4"){
+        } else if (selectedMenu === "4") {
             console.log("\nView all accounts menu".cyan);
 
 
-
-        } else if(selectedMenu === "5"){
-            console.log("Welcome to ((view account)) menu!".cyan+"command : <account-id>".green);
+        } else if (selectedMenu === "5") {
+            console.log("Welcome to ((view account)) menu!".cyan + "command : <account-id>".green);
             command = prompt("");
-            getAccountByID(command);
+            await getAccountByID(command);
 
-        } else if(selectedMenu === "6"){
+        } else if (selectedMenu === "6") {
 
-        } else if(selectedMenu === "7"){
+        } else if (selectedMenu === "7") {
 
-        } else if(selectedMenu === "8"){
+        } else if (selectedMenu === "8") {
 
-        } else if(selectedMenu === "9"){
+        } else if (selectedMenu === "9") {
 
-        } else if(selectedMenu === "10"){
+        } else if (selectedMenu === "10") {
 
-        } else if(selectedMenu === "11"){
+        } else if (selectedMenu === "11") {
 
-        }else if (selectedMenu === "12") {
+        } else if (selectedMenu === "12") {
             console.log("exit");
             commandIsValid = true;
         } else console.log("command is invalid! try again".red);
@@ -99,68 +99,76 @@ function loadMenus() {
 }
 
 /***********************************************Main-Functions*********************************************************/
-function viewAllProjects(){
-    projectClass.allProjects.forEach((project) =>{
-        console.log(project.id+"."+project.title);
+function viewAllProjects() {
+    projectClass.allProjects.forEach((project) => {
+        console.log(project.id + "." + project.title);
     })
 }
-function viewAvailableProjects(command){
+
+function viewAvailableProjects(command) {
     let hasMinOneAvailable = false;
     projectClass.allProjects.forEach((project) => {
-        if(checkIfSkilledEnough(command,project.title)) {
+        if (checkIfSkilledEnough(command, project.title)) {
             console.log(" Available projects :\n ".green + project.id + "." + project.title);
             hasMinOneAvailable = true;
         }
     })
-    if(!hasMinOneAvailable) console.log("There is no project available for you now!".red);
+    if (!hasMinOneAvailable) console.log("There is no project available for you now!".red);
 
 }
-function viewAllAccounts(){
+
+function viewAllAccounts() {
     accountClass.allAccounts.forEach((account) => {
-        console.log(account.id+"."+account.username);
+        console.log(account.id + "." + account.username);
     })
 }
+
 /***********************************************API-Client-Methods**************************************************/
 
-function getAllProjects(request) {
-    request('http://localhost:3000/api/projects', function (error, response, body) {
-        console.error('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        deserializeAllProjects(JSON.parse(body));
-        console.log(projectClass.allProjects);
-    });
+async function getAllProjects(request) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects');
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    deserializeAllProjects(JSON.parse(body));
+    console.log(projectClass.allProjects);
 }
 
-function getAllSkills(request) {
-    request('http://localhost:3000/api/skills', function (error, response, body) {
-        console.error('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        deserializeAllSkills(body);
-        console.log(allSkills);
-    });
+async function getAllSkills(request) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/skills');
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    deserializeAllSkills(body);
+    console.log(allSkills);
+
 }
 
-function getAllAccounts(request) {
-    request('http://localhost:3000/api/accounts', function (error, response, body) {
-        console.error('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        deserializeAllAccounts(JSON.parse(body));
-        console.log(accountClass.allAccounts);
-    });
+async function getAllAccounts(request) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/accounts');
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    deserializeAllAccounts(JSON.parse(body));
+    console.log(accountClass.allAccounts);
+
 }
-function getProjectById(id){
-    request('http://localhost:3000/api/projects/'+id, function (error, response, body) {
-        console.error('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        console.log(JSON.parse(body));
-    });
-};
-function getAccountByID(id){
-    request('http://localhost:3000/api/accounts/'+id, function (error, response, body) {
-        console.error('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        console.log(JSON.parse(body));
-    });
+
+async function getProjectById(id) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects/' + id);
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    console.log(JSON.parse(body));
+}
+
+async function getAccountByID(id) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/accounts/' + id);
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    console.log(JSON.parse(body));
+
 }
 
 /***********************************************OldMenu-Functions*****************************************************/
@@ -465,7 +473,7 @@ function deserializeAllAccounts(arr) {
         let skillsArr = objToMap(arr[i].skills);
         let asignedProjectList = arr[i].asignedProjectList;
         let skillConfirmationList = arr[i].skillConfirmationList;
-        new accountClass(id,username, skillsArr, asignedProjectList, skillConfirmationList);
+        new accountClass(id, username, skillsArr, asignedProjectList, skillConfirmationList);
     }
 }
 
@@ -478,7 +486,7 @@ function deserializeAllProjects(arr) {
         let listOfBids = arr[i].listOfBids;
         let deadline = arr[i].deadline;
         let isAvailable = arr[i].isAvailable;
-        new projectClass(id,title, skillsArr, budget, listOfBids, deadline, isAvailable);
+        new projectClass(id, title, skillsArr, budget, listOfBids, deadline, isAvailable);
     }
 }
 

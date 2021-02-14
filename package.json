@@ -18,7 +18,8 @@
     "n-readlines": "^1.0.1",
     "nodemon": "^2.0.7",
     "prompt": "^1.1.0",
-    "prompt-sync": "^4.2.0"
+    "prompt-sync": "^4.2.0",
+    "util": "^0.12.3"
   },
   "devDependencies": {
     "request": "^2.88.2"
