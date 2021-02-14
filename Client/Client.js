@@ -1,9 +1,9 @@
 /****************************************************Preperation******************************************************/
 //importing classes
-const accountClass = require("./Classes/Account");
-const projectClass = require("./Classes/Project");
-const bidClass = require("./Classes/Bid");
-const auctionClass = require("./Classes/Auction");
+const accountClass = require("../Classes/Account");
+const projectClass = require("../Classes/Project");
+const bidClass = require("../Classes/Bid");
+const auctionClass = require("../Classes/Auction");
 const util = require('util')
 let allSkills = [];
 
@@ -134,7 +134,7 @@ async function getAllProjectsFromServer(request) {
 
 async function getAllSkillsFromServer(request) {
     const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/skills');
+    const {error, response, body} = await promisifiedRequest('http://localhost:5000/api/skills');
     console.error('error:', error);
     console.log('statusCode:', response && response.statusCode);
     deserializeAllSkills(body);
@@ -143,7 +143,7 @@ async function getAllSkillsFromServer(request) {
 
 async function getAllAccountsFromServer(request) {
     const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/accounts');
+    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts');
     console.error('error:', error);
     console.log('statusCode:', response && response.statusCode);
     deserializeAllAccounts(JSON.parse(body));
@@ -159,7 +159,7 @@ async function getProjectById(request, id) {
 
 async function getAccountByID(request, id) {
     const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/accounts/' + id);
+    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts/' + id);
     console.error('error:', error);
     console.log('statusCode:', response && response.statusCode);
     console.log(JSON.parse(body));
@@ -395,7 +395,7 @@ function serializeAccounts() {
         myJson.asignedProjectList = account.asignedProjectList;
         myJson.skillConfirmationList = mapToObj(account.skillConfirmationList);
         const json = JSON.stringify(myJson);
-        serialize("./DataBase/Accounts/allAccounts" + "_" + i, json);
+        serialize("/home/tapsi/IdeaProjects/concurency/Client-DataBase/Accounts/allAccounts" + "_" + i, json);
 
 
     }
@@ -412,7 +412,7 @@ function serializeProjects() {
         myJson.deadline = project.deadline;
         myJson.isAvailable = project.isAvailable;
         const json = JSON.stringify(myJson);
-        serialize("./DataBase/Projects/allProjects" + "_" + i, json);
+        serialize("/home/tapsi/IdeaProjects/concurency/Client-DataBase/Projects/allProjects" + "_" + i, json);
 
     }
 }
@@ -427,7 +427,7 @@ function serializeBides() {
         myJson.projectaTitle = bid.projectaTitle;
         myJson.bidAmount = bid.bidAmount;
         const json = JSON.stringify(myJson);
-        serialize("./DataBase/Bids/allBids" + "_" + i, json);
+        serialize("/home/tapsi/IdeaProjects/concurency/Client-DataBase/Bids/allBids" + "_" + i, json);
 
 
     }
@@ -441,7 +441,7 @@ function serializeAuctions() {
         myJson.projecTitle = auction.projectTitle;
         myJson.usernameWinner = auction.accuntWinner;
         const json = JSON.stringify(myJson);
-        serialize("./DataBase/Auction/allAuctions" + "_" + i, json);
+        serialize("/home/tapsi/IdeaProjects/concurency/Client-DataBase/Auction/allAuctions" + "_" + i, json);
 
 
     }
