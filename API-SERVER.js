@@ -9,48 +9,12 @@ const port = 3000;
 app.listen(port, () => console.log("listening on port 3000"));
 
 /**************************************************Projects***********************************************************/
-const projects = [
-    {
-        id: 1,
-        title: "tap30",
-        skills: [
-            {"name": "Java", "point": 5},
-            {"name": "CSS", "point": 10},
-            {"name": "JS", "point": 20}
-        ],
-        budget: 4000,
-        listOfBids: [],
-        deadline: "2022/03/02",
-        isAvailable: true
-    },
-    {
-        id: 2,
-        title: "snap",
-        skills: [
-            {"name": "C", "point": 80},
-            {"name": "C++", "point": 40},
-            {"name": "GO", "point": 20}
-        ],
-        budget: 30,
-        listOfBids: [],
-        deadline: "2025/10/02",
-        isAvailable: true
-    },
-    {
-        id: 3,
-        title: "karpino",
-        skills: [
-            {"name": "PYTHON", "point": 20},
-            {"name": "HTML", "point": 33},
-            {"name": "CSS", "point": 55}
-        ],
-        budget: 34567,
-        listOfBids: [],
-        deadline: "2029/10/02",
-        isAvailable: true
-    }
+//allProjetcs load from Server-DataBase
+const fs = require('fs');
+const projectsData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server-DataBase/projects-text',
+    {encoding:'utf8', flag:'r'});
+const projects = projectsData;
 
-]
 //get
 app.get("/api/projects", (req, res) => {
     res.send(projects);
@@ -122,18 +86,10 @@ app.put("/api/projects/:id", (req, res) => {
  */
 
 /**************************************************Skills*************************************************************/
-const skills = [
-    {id:1,name:"C"},
-    {id:2,name:"C++"},
-    {id:3,name:"JAVA"},
-    {id:4,name:"JS"},
-    {id:5,name:"HTML"},
-    {id:6,name:"CSS"},
-    {id:7,name:"REACT"},
-    {id:8,name:"PYTHON"},
-    {id:9,name:"GO"},
-    {id:10,name:"NODEJS"},
-]
+//allSkills load from Server-DataBase
+const skillsData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server-DataBase/skills-text',
+    {encoding:'utf8', flag:'r'});
+const skills = skillsData;
 
 //get
 app.get("/api/skills", (req, res) => {
@@ -175,41 +131,10 @@ app.delete("/api/skills/:id", (req, res) => {
 
 });
 /**************************************************Accounts***********************************************************/
-const accounts = [
-    {
-        id: 1,
-        username: "yasamingol",
-        skills: [
-            {"name": "Java", "point": 50},
-            {"name": "CSS", "point": 11},
-            {"name": "JS", "point": 30}
-        ],
-        asignedProjectList: [],
-        skillConfirmationList: []
-    },
-    {
-        id: 2,
-        username: "sam",
-        skills: [
-            {"name": "C", "point": 100},
-            {"name": "C++", "point": 50},
-            {"name": "GO", "point": 30}
-        ],
-        asignedProjectList: [],
-        skillConfirmationList: []
-    },
-    {
-        id: 3,
-        username: "ali",
-        skills: [
-            {"name": "Java", "point": 100},
-            {"name": "CSS", "point": 1},
-            {"name": "JS", "point": 5}
-        ],
-        asignedProjectList: [],
-        skillConfirmationList: []
-    }
-]
+////allAccounts load from Server-DataBase
+const accountsData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server-DataBase/accounts-text',
+    {encoding:'utf8', flag:'r'});
+const accounts = accountsData;
 
 //get
 app.get("/api/accounts", (req, res) => {
@@ -235,7 +160,7 @@ app.post("/api/accounts", (req, res) => {
     const account = {
         id: projects.length + 1,
         username: req.body.username,
-        skills: req.body.skills ,
+        skills: req.body.skills,
         asignedProjectList: [],
         skillConfirmationList: []
     };
@@ -255,24 +180,33 @@ app.delete("/api/projects/:id", (req, res) => {
 });
 
 
-
 /***********************************************validation-functions**************************************************/
-    function validateProject(project) {
+function validateProject(project) {
 
-        const schema = Joi.object({
-            title: Joi.string().required(),
-            skills: Joi.required(),
-            budget: Joi.number().required(),
-            listOfBids: Joi.required(),
-            deadline: Joi.required(),
-            isAvailable: Joi.boolean().required()
-        });
-        return schema.validateAsync(project);
+    const schema = Joi.object({
+        title: Joi.string().required(),
+        skills: Joi.required(),
+        budget: Joi.number().required(),
+        listOfBids: Joi.required(),
+        deadline: Joi.required(),
+        isAvailable: Joi.boolean().required()
+    });
+    return schema.validateAsync(project);
 
 
-    }
-function validateSkill(project) {}
-function validateAccount(project) {}
+}
+
+function validateSkill(project) {
+}
+
+function validateAccount(project) {
+}
+
+/***********************************************Tool-functions********************************************************/
+
+
+
+
 
 
 

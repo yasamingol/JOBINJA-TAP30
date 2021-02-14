@@ -10,9 +10,9 @@ let allSkills = [];
 //using API to get DATA
 const request = require('request');
 (async () => {
-    getAllProjects(request);
-    getAllSkills(request);
-    getAllAccounts(request);
+    getAllProjectsFromServer(request);
+    getAllSkillsFromServer(request);
+    getAllAccountsFromServer(request);
     setTimeout(function afterTwoSeconds() {
         loadMenus();
     }, 5000)
@@ -68,7 +68,7 @@ function loadMenus() {
         } else if(selectedMenu === "3"){
             console.log("\nWelcome to ((view project)) menu!".cyan+ "command : <project-id>".green);
             command = prompt("");
-            getProjectById(command);
+            getProjectByIdFromServer(command);
 
         } else if(selectedMenu === "4"){
             console.log("\nView all accounts menu".cyan);
@@ -78,7 +78,7 @@ function loadMenus() {
         } else if(selectedMenu === "5"){
             console.log("Welcome to ((view account)) menu!".cyan+"command : <account-id>".green);
             command = prompt("");
-            getAccountByID(command);
+            getAccountByIDFromServer(command);
 
         } else if(selectedMenu === "6"){
 
@@ -133,7 +133,7 @@ function viewAllAccounts(){
 }
 /***********************************************API-Client-Methods**************************************************/
 
-function getAllProjects(request) {
+function getAllProjectsFromServer(request) {
     request('http://localhost:3000/api/projects', function (error, response, body) {
         console.error('error:', error);
         console.log('statusCode:', response && response.statusCode);
@@ -142,7 +142,7 @@ function getAllProjects(request) {
     });
 }
 
-function getAllSkills(request) {
+function getAllSkillsFromServer(request) {
     request('http://localhost:3000/api/skills', function (error, response, body) {
         console.error('error:', error);
         console.log('statusCode:', response && response.statusCode);
@@ -151,7 +151,7 @@ function getAllSkills(request) {
     });
 }
 
-function getAllAccounts(request) {
+function getAllAccountsFromServer(request) {
     request('http://localhost:3000/api/accounts', function (error, response, body) {
         console.error('error:', error);
         console.log('statusCode:', response && response.statusCode);
@@ -159,14 +159,14 @@ function getAllAccounts(request) {
         console.log(accountClass.allAccounts);
     });
 }
-function getProjectById(id){
+function getProjectByIdFromServer(id){
     request('http://localhost:3000/api/projects/'+id, function (error, response, body) {
         console.error('error:', error);
         console.log('statusCode:', response && response.statusCode);
         console.log(JSON.parse(body));
     });
 };
-function getAccountByID(id){
+function getAccountByIDFromServer(id){
     request('http://localhost:3000/api/accounts/'+id, function (error, response, body) {
         console.error('error:', error);
         console.log('statusCode:', response && response.statusCode);
