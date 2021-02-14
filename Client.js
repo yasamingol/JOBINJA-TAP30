@@ -15,7 +15,7 @@ const request = require('request');
     getAllAccounts(request);
     setTimeout(function afterTwoSeconds() {
         loadMenus();
-    }, 6000)
+    }, 5000)
 
 
 })();
@@ -46,61 +46,44 @@ function loadMenus() {
 
         //Menus
         let arr = [];
-        console.log(" MENUS : ".cyan + "\n 1.register \n 2.login \n 3.addProjecct \n 4.bid \n 5.addSkill \n 6.removeSkill \n 7.confirmSkills \n 8.exit \n Please enter the menu number you want to enter : ");
-        // const selectedMenu = readOneLine();
+        console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
+                                       "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
+                                       "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.login" +
+                                       " \n 12.exit \n Please enter the menu number you want to enter : ");
         const selectedMenu = prompt("");
 
 
         if (selectedMenu === "1") {
-            console.log("\nWelcome to register menu! You can create a new account using : " + "register <username> <skill:rate> ".green);
-            // const command = readOneLine();
+            console.log("\n View all projects menu :".cyan);
+            viewAllProjects();
+
+
+        } else if(selectedMenu === "2"){
+            console.log("\nWelcome to ((view available projects)) menu!".cyan+" command : <username> ".green);
             const command = prompt("");
-            arr = command.split(" ");
-            register(arr);
+            viewAvailableProjects(command);
 
 
-        } else if (selectedMenu === "2") {
-            console.log("\nWelcome to login menu! You log into your accout : " + "login <username> <skill:rate> ".green);
-
-
-        } else if (selectedMenu === "3") {
-            console.log("\nwelcome to  addProject menu!\nyou can add a new project using : " + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)>".green);
-            // const command = readOneLine();
+        } else if(selectedMenu === "3"){
             const command = prompt("");
-            arr = command.split(" ");
-            addProject(arr);
 
+        } else if(selectedMenu === "4"){
 
-        } else if (selectedMenu === "4") {
-            console.log("\nwelcome to  bid menu!\nyou can add a new bid using : " + "bid <username> <projectTitle> <bidAmount>".green);
-            // const command = readOneLine();
-            const command = prompt("");
-            arr = command.split(" ");
-            addBid(arr);
+        } else if(selectedMenu === "5"){
 
+        } else if(selectedMenu === "6"){
 
-        } else if (selectedMenu === "5") {
-            console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate>".green);
-            const command = prompt("");
-            arr = command.split(" ");
-            addSkill(arr);
+        } else if(selectedMenu === "7"){
 
+        } else if(selectedMenu === "8"){
 
-        } else if (selectedMenu === "6") {
-            console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using" + "removeSkill <username> <skill>".green);
-            const command = prompt("");
-            arr = command.split(" ");
-            removeSkill(arr);
+        } else if(selectedMenu === "9"){
 
+        } else if(selectedMenu === "10"){
 
-        } else if (selectedMenu === "7") {
-            console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" + "confirmSkill <your_username> <other_username> <skill>".green);
-            const command = prompt("");
-            arr = command.split(" ");
-            confirmSkill(arr);
+        } else if(selectedMenu === "11"){
 
-
-        } else if (selectedMenu === "8") {
+        }else if (selectedMenu === "12") {
             console.log("exit");
             commandIsValid = true;
         } else console.log("command is invalid! try again".red);
@@ -118,6 +101,23 @@ function loadMenus() {
 }
 
 /***********************************************Main-Functions*********************************************************/
+function viewAllProjects(){
+    projectClass.allProjects.forEach((project) =>{
+        console.log(project.id+"."+project.title);
+    })
+}
+function viewAvailableProjects(command){
+    let hasMinOneAvailable = false;
+    projectClass.allProjects.forEach((project) => {
+        if(checkIfSkilledEnough(command,project.title)) {
+            console.log(" Available projects :\n ".green + project.id + "." + project.title);
+            hasMinOneAvailable = true;
+        }
+    })
+    if(!hasMinOneAvailable) console.log("There is no project available for you now!".red);
+
+}
+
 function register(arr) {
     let username = arr[1];
     let skills = new Map;

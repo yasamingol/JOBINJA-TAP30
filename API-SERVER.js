@@ -22,6 +22,32 @@ const projects = [
         listOfBids: [],
         deadline: "2022/03/02",
         isAvailable: true
+    },
+    {
+        id: 2,
+        title: "snap",
+        skills: [
+            {"name": "C", "point": 80},
+            {"name": "C++", "point": 40},
+            {"name": "GO", "point": 20}
+        ],
+        budget: 30,
+        listOfBids: [],
+        deadline: "2025/10/02",
+        isAvailable: true
+    },
+    {
+        id: 3,
+        title: "karpino",
+        skills: [
+            {"name": "PYTHON", "point": 20},
+            {"name": "HTML", "point": 33},
+            {"name": "CSS", "point": 55}
+        ],
+        budget: 34567,
+        listOfBids: [],
+        deadline: "2029/10/02",
+        isAvailable: true
     }
 
 ]
@@ -157,6 +183,28 @@ const accounts = [
             {"name": "Java", "point": 50},
             {"name": "CSS", "point": 11},
             {"name": "JS", "point": 30}
+        ],
+        asignedProjectList: [],
+        skillConfirmationList: []
+    },
+    {
+        id: 2,
+        username: "sam",
+        skills: [
+            {"name": "C", "point": 100},
+            {"name": "C++", "point": 50},
+            {"name": "GO", "point": 30}
+        ],
+        asignedProjectList: [],
+        skillConfirmationList: []
+    },
+    {
+        id: 3,
+        username: "ali",
+        skills: [
+            {"name": "Java", "point": 100},
+            {"name": "CSS", "point": 1},
+            {"name": "JS", "point": 5}
         ],
         asignedProjectList: [],
         skillConfirmationList: []
