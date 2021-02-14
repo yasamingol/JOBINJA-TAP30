@@ -21,7 +21,7 @@ app.get("/api/projects", (req, res) => {
 });
 
 app.get("/api/projects/:id", (req, res) => {
-    const project = projects.find((c) => c.id === parseInt(req.params.id));
+    const project = JSON.parse(projects).find((c) => c.id === parseInt(req.params.id));
     if (!project) return res.status(404).send("The course with the given ID was not found!");
     else res.send(project);
 });
@@ -90,7 +90,7 @@ app.get("/api/skills", (req, res) => {
 });
 
 app.get("/api/skills/:id", (req, res) => {
-    const skill = skills.find((c) => c.id === parseInt(req.params.id));
+    const skill = JSON.parse(skills).find((c) => c.id === parseInt(req.params.id));
     if (!skill) return res.status(404).send("The skill with the given ID was not found!");
     else res.send(skill);
 });
@@ -133,7 +133,7 @@ app.get("/api/accounts", (req, res) => {
 });
 
 app.get("/api/accounts/:id", (req, res) => {
-    const account = accounts.find((c) => c.id === parseInt(req.params.id));
+    const account = JSON.parse(accounts).find((c) => c.id === parseInt(req.params.id));
     if (!account) return res.status(404).send("The course with the given ID was not found!");
     else res.send(account);
 });

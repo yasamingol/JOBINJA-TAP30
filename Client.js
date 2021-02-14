@@ -14,8 +14,7 @@ const request = require('request');
     await getAllProjects(request);
     await getAllSkills(request);
     await getAllAccounts(request);
-    loadMenus();
-
+    await loadMenus();
 
 
 })();
@@ -33,7 +32,6 @@ async function loadMenus() {
 
         //checking the expiration date for auctions
         holdAuctions();
-
 
         //Menus
         let arr = [];
@@ -58,7 +56,7 @@ async function loadMenus() {
         } else if (selectedMenu === "3") {
             console.log("\nWelcome to ((view project)) menu!".cyan + "command : <project-id>".green);
             command = prompt("");
-            await getProjectById(command);
+            await getProjectById(request,command);
 
         } else if (selectedMenu === "4") {
             console.log("\nView all accounts menu".cyan);
@@ -67,7 +65,7 @@ async function loadMenus() {
         } else if (selectedMenu === "5") {
             console.log("Welcome to ((view account)) menu!".cyan + "command : <account-id>".green);
             command = prompt("");
-            await getAccountByID(command);
+            await getAccountByID(request,command);
 
         } else if (selectedMenu === "6") {
 
@@ -154,7 +152,7 @@ async function getAllAccounts(request) {
 
 }
 
-async function getProjectById(id) {
+async function getProjectById(request,id) {
     const promisifiedRequest = util.promisify(request);
     const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects/' + id);
     console.error('error:', error);
@@ -162,7 +160,7 @@ async function getProjectById(id) {
     console.log(JSON.parse(body));
 }
 
-async function getAccountByID(id) {
+async function getAccountByID(request, id) {
     const promisifiedRequest = util.promisify(request);
     const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/accounts/' + id);
     console.error('error:', error);
