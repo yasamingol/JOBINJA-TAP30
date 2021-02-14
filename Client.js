@@ -19,12 +19,10 @@ const request = require('request');
 
 /***************************************************Main-Menus********************************************************/
 async function loadMenus() {
-
     const prompt = require('prompt-sync')();
     const colors = require('colors');
     let command;
     console.log("Welcome to JobInja!".red)
-
     let commandIsValid = false;
     while (!commandIsValid) {
 
@@ -33,12 +31,8 @@ async function loadMenus() {
 
         //Menus
         let arr = [];
-        console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
-            "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
-            "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.login" +
-            " \n 12.exit \n Please enter the menu number you want to enter : ");
+        showAvailableMenus()
         const selectedMenu = prompt("");
-
 
         if (selectedMenu === "1") {
             console.log("\n View all projects menu :".cyan);
@@ -54,7 +48,7 @@ async function loadMenus() {
         } else if (selectedMenu === "3") {
             console.log("\nWelcome to ((view project)) menu!".cyan + "command : <project-id>".green);
             command = prompt("");
-            await getProjectById(request,command);
+            await getProjectById(request, command);
 
         } else if (selectedMenu === "4") {
             console.log("\nView all accounts menu".cyan);
@@ -64,7 +58,7 @@ async function loadMenus() {
         } else if (selectedMenu === "5") {
             console.log("Welcome to ((view account)) menu!".cyan + "command : <account-id>".green);
             command = prompt("");
-            await getAccountByID(request,command);
+            await getAccountByID(request, command);
 
         } else if (selectedMenu === "6") {
 
@@ -87,13 +81,17 @@ async function loadMenus() {
     }
 
 //serializing
-    serializeAccounts();
-    serializeProjects();
-    serializeBides();
-    serializeAuctions();
+    serializeAllData();
 }
 
 /***********************************************Main-Functions*********************************************************/
+function showAvailableMenus() {
+    console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
+        "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
+        "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.login" +
+        " \n 12.exit \n Please enter the menu number you want to enter : ");
+}
+
 function viewAllProjects() {
     projectClass.allProjects.forEach((project) => {
         console.log(project.id + "." + project.title);
@@ -117,8 +115,14 @@ function viewAllAccounts() {
         console.log(account.id + "." + account.username);
     })
 }
+function serializeAllData(){
+    serializeAccounts();
+    serializeProjects();
+    serializeBides();
+    serializeAuctions();
+}
 
-/***********************************************API-Client-Methods**************************************************/
+/**********************************************Calling-APIServer-Methods***********************************************/
 
 async function getAllProjectsFromServer(request) {
     const promisifiedRequest = util.promisify(request);
@@ -145,7 +149,7 @@ async function getAllAccountsFromServer(request) {
     deserializeAllAccounts(JSON.parse(body));
 }
 
-async function getProjectById(request,id) {
+async function getProjectById(request, id) {
     const promisifiedRequest = util.promisify(request);
     const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects/' + id);
     console.error('error:', error);
@@ -353,15 +357,6 @@ function calculateBestBid(projectTitle) {
 
 /***********************************************Tool-Functions*********************************************************/
 
-function getMapSize(x) {
-    let len = 0;
-    for (let count in x) {
-        len++;
-    }
-
-    return len;
-}
-
 function mapToObj(map) {
     const obj = {}
     for (let [k, v] of map)
@@ -377,7 +372,6 @@ function objToMap(myObject) {
     return map;
 
 }
-
 /***************************************************Serialize*********************************************************/
 
 function serialize(name, jsonContent) {
@@ -454,7 +448,7 @@ function serializeAuctions() {
 
 }
 
-/***********************************************Deserialize**************************************************/
+/**************************************************Deserialize********************************************************/
 
 function deserializeAllAccounts(arr) {
     // username, skills,asignedProjectList,skillConfirmationList
