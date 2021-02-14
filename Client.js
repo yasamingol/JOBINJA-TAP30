@@ -1,9 +1,9 @@
 /****************************************************Preperation******************************************************/
 //importing classes
-const accountClass = require("./Account");
-const projectClass = require("./Project");
-const bidClass = require("./Bid");
-const auctionClass = require("./Auction");
+const accountClass = require("./Classes/Account");
+const projectClass = require("./Classes/Project");
+const bidClass = require("./Classes/Bid");
+const auctionClass = require("./Classes/Auction");
 const util = require('util')
 let allSkills = [];
 
@@ -60,6 +60,7 @@ async function loadMenus() {
 
         } else if (selectedMenu === "4") {
             console.log("\nView all accounts menu".cyan);
+            viewAllAccounts();
 
 
         } else if (selectedMenu === "5") {
