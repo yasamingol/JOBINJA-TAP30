@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const express = require("express");
+const fs = require('fs');
 const app = express();
 app.use(express.json());
 
@@ -9,22 +10,11 @@ const port = 3000;
 app.listen(port, () => console.log("listening on port 3000"));
 
 /**************************************************Projects***********************************************************/
-const projects = [
-    {
-        id: 1,
-        title: "tap30",
-        skills: [
-            {"name": "Java", "point": 5},
-            {"name": "CSS", "point": 10},
-            {"name": "JS", "point": 20}
-        ],
-        budget: 4000,
-        listOfBids: [],
-        deadline: "2022/03/02",
-        isAvailable: true
-    }
 
-]
+let projectData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server-DataBase/projects-text', 'utf-8', 'r+');
+const projects = projectData;
+
+
 //get
 app.get("/api/projects", (req, res) => {
     res.send(projects);
@@ -91,18 +81,8 @@ app.put("/api/projects/:id", (req, res) => {
  */
 
 /**************************************************Skills*************************************************************/
-const skills = [
-    {id:1,name:"C"},
-    {id:2,name:"C++"},
-    {id:3,name:"JAVA"},
-    {id:4,name:"JS"},
-    {id:5,name:"HTML"},
-    {id:6,name:"CSS"},
-    {id:7,name:"REACT"},
-    {id:8,name:"PYTHON"},
-    {id:9,name:"GO"},
-    {id:10,name:"NODEJS"},
-]
+let skillData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server-DataBase/skills-text', 'utf-8', 'r+');
+const skills = skillData;
 
 //get
 app.get("/api/skills", (req, res) => {
@@ -144,20 +124,8 @@ app.delete("/api/skills/:id", (req, res) => {
 
 });
 /**************************************************Accounts***********************************************************/
-//username, skills,asignedProjectList,skillConfirmationList
-const accounts = [
-    {
-        id: 1,
-        username: "yasamingol",
-        skills: [
-            {"name": "Java", "point": 50},
-            {"name": "CSS", "point": 11},
-            {"name": "JS", "point": 30}
-        ],
-        asignedProjectList: [],
-        skillConfirmationList: []
-    }
-]
+let accountData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server-DataBase/accounts-text', 'utf-8', 'r+');
+const accounts = accountData;
 
 //get
 app.get("/api/accounts", (req, res) => {

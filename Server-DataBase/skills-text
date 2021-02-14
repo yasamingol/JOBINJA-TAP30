@@ -1,12 +1,42 @@
 [
-    {id:1,name:"C"},
-    {id:2,name:"C++"},
-    {id:3,name:"JAVA"},
-    {id:4,name:"JS"},
-    {id:5,name:"HTML"},
-    {id:6,name:"CSS"},
-    {id:7,name:"REACT"},
-    {id:8,name:"PYTHON"},
-    {id:9,name:"GO"},
-    {id:10,name:"NODEJS"},
+    {
+        "id": 1,
+        "name": "C"
+    },
+    {
+        "id": 2,
+        "name": "C++"
+    },
+    {
+        "id": 3,
+        "name": "JAVA"
+    },
+    {
+        "id": 4,
+        "name": "JS"
+    },
+    {
+        "id": 5,
+        "name": "HTML"
+    },
+    {
+        "id": 6,
+        "name": "CSS"
+    },
+    {
+        "id": 7,
+        "name": "REACT"
+    },
+    {
+        "id": 8,
+        "name": "PYTHON"
+    },
+    {
+        "id": 9,
+        "name": "GO"
+    },
+    {
+        "id": 10,
+        "name": "NODEJS"
+    }
 ]
