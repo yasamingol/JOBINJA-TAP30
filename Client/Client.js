@@ -395,7 +395,7 @@ function serializeAccounts() {
         myJson.asignedProjectList = account.asignedProjectList;
         myJson.skillConfirmationList = mapToObj(account.skillConfirmationList);
         const json = JSON.stringify(myJson);
-        serialize("/home/tapsi/IdeaProjects/concurency/Client-DataBase/Accounts/allAccounts" + "_" + i, json);
+        serialize("/home/tapsi/IdeaProjects/concurency/Client/Client-DataBase/Accounts/allAccounts" + "_" + i, json);
 
 
     }
@@ -412,7 +412,7 @@ function serializeProjects() {
         myJson.deadline = project.deadline;
         myJson.isAvailable = project.isAvailable;
         const json = JSON.stringify(myJson);
-        serialize("/home/tapsi/IdeaProjects/concurency/Client-DataBase/Projects/allProjects" + "_" + i, json);
+        serialize("/home/tapsi/IdeaProjects/concurency/Client/Client-DataBase/Projects/allProjects" + "_" + i, json);
 
     }
 }
@@ -427,7 +427,7 @@ function serializeBides() {
         myJson.projectaTitle = bid.projectaTitle;
         myJson.bidAmount = bid.bidAmount;
         const json = JSON.stringify(myJson);
-        serialize("/home/tapsi/IdeaProjects/concurency/Client-DataBase/Bids/allBids" + "_" + i, json);
+        serialize("/home/tapsi/IdeaProjects/concurency/Client/Client-DataBase/Bids/allBids" + "_" + i, json);
 
 
     }
@@ -441,7 +441,7 @@ function serializeAuctions() {
         myJson.projecTitle = auction.projectTitle;
         myJson.usernameWinner = auction.accuntWinner;
         const json = JSON.stringify(myJson);
-        serialize("/home/tapsi/IdeaProjects/concurency/Client-DataBase/Auction/allAuctions" + "_" + i, json);
+        serialize("/home/tapsi/IdeaProjects/concurency/Client/Client-DataBase/Auction/allAuctions" + "_" + i, json);
 
 
     }

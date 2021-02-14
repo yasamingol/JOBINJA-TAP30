@@ -6,7 +6,7 @@ app.use(express.json());
 
 //PORT
 const port = 4000;
-app.listen(port, () => console.log("listening on port 3000"));
+app.listen(port, () => console.log("listening on port 4000"));
 /**************************************************Accounts***********************************************************/
 let accountData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server/Server-DataBase/accounts-text', 'utf-8', 'r+');
 const accounts = accountData;
