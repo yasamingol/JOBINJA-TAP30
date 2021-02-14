@@ -1,7 +1,8 @@
 
 class Auction{
     static  allAuctions = [];
-    constructor(projectTitle,accountWinner) {
+    constructor(id,projectTitle,accountWinner) {
+        this.id = id;
         this.projectTitle = projectTitle;
         this.accuntWinner = accountWinner;
         Auction.allAuctions[Auction.allAuctions.length] = this;

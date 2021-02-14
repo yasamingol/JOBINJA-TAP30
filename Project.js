@@ -1,6 +1,7 @@
 class Project {
     static allProjects = [];
-    constructor(title, skills, budget, listOfBids,deadline,isAvailable) {
+    constructor(id,title, skills, budget, listOfBids,deadline,isAvailable) {
+        this.id = id;
         this.title = title;
         this.skills = skills;
         this.budget = budget;

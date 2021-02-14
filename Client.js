@@ -364,6 +364,7 @@ function serializeAccounts() {
     for (let i = 0; i < accountClass.allAccounts.length; i++) {
         let account = accountClass.allAccounts[i];
         const myJson = {};
+        myJson.id = account.id;
         myJson.username = account.username;
         myJson.skills = mapToObj(account.skills);
         myJson.asignedProjectList = account.asignedProjectList;
@@ -379,6 +380,7 @@ function serializeProjects() {
     for (let i = 0; i < projectClass.allProjects.length; i++) {
         let project = projectClass.allProjects[i];
         const myJson = {};
+        myJson.id = project.id;
         myJson.title = project.title;
         myJson.skills = mapToObj(project.skills);
         myJson.budget = project.budget;
@@ -395,6 +397,7 @@ function serializeBides() {
     for (let i = 0; i < bidClass.allBids.length; i++) {
         let bid = bidClass.allBids[i];
         const myJson = {};
+        myJson.id = bid.id;
         myJson.username = bid.username;
         myJson.projectaTitle = bid.projectaTitle;
         myJson.bidAmount = bid.bidAmount;
@@ -409,6 +412,7 @@ function serializeAuctions() {
     for (let i = 0; i < auctionClass.allAuctions.length; i++) {
         let auction = auctionClass.allAuctions[i];
         const myJson = {};
+        myJson.id = auction.id;
         myJson.projecTitle = auction.projectTitle;
         myJson.usernameWinner = auction.accuntWinner;
         const json = JSON.stringify(myJson);
@@ -424,23 +428,25 @@ function serializeAuctions() {
 function deserializeAllAccounts(arr) {
     // username, skills,asignedProjectList,skillConfirmationList
     for (let i = 0; i < arr.length; i++) {
+        let id = arr[i].id;
         let username = arr[i].username;
         let skillsArr = objToMap(arr[i].skills);
         let asignedProjectList = arr[i].asignedProjectList;
         let skillConfirmationList = arr[i].skillConfirmationList;
-        new accountClass(username, skillsArr, asignedProjectList, skillConfirmationList);
+        new accountClass(id,username, skillsArr, asignedProjectList, skillConfirmationList);
     }
 }
 
 function deserializeAllProjects(arr) {
     for (let i = 0; i < arr.length; i++) {
+        let id = arr[i].id;
         let title = arr[i].title;
         let skillsArr = objToMap(arr[i].skills);
         let budget = arr[i].budget;
         let listOfBids = arr[i].listOfBids;
         let deadline = arr[i].deadline;
         let isAvailable = arr[i].isAvailable;
-        new projectClass(title, skillsArr, budget, listOfBids, deadline, isAvailable);
+        new projectClass(id,title, skillsArr, budget, listOfBids, deadline, isAvailable);
     }
 }
 

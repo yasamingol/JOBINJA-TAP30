@@ -1,6 +1,7 @@
 class Bid {
     static allBids = [];
-    constructor(username, projectTitle, bidAmount) {
+    constructor(id,username, projectTitle, bidAmount) {
+        this.id = id;
         this.username = username;
         this.projectaTitle = projectTitle;
         this.bidAmount = bidAmount;
