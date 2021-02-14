@@ -153,28 +153,26 @@ app.delete("/api/skills/:id", (req, res) => {
 const accounts = [
     {
         id: 1,
-        title: "tap30",
+        username: "yasamingol",
         skills: [
-            {"name": "Java", "point": 5},
-            {"name": "CSS", "point": 10},
-            {"name": "JS", "point": 20}
+            {"name": "Java", "point": 50},
+            {"name": "CSS", "point": 11},
+            {"name": "JS", "point": 30}
         ],
-        budget: 4000,
-        listOfBids: [],
-        deadline: "2022/03/02",
-        isAvailable: true
+        asignedProjectList: [],
+        skillConfirmationList: []
     }
-
 ]
+
 //get
 app.get("/api/accounts", (req, res) => {
-    res.send(projects);
+    res.send(accounts);
 });
 
 app.get("/api/accounts/:id", (req, res) => {
-    const project = projects.find((c) => c.id === parseInt(req.params.id));
-    if (!project) return res.status(404).send("The course with the given ID was not found!");
-    else res.send(project);
+    const account = accounts.find((c) => c.id === parseInt(req.params.id));
+    if (!account) return res.status(404).send("The course with the given ID was not found!");
+    else res.send(account);
 });
 
 
@@ -182,34 +180,31 @@ app.get("/api/accounts/:id", (req, res) => {
 app.post("/api/accounts", (req, res) => {
     /*
     //validating required data
-     const {error} = validateProject(req.body);
+     const {error} = validateAccount(req.body);
     console.log("the error is " + error);
     if (error) return res.status(400).send(error.details[0].message);
      */
 
     const account = {
         id: projects.length + 1,
-        title: req.body.title,
-        skills: req.body.skills,
-        budget: req.body.budget,
-        listOfBids: req.body.listOfBids,
-        deadline: req.body.deadline,
-        isAvailable: req.body.isAvailable
+        username: req.body.username,
+        skills: req.body.skills ,
+        asignedProjectList: [],
+        skillConfirmationList: []
     };
-    projects.push(account);
+    accounts.push(account);
     res.send(account);
 });
 
 //delete
 app.delete("/api/projects/:id", (req, res) => {
-    const project = projects.find((c) => c.id === parseInt(req.params.id));
-    if (!project) return res.status(404).send("The course with the given ID was not found!");
+    const account = accounts.find((c) => c.id === parseInt(req.params.id));
+    if (!account) return res.status(404).send("The course with the given ID was not found!");
 
-    const index = projects.indexOf(project);
-    projects.splice(index, 1);
+    const index = accounts.indexOf(account);
+    accounts.splice(index, 1);
 
-    res.send(project);
-
+    res.send(account);
 });
 
 
@@ -230,5 +225,7 @@ app.delete("/api/projects/:id", (req, res) => {
 
     }
 function validateSkill(project) {}
+function validateAccount(project) {}
+
 
 

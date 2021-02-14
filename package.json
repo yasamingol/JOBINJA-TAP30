@@ -2,7 +2,7 @@
   "name": "concurency",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "API_SERVER.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
