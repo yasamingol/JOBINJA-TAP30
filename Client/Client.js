@@ -8,20 +8,26 @@ const auctionClass = require("../Classes/Auction");
 const request = require('request');
 const util = require('util');
 const needle = require("needle");
+const got = require('got');
 //global vars
 let allSkills = [];
 
 
-
 //testing post :
 let map = new Map();
-map.set("C",20);
-map.set("C++",30);
-postAccount(request, "jafar", map).then(() => console.log("account registered successfully"));
+map.set("C", 20);
+map.set("C++", 30);
+postAccount("jafar", map).then(() => console.log("account registered successfully"));
 
-
-
-
+async function postAccount(username, skills) {
+    let account = new accountClass(0, username, skills, [], []);
+    let accountJson = serializeAccount(account);
+    let options = {
+        headers: {'X-Custom-Header': 'Bumbaway atuna'}
+    }
+    needle.post('http://localhost:4000/api/accounts', accountJson, options, function (err, resp) {
+    });
+}
 
 //using API to get DATA
 /*
@@ -136,7 +142,8 @@ function viewAllAccounts() {
         console.log(account.id + "." + account.username);
     })
 }
-function serializeAllData(){
+
+function serializeAllData() {
     serializeAccounts();
     serializeProjects();
     serializeBides();
@@ -186,15 +193,7 @@ async function getAccountByID(request, id) {
     console.log(JSON.parse(body));
 
 }
-async function postAccount(request,username,skills){
-    let account = new accountClass(0,username,skills,[],[]);
-    let accountJson = serializeAccount(account);
-    let options = {
-        headers: { 'X-Custom-Header': 'Bumbaway atuna' }
-    }
-    needle.post('http://localhost:4000/api/accounts/', account , options, function(err, resp) {
-    });
-}
+
 
 /***********************************************OldMenu-Functions*****************************************************/
 function register(arr) {
@@ -402,6 +401,7 @@ function objToMap(myObject) {
     return map;
 
 }
+
 /***************************************************Serialize*********************************************************/
 
 function serialize(name, jsonContent) {
@@ -423,7 +423,8 @@ function serializeAccounts() {
 
     }
 }
-function serializeAccount(account){
+
+function serializeAccount(account) {
     const myJson = {};
     myJson.id = account.id;
     myJson.username = account.username;
@@ -431,7 +432,7 @@ function serializeAccount(account){
     myJson.asignedProjectList = account.asignedProjectList;
     myJson.skillConfirmationList = mapToObj(account.skillConfirmationList);
     const json = JSON.stringify(myJson);
-    return json;
+    return myJson;
 }
 
 function serializeProjects() {

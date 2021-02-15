@@ -32,8 +32,8 @@ app.post("/api/accounts", (req, res) => {
         id: arr.length + 1,
         username: req.body.username,
         skills: req.body.skills ,
-        asignedProjectList: [],
-        skillConfirmationList: []
+        asignedProjectList: req.body.asignedProjectList,
+        skillConfirmationList: req.body.skillConfirmationList
     };
 
     arr.push(account);
