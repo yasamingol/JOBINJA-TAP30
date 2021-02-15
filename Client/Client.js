@@ -7,33 +7,26 @@ const auctionClass = require("../Classes/Auction");
 //requirements
 const request = require('request');
 const util = require('util');
-const needle = require("needle");
-const got = require('got');
+const axios = require('axios')
 //global vars
 let allSkills = [];
 
 
 //testing post :
 let data = {
-    "id":0,
-    "username": "jafar",
-    "skills": [
-        {"name": "Java", "point": 100},
-        {"name": "CSS", "point": 12},
-        {"name": "JS", "point": 70}
+    id:0,
+    username: "testing i think its working",
+    skills: [
+        {name: "Java", "point": 100},
+        {name: "CSS", "point": 12},
+        {name: "JS", "point": 70}
     ],
-    "asignedProjectList":[],
-    "skillConfirmationList":[]
+    asignedProjectList:[],
+    skillConfirmationList:[]
 }
-postAccount(data).then(() => console.log("account registered successfully"));
+axios.post('http://localhost:4000/api/accounts', data)
 
-async function postAccount(data) {
-    let options = {
-        headers: {'X-Custom-Header': 'Bumbaway atuna'}
-    }
-    needle.post('http://localhost:4000/api/accounts', data, options, function (err, resp) {
-    });
-}
+
 
 //using API to get DATA
 /*
