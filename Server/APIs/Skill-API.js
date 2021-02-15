@@ -24,19 +24,14 @@ app.get("/api/skills/:id", (req, res) => {
 });
 //post
 app.post("/api/skills", (req, res) => {
-    /*
-    //validating required data
-     const {error} = validateSkill(req.body);
-    console.log("the error is " + error);
-    if (error) return res.status(400).send(error.details[0].message);
-     */
-
+    let arr = JSON.parse(skills);
     const skill = {
-        id: projects.length + 1,
+        id: arr.length + 1,
         name: req.body.name,
     };
-    skills.push(skill);
-    res.send(skill);
+    arr.push(skill);
+    fs.writeFileSync("/home/tapsi/IdeaProjects/concurency/Server/Server-DataBase/skills-text",JSON.stringify(arr),'utf-8', 'r+');
+    res.send("skill built");
 
 });
 

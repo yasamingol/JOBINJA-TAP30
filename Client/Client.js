@@ -1,3 +1,4 @@
+
 /****************************************************Preperation******************************************************/
 //requirements
 const request = require('request');
@@ -11,18 +12,6 @@ const auctionClass = require("../Classes/Auction");
 //global vars
 let allSkills = [];
 
-
-//testing post :
-let map  = new Map();
-map.set("C",20);
-map.set("CSS",40);
-let account = new accountClass(0,"test",map,[],[]);
-let data = JSON.parse(serializeAccount(account));
-postAccount(data);
-
-
-
-
 //using API to get DATA
 /*
 (async () => {
@@ -31,9 +20,9 @@ postAccount(data);
     await getAllAccountsFromServer(request);
     await loadMenus();
 })();
-
-
  */
+
+
 /***************************************************Main-Menus********************************************************/
 async function loadMenus() {
     const prompt = require('prompt-sync')();
@@ -77,27 +66,60 @@ async function loadMenus() {
             command = prompt("");
             await getAccountByID(request, command);
 
+
         } else if (selectedMenu === "6") {
+            console.log("\nwelcome to  bid menu!\nyou can add a new bid using : " + "bid <username> <projectTitle> <bidAmount>".green);
+            const command = prompt("");
+            arr = command.split(" ");
+            addBid(arr);
+
 
         } else if (selectedMenu === "7") {
+            console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" + "confirmSkill <your_username> <other_username> <skill>".green);
+            const command = prompt("");
+            arr = command.split(" ");
+            confirmSkill(arr);
+
 
         } else if (selectedMenu === "8") {
+            console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate>".green);
+            const command = prompt("");
+            arr = command.split(" ");
+            addSkill(arr);
+
 
         } else if (selectedMenu === "9") {
+            console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using" + "removeSkill <username> <skill>".green);
+            const command = prompt("");
+            arr = command.split(" ");
+            removeSkill(arr);
+
 
         } else if (selectedMenu === "10") {
-            console.log("Welcome to ((register)) menu!".cyan + "command : <username> <skill:point> ".green);
+            console.log("Welcome to ((register)) menu!".cyan + "command : register <username> <skill:point> ".green);
             command = prompt("");
             arr = command.split(" ");
+            register(arr);
 
 
         } else if (selectedMenu === "11") {
+            console.log("\nWelcome to login menu! You log into your accout : " + "login <username> <skill:rate> ".green);
+
 
         } else if (selectedMenu === "12") {
+            console.log("\nwelcome to  addProject menu!\nyou can add a new project using : " + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)>".green);
+            // const command = readOneLine();
+            const command = prompt("");
+            arr = command.split(" ");
+            addProject(arr);
+
+
+        } else if (selectedMenu === "13") {
             console.log("exit");
             commandIsValid = true;
-        } else console.log("command is invalid! try again".red);
 
+
+        } else console.log("command is invalid! try again".red);
 
     }
 
@@ -109,8 +131,8 @@ async function loadMenus() {
 function showAvailableMenus() {
     console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
         "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
-        "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.login" +
-        " \n 12.exit \n Please enter the menu number you want to enter : ");
+        "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.login \n 12.addProject" +
+        " \n 13.exit \n Please enter the menu number you want to enter : ");
 }
 
 function viewAllProjects() {
@@ -187,14 +209,9 @@ async function getAccountByID(request, id) {
     console.log(JSON.parse(body));
 
 }
-async function postAccount(account){
-    let data = JSON.parse(serializeAccount(account));
-    axios.post('http://localhost:4000/api/accounts', data);
-}
-
-
 
 /***********************************************OldMenu-Functions*****************************************************/
+
 function register(arr) {
     let username = arr[1];
     let skills = new Map;
@@ -205,11 +222,11 @@ function register(arr) {
         skills.set(arrSkiles[0], arrSkiles[1]);
 
     }
-    new accountClass(username, skills, [], skillConfirmationList);
+    let account = new accountClass(0, username, skills, [], skillConfirmationList);
     console.log("registered successfully!\n".red);
+    return account;
 
 }
-
 
 function addProject(arr) {
     let title = arr[1];
@@ -256,12 +273,13 @@ function holdAuctions() {
 }
 
 function holdAuction(projectName) {
-    let projectTitle = projectClass.getProjectByTitle(projectName);
-    let accountWinner = calculateBestBid(projectTitle);
-    new auctionClass(projectTitle, accountWinner);
-    projectClass.getProjectByTitle(projectTitle).isAvailable = false;
-    assignProject(accountWinner, projectTitle);
+    let project = projectClass.getProjectByTitle(projectName);
+    let accountWinner = calculateBestBid(project);
+    new auctionClass(projectName, accountWinner);
+    project.isAvailable = false;
+    assignProject(accountWinner, projectName);
     console.log("\nThe winner of the auction is : ".red + accountWinner.red);
+    return accountWinner;
 }
 
 
@@ -369,10 +387,9 @@ function calculateUserSkill(bid) {
     return skillSum + (jobOffer - userOffer);
 }
 
-function calculateBestBid(projectTitle) {
+function calculateBestBid(project) {
     let bestBid = 0;
     let bestBidsAccount;
-    let project = projectClass.getProjectByTitle(projectTitle);
     project.listOfBids.forEach((bid) => {
         let userSkill = parseInt(calculateUserSkill(bid));
         if (userSkill > bestBid) {
@@ -511,3 +528,5 @@ function deserializeAllProjects(arr) {
 function deserializeAllSkills(body) {
     allSkills = JSON.parse(body);
 }
+
+module.exports = {holdAuction,calculateBestBid,calculateUserSkill};
