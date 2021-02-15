@@ -13,6 +13,7 @@ let accountData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server/Se
 let accounts = accountData;
 
 //get
+
 app.get("/api/accounts", (req, res) => {
     res.send(accounts);
 });

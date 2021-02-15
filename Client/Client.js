@@ -14,18 +14,24 @@ let allSkills = [];
 
 
 //testing post :
-let map = new Map();
-map.set("C", 20);
-map.set("C++", 30);
-postAccount("jafar", map).then(() => console.log("account registered successfully"));
+let data = {
+    "id":0,
+    "username": "jafar",
+    "skills": [
+        {"name": "Java", "point": 100},
+        {"name": "CSS", "point": 12},
+        {"name": "JS", "point": 70}
+    ],
+    "asignedProjectList":[],
+    "skillConfirmationList":[]
+}
+postAccount(data).then(() => console.log("account registered successfully"));
 
-async function postAccount(username, skills) {
-    let account = new accountClass(0, username, skills, [], []);
-    let accountJson = serializeAccount(account);
+async function postAccount(data) {
     let options = {
         headers: {'X-Custom-Header': 'Bumbaway atuna'}
     }
-    needle.post('http://localhost:4000/api/accounts', accountJson, options, function (err, resp) {
+    needle.post('http://localhost:4000/api/accounts', data, options, function (err, resp) {
     });
 }
 
