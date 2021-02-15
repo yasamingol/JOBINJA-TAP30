@@ -10,7 +10,7 @@ app.listen(port, () => console.log("listening on port 5000"));
 
 /**************************************************Skills*************************************************************/
 let skillData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server/Server-DataBase/skills-text', 'utf-8', 'r+');
-const skills = skillData;
+let skills = skillData;
 
 //get
 app.get("/api/skills", (req, res) => {

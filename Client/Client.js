@@ -4,12 +4,27 @@ const accountClass = require("../Classes/Account");
 const projectClass = require("../Classes/Project");
 const bidClass = require("../Classes/Bid");
 const auctionClass = require("../Classes/Auction");
-const util = require('util')
+//requirements
+const request = require('request');
+const util = require('util');
+const needle = require("needle");
+//global vars
 let allSkills = [];
 
 
+
+//testing post :
+let map = new Map();
+map.set("C",20);
+map.set("C++",30);
+postAccount(request, "jafar", map).then(() => console.log("account registered successfully"));
+
+
+
+
+
 //using API to get DATA
-const request = require('request');
+/*
 (async () => {
     await getAllProjectsFromServer(request);
     await getAllSkillsFromServer(request);
@@ -17,6 +32,8 @@ const request = require('request');
     await loadMenus();
 })();
 
+
+ */
 /***************************************************Main-Menus********************************************************/
 async function loadMenus() {
     const prompt = require('prompt-sync')();
@@ -69,6 +86,10 @@ async function loadMenus() {
         } else if (selectedMenu === "9") {
 
         } else if (selectedMenu === "10") {
+            console.log("Welcome to ((register)) menu!".cyan + "command : <username> <skill:point> ".green);
+            command = prompt("");
+            arr = command.split(" ");
+
 
         } else if (selectedMenu === "11") {
 
@@ -122,7 +143,7 @@ function serializeAllData(){
     serializeAuctions();
 }
 
-/**********************************************Calling-APIServer-Methods***********************************************/
+/**********************************************Calling-API_Server-Methods*********************************************/
 
 async function getAllProjectsFromServer(request) {
     const promisifiedRequest = util.promisify(request);
@@ -164,6 +185,15 @@ async function getAccountByID(request, id) {
     console.log('statusCode:', response && response.statusCode);
     console.log(JSON.parse(body));
 
+}
+async function postAccount(request,username,skills){
+    let account = new accountClass(0,username,skills,[],[]);
+    let accountJson = serializeAccount(account);
+    let options = {
+        headers: { 'X-Custom-Header': 'Bumbaway atuna' }
+    }
+    needle.post('http://localhost:4000/api/accounts/', account , options, function(err, resp) {
+    });
 }
 
 /***********************************************OldMenu-Functions*****************************************************/
@@ -388,17 +418,20 @@ function serialize(name, jsonContent) {
 function serializeAccounts() {
     for (let i = 0; i < accountClass.allAccounts.length; i++) {
         let account = accountClass.allAccounts[i];
-        const myJson = {};
-        myJson.id = account.id;
-        myJson.username = account.username;
-        myJson.skills = mapToObj(account.skills);
-        myJson.asignedProjectList = account.asignedProjectList;
-        myJson.skillConfirmationList = mapToObj(account.skillConfirmationList);
-        const json = JSON.stringify(myJson);
+        let json = serializeAccount(account);
         serialize("/home/tapsi/IdeaProjects/concurency/Client/Client-DataBase/Accounts/allAccounts" + "_" + i, json);
 
-
     }
+}
+function serializeAccount(account){
+    const myJson = {};
+    myJson.id = account.id;
+    myJson.username = account.username;
+    myJson.skills = mapToObj(account.skills);
+    myJson.asignedProjectList = account.asignedProjectList;
+    myJson.skillConfirmationList = mapToObj(account.skillConfirmationList);
+    const json = JSON.stringify(myJson);
+    return json;
 }
 
 function serializeProjects() {

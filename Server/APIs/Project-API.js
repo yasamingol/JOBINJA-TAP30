@@ -10,7 +10,7 @@ app.listen(port, () => console.log("listening on port 3000"));
 
 /**************************************************Projects***********************************************************/
 let projectData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server/Server-DataBase/projects-text', 'utf-8', 'r+');
-const projects = projectData;
+let projects = projectData;
 
 
 //get

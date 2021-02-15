@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const express = require("express");
 const fs = require('fs');
+const temp = require("assert");
 const app = express();
 app.use(express.json());
 
@@ -9,7 +10,7 @@ const port = 4000;
 app.listen(port, () => console.log("listening on port 4000"));
 /**************************************************Accounts***********************************************************/
 let accountData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server/Server-DataBase/accounts-text', 'utf-8', 'r+');
-const accounts = accountData;
+let accounts = accountData;
 
 //get
 app.get("/api/accounts", (req, res) => {
@@ -25,22 +26,19 @@ app.get("/api/accounts/:id", (req, res) => {
 
 //post
 app.post("/api/accounts", (req, res) => {
-    /*
-    //validating required data
-     const {error} = validateAccount(req.body);
-    console.log("the error is " + error);
-    if (error) return res.status(400).send(error.details[0].message);
-     */
 
+    let arr = JSON.parse(accounts);
     const account = {
-        id: projects.length + 1,
+        id: arr.length + 1,
         username: req.body.username,
         skills: req.body.skills ,
         asignedProjectList: [],
         skillConfirmationList: []
     };
-    accounts.push(account);
-    res.send(account);
+
+    arr.push(account);
+    fs.writeFileSync("/home/tapsi/IdeaProjects/concurency/Server/Server-DataBase/accounts-text",JSON.stringify(arr),'utf-8', 'r+');
+    res.send("account built");
 });
 
 //delete
