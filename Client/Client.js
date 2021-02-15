@@ -1,30 +1,25 @@
 /****************************************************Preperation******************************************************/
+//requirements
+const request = require('request');
+const util = require('util');
+const axios = require('axios')
 //importing classes
 const accountClass = require("../Classes/Account");
 const projectClass = require("../Classes/Project");
 const bidClass = require("../Classes/Bid");
 const auctionClass = require("../Classes/Auction");
-//requirements
-const request = require('request');
-const util = require('util');
-const axios = require('axios')
 //global vars
 let allSkills = [];
 
 
 //testing post :
-let data = {
-    id:0,
-    username: "testing i think its working",
-    skills: [
-        {name: "Java", "point": 100},
-        {name: "CSS", "point": 12},
-        {name: "JS", "point": 70}
-    ],
-    asignedProjectList:[],
-    skillConfirmationList:[]
-}
-axios.post('http://localhost:4000/api/accounts', data)
+let map  = new Map();
+map.set("C",20);
+map.set("CSS",40);
+let account = new accountClass(0,"test",map,[],[]);
+let data = JSON.parse(serializeAccount(account));
+postAccount(data);
+
 
 
 
@@ -192,6 +187,11 @@ async function getAccountByID(request, id) {
     console.log(JSON.parse(body));
 
 }
+async function postAccount(account){
+    let data = JSON.parse(serializeAccount(account));
+    axios.post('http://localhost:4000/api/accounts', data);
+}
+
 
 
 /***********************************************OldMenu-Functions*****************************************************/
@@ -431,7 +431,7 @@ function serializeAccount(account) {
     myJson.asignedProjectList = account.asignedProjectList;
     myJson.skillConfirmationList = mapToObj(account.skillConfirmationList);
     const json = JSON.stringify(myJson);
-    return myJson;
+    return json;
 }
 
 function serializeProjects() {
