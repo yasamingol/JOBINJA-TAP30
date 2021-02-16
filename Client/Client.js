@@ -13,14 +13,13 @@ const auctionClass = require("../Classes/Auction");
 let allSkills = [];
 
 //using API to get DATA
-/*
 (async () => {
     await getAllProjectsFromServer(request);
     await getAllSkillsFromServer(request);
     await getAllAccountsFromServer(request);
     await loadMenus();
 })();
- */
+
 
 
 /***************************************************Main-Menus********************************************************/
@@ -33,7 +32,7 @@ async function loadMenus() {
     while (!commandIsValid) {
 
         //checking the expiration date for auctions
-        holdAuctions();
+        // holdAuctions();
 
         //Menus
         let arr = [];
@@ -239,7 +238,7 @@ function addProject(arr) {
         arrSkiles = arr[i].split(":");
         skills.set(arrSkiles[0], arrSkiles[1]);
     }
-    new projectClass(title, skills, budget, [], deadline, true);
+    new projectClass(0,title, skills, budget, [], deadline, true);
     console.log("project built successfully!\n".red);
 }
 
@@ -294,15 +293,37 @@ function addSkill(arr) {
     let account = accountClass.getAccountByUsername(arr[1]);
     let arrSkiles = [];
     arrSkiles = arr[2].split(":");
-    account.skills.set(arrSkiles[0], arrSkiles[1]);
-    console.log("skill added successfully!\n".red);
+    if(checkIfSkillIsValid(arrSkiles[0])) {
+        account.skills.set(arrSkiles[0], arrSkiles[1]);
+        console.log("skill added successfully!\n".red);
+    }else console.log("such skill does not exist!".red);
+}
+
+function checkIfSkillIsValid(givenSkill){
+    let skillIsValid = false;
+    allSkills.forEach((skill) => {
+        if(skill.name===givenSkill) skillIsValid = true;
+    })
+    return skillIsValid;
 }
 
 function removeSkill(arr) {
     let account = accountClass.getAccountByUsername(arr[1]);
     let skillName = arr[2];
-    account.skills.delete(skillName);
-    console.log("skill removed successfully!\n".red);
+    if(checkIfAccountHasSkill(account,skillName)) {
+        account.skills.delete(skillName);
+        console.log("skill removed successfully!\n".red);
+    }else console.log("user does not have such skill!".red);
+}
+function checkIfAccountHasSkill(account,skillName){
+    let hasThisSkill = false;
+    account.skills.forEach((value,key) => {
+        if(key===skillName){
+            hasThisSkill = true;
+        }
+    })
+    return hasThisSkill;
+
 }
 
 function confirmSkill(arr) {
@@ -314,7 +335,7 @@ function confirmSkill(arr) {
         otherUser.skills.delete(skillName);
         otherUser.skills.set(skillName, parseInt(skillRate) + 1);
         thisUser.skillConfirmationList.set(otherUser.username, skillName);
-        console.log(arr[1] + " confirmed ".red + arr[2] + " s ((".red + arr[3] + ")) skill\n ".red);
+        console.log(arr[1] + " confirmed "+ arr[2] + " s ((" + arr[3] + ")) skill\n ");
     } else console.log("cannot confirm this skillSet! you have done it once before!".red);
 
 }
@@ -359,7 +380,7 @@ function checkIfBidEnough(projectName, userBidAmount) {
 }
 
 function checkIfValidDateToBid(projectName) {
-    let projectDeadline = projectClass.getProjectByTitle(projectName).deadline;
+    let projectDeadline = Date.parse(projectClass.getProjectByTitle(projectName).deadline);
     let localDate = Date.now();
     return projectDeadline >= localDate;
 
@@ -507,7 +528,7 @@ function deserializeAllAccounts(arr) {
         let username = arr[i].username;
         let skillsArr = objToMap(arr[i].skills);
         let asignedProjectList = arr[i].asignedProjectList;
-        let skillConfirmationList = arr[i].skillConfirmationList;
+        let skillConfirmationList = objToMap(arr[i].skillConfirmationList);
         new accountClass(id, username, skillsArr, asignedProjectList, skillConfirmationList);
     }
 }
