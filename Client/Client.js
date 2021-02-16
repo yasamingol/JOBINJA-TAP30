@@ -529,4 +529,4 @@ function deserializeAllSkills(body) {
     allSkills = JSON.parse(body);
 }
 
-module.exports = {holdAuction,calculateBestBid,calculateUserSkill};
+module.exports = {holdAuction,calculateBestBid,calculateUserSkill,checkIfSkilledEnough,checkIfBidEnough};
