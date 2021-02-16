@@ -35,4 +35,9 @@ test('checking holdAuction method - the winner of tap30 should be yasamingol',()
     expect(clientClass.holdAuction("tap30")).toBe("yasamingol");
 })
 
+test('checking holdAuction method - the winner of tap30 should be yasamingol',() =>{
+    expect(clientClass.calculateBestBid(project1)).toBe("yasamingol");
+})
+
+
 
