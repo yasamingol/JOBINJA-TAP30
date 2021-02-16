@@ -8,7 +8,7 @@ app.use(express.json());
 const port = 3000;
 app.listen(port, () => console.log("listening on port 3000"));
 
-/**************************************************Projects***********************************************************/
+/**************************************************Projects*****************************************************************/
 let projectData = fs.readFileSync('/home/tapsi/IdeaProjects/concurency/Server/Server-DataBase/projects-text', 'utf-8', 'r+');
 let projects = projectData;
 

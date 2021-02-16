@@ -18,19 +18,17 @@ let project2 = new projectClass(2, "snap", map_project2, 8000, [], new Date(2022
         filename: 'database.db',
         driver: sqlite3.Database
     })
-    await db.exec('CREATE TABLE projects (id,title, skills, budget,deadline,isAvailable)')
-    await db.run('INSERT INTO projects VALUES ("1","2","3","4","5","6")')
-    console.log(await db.all('SELECT id FROM projects'))
-    console.log(await db.all('SELECT title FROM projects'))
-    console.log(await db.all('SELECT skills FROM projects'))
-    console.log(await db.all('SELECT budget FROM projects'))
-    console.log(await db.all('SELECT deadline FROM projects'))
-    console.log(await db.all('SELECT isAvailable FROM projects'))
+    await db.exec('CREATE TABLE projects (id,title, skills, budget,deadline,isAvailable)');
+    await db.run('INSERT INTO projects VALUES ("1","yasamingol","A:30","90","2020/03/04","true")');
+    await db.run('INSERT INTO projects VALUES ("2","ali","B:40","9797","2020/03/04","true")');
 
 
-    // await console.log(db.get('SELECT id FROM projects'))
+    console.log(await db.all('SELECT * FROM projects'))
+
+
 })()
 function saveProjectInDB(id,title, skills, budget,deadline,isAvailable){
 
 }
 
+//"1","yasamingol","A:30","90","2020/03/04","true"
