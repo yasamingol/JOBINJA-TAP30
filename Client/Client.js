@@ -21,7 +21,6 @@ let allSkills = [];
 })();
 
 
-
 /***************************************************Main-Menus********************************************************/
 async function loadMenus() {
     const prompt = require('prompt-sync')();
