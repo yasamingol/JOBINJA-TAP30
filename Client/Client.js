@@ -132,7 +132,7 @@ async function loadMenus() {
             // const command = readOneLine();
             const command = prompt("");
             arr = command.split(" ");
-            addProject(arr);
+            await addProject(arr);
 
 
         } else if (selectedMenu === "13") {
@@ -236,14 +236,8 @@ async function getAccountByID(request, id) {
 async function register(arr) {
     let username = arr[1];
     let skills = new Map;
-    let skillConfirmationList = new Map;
-    for (let i = 2; i < arr.length; i++) {
-        let arrSkiles = [];
-        arrSkiles = arr[i].split(":");
-        skills.set(arrSkiles[0], arrSkiles[1]);
-
-    }
-    let account = new accountClass(0, username, skills, [], skillConfirmationList);
+    buildSkillsMap(arr,skills,arr.length);
+    let account = new accountClass(0, username, skills, [], new Map);
     await databaseClass.saveAccountInDB(databaseClass.db,account);
     let counter = 0;
     for(const [key,value] of account.skills) {
@@ -251,25 +245,33 @@ async function register(arr) {
         counter++;
     }
     console.log("registered successfully!\n".red);
-    return account;
 
 }
 
-function addProject(arr) {
+async function addProject(arr) {
     let title = arr[1];
     let skills = new Map;
     let budget = arr[arr.length - 2];
     let deadline = stringToDateConverter(arr[arr.length - 1]);
-
-    for (let i = 2; i < arr.length - 2; i++) {
-        let arrSkiles = [];
-        arrSkiles = arr[i].split(":");
-        skills.set(arrSkiles[0], arrSkiles[1]);
+    buildSkillsMap(arr,skills,arr.length - 2);
+    let project = new projectClass(0,title, skills, budget, [], deadline, true);
+    await databaseClass.saveProjectInDB(databaseClass.db,0,project);
+    let counter = 0;
+    for(const [key,value] of project.skills){
+        await databaseClass.saveProjectSkillInDB(databaseClass.db,counter,key,value,project.id);
+        counter++
     }
-    new projectClass(0,title, skills, budget, [], deadline, true);
     console.log("project built successfully!\n".red);
 }
 
+function buildSkillsMap(arr,skills,length){
+    for (let i = 2; i < length; i++) {
+        let arrSkiles = [];
+        arrSkiles = arr[i].split(":");
+        skills.set(arrSkiles[0], arrSkiles[1]);
+
+    }
+}
 
 function addBid(arr) {
     let biddingUser = arr[1];
