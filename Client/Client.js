@@ -15,7 +15,16 @@ const sqlite = require('sqlite');
     await databaseClass.createAuctionsDB(databaseClass.db);
     await databaseClass.createSkillsDB(databaseClass.db);
     console.log("DataBase created succesfully :)")
-    await loadMenus();
+    // await loadMenus();
+
+    //test
+    let project = new projectClass(0,"tap30",-1,900,-1,"2022/03/03",true);
+    await databaseClass.saveProjectInDB(databaseClass.db,project);
+    let projectPrime = await projectClass.getProjectByTitle("tap30");
+    console.log("salam salam");
+
+
+
 })()
 
 
@@ -232,7 +241,7 @@ async function getAccountByID(request, id) {
 }
 
 /***********************************************ClientMenu-Functions*****************************************************/
-
+//register
 async function register(arr) {
     let username = arr[1];
     let skills = new Map;
@@ -252,6 +261,8 @@ async function saveRegisterInfoInDB(account) {
     }
 }
 
+
+//addProject
 async function addProject(arr) {
     let title = arr[1];
     let skills = new Map;
@@ -281,10 +292,19 @@ function buildSkillsMap(arr, skills, length) {
     }
 }
 
-function addBid(arr) {
+
+//addBid
+async function addBid(arr) {
     let biddingUser = arr[1];
     let projectTitle = arr[2];
     let bidAmount = arr[3];
+    let bid = await handlingAddBidErrors(biddingUser, projectTitle, bidAmount);
+    // let projectId = await projectClass.getProjectByTitle(projectTitle).listOfBids.push(bid);
+    await databaseClass.saveBidInDB(databaseClass.db, bid);
+    console.log("bid created successfully!\n".red);
+}
+
+async function handlingAddBidErrors(biddingUser, projectTitle, bidAmount) {
     if (!projectClass.getProjectByTitle(projectTitle).isAvailable) {
         console.log("cannot bid! project has already been taken.".red);
     } else if (!checkIfSkilledEnough(biddingUser, projectTitle)) {
@@ -294,12 +314,13 @@ function addBid(arr) {
     } else if (!checkIfValidDateToBid(projectTitle)) {
         console.log("you cannot bid on this project! it has ended".red);
     } else {
-        let bid = new bidClass(biddingUser, projectTitle, bidAmount);
-        projectClass.getProjectByTitle(projectTitle).listOfBids.push(bid);
-        console.log("bid created successfully!\n".red);
+        return new bidClass(biddingUser, projectTitle, bidAmount);
+
     }
 }
 
+
+//holdAuctions
 function holdAuctions() {
     projectClass.allProjects.forEach((project) => {
         let projectName = project.title;
@@ -327,6 +348,26 @@ function isAuctionDate(projectName) {
 
 }
 
+function calculateBestBid(project) {
+    let bestBid = 0;
+    let bestBidsAccount;
+    project.listOfBids.forEach((bid) => {
+        let userSkill = parseInt(calculateUserSkill(bid));
+        if (userSkill > bestBid) {
+            bestBid = userSkill;
+            bestBidsAccount = accountClass.getAccountByUsername(bid.username);
+        }
+    });
+    return bestBidsAccount.username;
+}
+
+function assignProject(username, projectName) {
+    let account = accountClass.getAccountByUsername(username);
+    account.asignedProjectList.push(projectName);
+}
+
+
+//add/remove/confirm Skill
 function addSkill(arr) {
     let account = accountClass.getAccountByUsername(arr[1]);
     let arrSkiles = [];
@@ -365,6 +406,7 @@ function checkIfAccountHasSkill(account, skillName) {
 
 }
 
+
 function confirmSkill(arr) {
     let thisUser = accountClass.getAccountByUsername(arr[1]);
     let otherUser = accountClass.getAccountByUsername(arr[2]);
@@ -387,12 +429,6 @@ function checkIfConfirmedBefore(user1, user2, skill) {
         } else return false
     } else return false
 
-}
-
-
-function assignProject(username, projectName) {
-    let account = accountClass.getAccountByUsername(username);
-    account.asignedProjectList.push(projectName);
 }
 
 
@@ -425,13 +461,6 @@ function checkIfValidDateToBid(projectName) {
 
 }
 
-function stringToDateConverter(string) {
-    let arr = string.split("/");
-    let date = new Date(arr[0], arr[1], arr[2], 0, 0, 0);
-    console.log(date);
-    return date;
-}
-
 
 function calculateUserSkill(bid) {
     let project = projectClass.getProjectByTitle(bid.projectaTitle);
@@ -447,18 +476,6 @@ function calculateUserSkill(bid) {
     return skillSum + (jobOffer - userOffer);
 }
 
-function calculateBestBid(project) {
-    let bestBid = 0;
-    let bestBidsAccount;
-    project.listOfBids.forEach((bid) => {
-        let userSkill = parseInt(calculateUserSkill(bid));
-        if (userSkill > bestBid) {
-            bestBid = userSkill;
-            bestBidsAccount = accountClass.getAccountByUsername(bid.username);
-        }
-    });
-    return bestBidsAccount.username;
-}
 
 /***********************************************Tool-Functions*********************************************************/
 
@@ -476,6 +493,13 @@ function objToMap(myObject) {
     });
     return map;
 
+}
+
+function stringToDateConverter(string) {
+    let arr = string.split("/");
+    let date = new Date(arr[0], arr[1], arr[2], 0, 0, 0);
+    console.log(date);
+    return date;
 }
 
 /***************************************************Serialize*********************************************************/

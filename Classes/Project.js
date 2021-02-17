@@ -1,3 +1,8 @@
+const databaseClass = require('../DataBase/database');
+const sqlite3 = require('sqlite3');
+const sqlite = require('sqlite');
+
+
 class Project {
     static allProjects = [];
     constructor(id,title, skills, budget, listOfBids,deadline,isAvailable) {
@@ -10,13 +15,9 @@ class Project {
         this.isAvailable = isAvailable;
         Project.allProjects[Project.allProjects.length] = this;
     }
-    static getProjectByTitle(title) {
-        for (let i = 0; i < Project.allProjects.length; i++) {
-            if (Project.allProjects[i].title === title) {
-                return Project.allProjects[i];
-            }
-        }
-        console.log("this project does not exist");
+
+    static async getProjectByTitle(title) {
+        let projectID = await databaseClass.getProjlectIDUsingTitleFromDB(databaseClass.db,title);
     }
 
 }
