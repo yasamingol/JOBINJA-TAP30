@@ -17,31 +17,44 @@ let project1 = new projectClass(1, "tap30", map_project1, 400, [], new Date(2022
     })
     await db.exec('CREATE TABLE projects (id, title, budget,deadline,isAvailable)');
     await saveProjectInDB(project1.id, project1.title, project1.budget, project1.deadline, project1.isAvailable)
-    console.log(await getProjectIDUsingTitleFromDB("tap30"));
-
+    await updateProjectAvailabilityInDB(1);
+    console.log(await getProjectsFullDBTable())
 
 
 })()
 
 function saveProjectInDB(id, title, budget, deadline, isAvailable) {
-   db.run('INSERT INTO projects VALUES (?,?,?,?,?)', [id, title, budget, deadline, isAvailable]);
+    db.run('INSERT INTO projects VALUES (?,?,?,?,?)', [id, title, budget, deadline, isAvailable]);
 }
-function getProjectsFullDBTable(){
+
+function updateProjectAvailabilityInDB(projectID) {
+    db.run('UPDATE projects SET isAvailable = ? WHERE id = ?',
+        false,
+        projectID
+    )
+}
+
+function getProjectsFullDBTable() {
     return db.all('SELECT * FROM projects')
 }
-function getProjectXTitleFromDB(projectID){
+
+function getProjectXTitleFromDB(projectID) {
     return db.get('SELECT title FROM projects WHERE id = ?', [projectID]);
 }
-function getProjectXBudgetFromDB(projectID){
+
+function getProjectXBudgetFromDB(projectID) {
     return db.get('SELECT budget FROM projects WHERE id = ?', [projectID]);
 }
-function getProjectXDeadlineFromDB(projectID){
+
+function getProjectXDeadlineFromDB(projectID) {
     return db.get('SELECT deadline FROM projects WHERE id = ?', [projectID]);
 }
-function getProjectXIsAvailableFromDB(projectID){
+
+function getProjectXIsAvailableFromDB(projectID) {
     return db.get('SELECT isAvailable FROM projects WHERE id = ?', [projectID]);
 }
-function getProjectIDUsingTitleFromDB(projectTitle){
+
+function getProjectIDUsingTitleFromDB(projectTitle) {
     return db.get('SELECT id FROM projects WHERE title = ?', [projectTitle])
 }
 
