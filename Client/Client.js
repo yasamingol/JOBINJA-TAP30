@@ -231,21 +231,25 @@ async function getAccountByID(request, id) {
 
 }
 
-/***********************************************OldMenu-Functions*****************************************************/
+/***********************************************ClientMenu-Functions*****************************************************/
 
 async function register(arr) {
     let username = arr[1];
     let skills = new Map;
-    buildSkillsMap(arr,skills,arr.length);
+    buildSkillsMap(arr, skills, arr.length);
     let account = new accountClass(0, username, skills, [], new Map);
-    await databaseClass.saveAccountInDB(databaseClass.db,account);
-    let counter = 0;
-    for(const [key,value] of account.skills) {
-        await databaseClass.saveAccountSkillInDB(databaseClass.db,counter,key,value,account.id);
-        counter++;
-    }
+    await saveRegisterInfoInDB(account);
     console.log("registered successfully!\n".red);
 
+}
+
+async function saveRegisterInfoInDB(account) {
+    await databaseClass.saveAccountInDB(databaseClass.db, account);
+    let counter = 0;
+    for (const [key, value] of account.skills) {
+        await databaseClass.saveAccountSkillInDB(databaseClass.db, counter, key, value, account.id);
+        counter++;
+    }
 }
 
 async function addProject(arr) {
@@ -253,18 +257,22 @@ async function addProject(arr) {
     let skills = new Map;
     let budget = arr[arr.length - 2];
     let deadline = stringToDateConverter(arr[arr.length - 1]);
-    buildSkillsMap(arr,skills,arr.length - 2);
-    let project = new projectClass(0,title, skills, budget, [], deadline, true);
-    await databaseClass.saveProjectInDB(databaseClass.db,0,project);
-    let counter = 0;
-    for(const [key,value] of project.skills){
-        await databaseClass.saveProjectSkillInDB(databaseClass.db,counter,key,value,project.id);
-        counter++
-    }
+    buildSkillsMap(arr, skills, arr.length - 2);
+    let project = new projectClass(0, title, skills, budget, [], deadline, true);
+    await saveAddProjectInfoInDB(project);
     console.log("project built successfully!\n".red);
 }
 
-function buildSkillsMap(arr,skills,length){
+async function saveAddProjectInfoInDB(project) {
+    await databaseClass.saveProjectInDB(databaseClass.db, 0, project);
+    let counter = 0;
+    for (const [key, value] of project.skills) {
+        await databaseClass.saveProjectSkillInDB(databaseClass.db, counter, key, value, project.id);
+        counter++
+    }
+}
+
+function buildSkillsMap(arr, skills, length) {
     for (let i = 2; i < length; i++) {
         let arrSkiles = [];
         arrSkiles = arr[i].split(":");
@@ -323,16 +331,16 @@ function addSkill(arr) {
     let account = accountClass.getAccountByUsername(arr[1]);
     let arrSkiles = [];
     arrSkiles = arr[2].split(":");
-    if(checkIfSkillIsValid(arrSkiles[0])) {
+    if (checkIfSkillIsValid(arrSkiles[0])) {
         account.skills.set(arrSkiles[0], arrSkiles[1]);
         console.log("skill added successfully!\n".red);
-    }else console.log("such skill does not exist!".red);
+    } else console.log("such skill does not exist!".red);
 }
 
-function checkIfSkillIsValid(givenSkill){
+function checkIfSkillIsValid(givenSkill) {
     let skillIsValid = false;
     allSkills.forEach((skill) => {
-        if(skill.name===givenSkill) skillIsValid = true;
+        if (skill.name === givenSkill) skillIsValid = true;
     })
     return skillIsValid;
 }
@@ -340,15 +348,16 @@ function checkIfSkillIsValid(givenSkill){
 function removeSkill(arr) {
     let account = accountClass.getAccountByUsername(arr[1]);
     let skillName = arr[2];
-    if(checkIfAccountHasSkill(account,skillName)) {
+    if (checkIfAccountHasSkill(account, skillName)) {
         account.skills.delete(skillName);
         console.log("skill removed successfully!\n".red);
-    }else console.log("user does not have such skill!".red);
+    } else console.log("user does not have such skill!".red);
 }
-function checkIfAccountHasSkill(account,skillName){
+
+function checkIfAccountHasSkill(account, skillName) {
     let hasThisSkill = false;
-    account.skills.forEach((value,key) => {
-        if(key===skillName){
+    account.skills.forEach((value, key) => {
+        if (key === skillName) {
             hasThisSkill = true;
         }
     })
@@ -365,7 +374,7 @@ function confirmSkill(arr) {
         otherUser.skills.delete(skillName);
         otherUser.skills.set(skillName, parseInt(skillRate) + 1);
         thisUser.skillConfirmationList.set(otherUser.username, skillName);
-        console.log(arr[1] + " confirmed "+ arr[2] + " s ((" + arr[3] + ")) skill\n ");
+        console.log(arr[1] + " confirmed " + arr[2] + " s ((" + arr[3] + ")) skill\n ");
     } else console.log("cannot confirm this skillSet! you have done it once before!".red);
 
 }
@@ -580,4 +589,4 @@ function deserializeAllSkills(body) {
     allSkills = JSON.parse(body);
 }
 
-module.exports = {holdAuction,calculateBestBid,calculateUserSkill,checkIfSkilledEnough,checkIfBidEnough};
+module.exports = {holdAuction, calculateBestBid, calculateUserSkill, checkIfSkilledEnough, checkIfBidEnough};
