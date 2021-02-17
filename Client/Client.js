@@ -1,4 +1,4 @@
-
+const databaseClass = require('../DataBase/database');
 /****************************************************Preperation******************************************************/
 //requirements
 const request = require('request');

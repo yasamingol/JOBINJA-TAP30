@@ -2,15 +2,6 @@ const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 let db;
 
-
-//sample test to build the database
-const accountClass = require("../Classes/Account");
-const projectClass = require("../Classes/Project");
-let map_project1 = new Map([["C", "10"], ["C++", "20"]]);
-let project1 = new projectClass(1, "tap30", map_project1, 400, [], new Date(2022, 3, 4, 0, 0, 0), true);
-let account1 = new accountClass(1, "yasamingol", map_project1, [], []);
-
-
 // this is a top-level await
 (async () => {
     db = await sqlite.open({
@@ -18,17 +9,10 @@ let account1 = new accountClass(1, "yasamingol", map_project1, [], []);
         driver: sqlite3.Database
     })
     await createProjectsDB();
-    await saveProjectInDB(project1.id, project1.title, project1.budget, project1.deadline, project1.isAvailable)
     await createAccountsDB();
-    await saveAccountInDB(account1.id,account1.username);
     await createBidsDB();
-    await saveBidInDB(1,"yasamingol","tap30",34567);
     await createAuctionsDB();
-    await saveAuctionInDB(1,"top30","yasamingol");
-    console.log(await getAuctionsFullDBTable());
-    console.log(await getBidsFullDBTable())
-    console.log(await getProjectsFullDBTable())
-    console.log(await getAccountsFullDBTable())
+
 })()
 /************************************************ProjectsDBFunctions**************************************************/
 function createProjectsDB() {
@@ -169,4 +153,19 @@ function getSkillXAccountIDFromDB(skillID){
 }
 function getSkillXProjectIDFromDB(skillID){
     return db.get('SELECT projectID FROM Skills WHERE id = ?', [skillID]);
+}
+
+
+module.exports = {createProjectsDB,saveProjectInDB,updateProjectAvailabilityInDB,
+    updateProjectAssignedAccountIdInDB,getProjectsFullDBTable,getProjectXTitleFromDB,
+    getProjectXBudgetFromDB,getProjectXDeadlineFromDB,getProjectXIsAvailableFromDB,
+    getProjectIDUsingTitleFromDB,createAccountsDB,saveAccountInDB,getAccountsFullDBTable,
+    getAccountXUsernameFromDB,getAccountIDUsingUsernameFromDB,createBidsDB,saveBidInDB,
+    getBidsFullDBTable,getBidXUsernameFromDB,getBidXProjectTitleFromDB,getBidXBidAmountFromDB,
+    getBidIDUsingUsernameFromDB,createAuctionsDB,saveAuctionInDB,updateAuctionWinnerInDB,
+    getAuctionsFullDBTable,getAuctionXProjectTitleFromDB,getAuctionXWinnerFromDB,
+    createSkillsDB,saveAccountSkillInDB,saveProjectSkillInDB,updateAccountSkillPointInDB,
+    getSkillsFullDBTable,getSkillXSkillNameFromDB,getSkillXSkillPointFromDB,getSkillXAccountIDFromDB,
+    getSkillXProjectIDFromDB
+
 }
