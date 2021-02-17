@@ -15,13 +15,16 @@ let project1 = new projectClass(1, "tap30", map_project1, 400, [], new Date(2022
         filename: 'database.db',
         driver: sqlite3.Database
     })
-    await db.exec('CREATE TABLE projects (id, title, budget,deadline,isAvailable)');
+    await createProjectsDB();
     await saveProjectInDB(project1.id, project1.title, project1.budget, project1.deadline, project1.isAvailable)
-    await updateProjectAvailabilityInDB(1);
     console.log(await getProjectsFullDBTable())
 
 
 })()
+
+function createProjectsDB() {
+    db.exec('CREATE TABLE projects (id, title, budget,deadline,isAvailable)');
+}
 
 function saveProjectInDB(id, title, budget, deadline, isAvailable) {
     db.run('INSERT INTO projects VALUES (?,?,?,?,?)', [id, title, budget, deadline, isAvailable]);
