@@ -21,10 +21,11 @@ let account1 = new accountClass(1, "yasamingol", map_project1, [], []);
     await saveProjectInDB(project1.id, project1.title, project1.budget, project1.deadline, project1.isAvailable)
     await createAccountsDB();
     await saveAccountInDB(account1.id,account1.username);
-    console.log(await getAccountIDUsingUsernameFromDB("yasamingol"));
-    console.log(await getAccountXUsernameFromDB(1));
+    await createBidsDB();
+    await saveBidInDB(1,"yasamingol","tap30",34567);
+    console.log(await getBidsFullDBTable())
     console.log(await getProjectsFullDBTable())
-    console.log(await getAccountsFullDBtABLE())
+    console.log(await getAccountsFullDBTable())
 })()
 /************************************************ProjectsDBFunctions**************************************************/
 function createProjectsDB() {
@@ -73,7 +74,7 @@ function createAccountsDB(){
 function saveAccountInDB(id, username) {
     db.run('INSERT INTO Accounts VALUES (?,?)', [id, username]);
 }
-function getAccountsFullDBtABLE(){
+function getAccountsFullDBTable(){
     return db.all('SELECT * FROM Accounts');
 }
 function getAccountXUsernameFromDB(accountID){
@@ -82,4 +83,27 @@ function getAccountXUsernameFromDB(accountID){
 function getAccountIDUsingUsernameFromDB(accountUsername){
     return db.get('SELECT id FROM Accounts WHERE username = ?', [accountUsername])
 
+}
+/************************************************BidsDBFunctions**************************************************/
+//id,username, projectTitle, bidAmount
+function createBidsDB(){
+    db.exec('CREATE TABLE Bids (id, username,projectTitle,bidAmount)');
+}
+function saveBidInDB(id, username,projectTitle,bidAmount){
+    db.run('INSERT INTO Bids VALUES (?,?,?,?)', [id, username,projectTitle,bidAmount]);
+}
+function getBidsFullDBTable(){
+    return db.all('SELECT * FROM Bids');
+}
+function getBidXUsernameFromDB(bidID){
+    return db.get('SELECT username FROM Bids WHERE id = ?', [bidID]);
+}
+function getBidXProjectTitleFromDB(bidID){
+    return db.get('SELECT projectTitle FROM Bids WHERE id = ?', [bidID]);
+}
+function getBidXBidAmountFromDB(bidID){
+    return db.get('SELECT bidAmount FROM Bids WHERE id = ?', [bidID]);
+}
+function getBidIDUsingUsernameFromDB(bidUsername){
+    return db.get('SELECT id FROM Bids WHERE  username = ?', [bidUsername]);
 }
