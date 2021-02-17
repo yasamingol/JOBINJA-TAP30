@@ -17,12 +17,18 @@ let project1 = new projectClass(1, "tap30", map_project1, 400, [], new Date(2022
     })
     await db.exec('CREATE TABLE projects (id,title, skills, budget,deadline,isAvailable)');
     await saveProjectInDB(project1.id, project1.title, project1.skills, project1.budget, project1.title, project1.isAvailable)
-    console.log(await db.all('SELECT * FROM projects'))
+    console.log(await getProjectsFullDBTable());
+    console.log(await getProjectXTitleFromDB(1));
 
 
 })()
 
 function saveProjectInDB(id, title, skills, budget, deadline, isAvailable) {
    db.run('INSERT INTO projects VALUES (?,?,?,?,?,?)', [id, title, skills, budget, deadline, isAvailable]);
-
+}
+function getProjectsFullDBTable(){
+    return db.all('SELECT * FROM projects')
+}
+function getProjectXTitleFromDB(projectID){
+    return db.get('SELECT title FROM projects WHERE id = ?', [projectID]);
 }
