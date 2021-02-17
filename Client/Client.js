@@ -13,10 +13,9 @@ const sqlite = require('sqlite');
     await databaseClass.createAccountsDB(databaseClass.db);
     await databaseClass.createBidsDB(databaseClass.db);
     await databaseClass.createAuctionsDB(databaseClass.db);
+    await databaseClass.createSkillsDB(databaseClass.db);
     console.log("DataBase created succesfully :)")
-
-    // await databaseClass.saveProjectInDB(1,"tap30",300,"2020/03/03",true);
-
+    await loadMenus();
 })()
 
 
@@ -121,7 +120,7 @@ async function loadMenus() {
             console.log("Welcome to ((register)) menu!".cyan + "command : register <username> <skill:point> ".green);
             command = prompt("");
             arr = command.split(" ");
-            register(arr);
+            await register(arr);
 
 
         } else if (selectedMenu === "11") {
@@ -234,7 +233,7 @@ async function getAccountByID(request, id) {
 
 /***********************************************OldMenu-Functions*****************************************************/
 
-function register(arr) {
+async function register(arr) {
     let username = arr[1];
     let skills = new Map;
     let skillConfirmationList = new Map;
@@ -245,6 +244,12 @@ function register(arr) {
 
     }
     let account = new accountClass(0, username, skills, [], skillConfirmationList);
+    await databaseClass.saveAccountInDB(databaseClass.db,account);
+    let counter = 0;
+    for(const [key,value] of account.skills) {
+        await databaseClass.saveAccountSkillInDB(databaseClass.db,counter,key,value,account.id);
+        counter++;
+    }
     console.log("registered successfully!\n".red);
     return account;
 
