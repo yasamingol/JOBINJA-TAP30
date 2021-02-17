@@ -17,11 +17,7 @@ let project1 = new projectClass(1, "tap30", map_project1, 400, [], new Date(2022
     })
     await db.exec('CREATE TABLE projects (id, title, budget,deadline,isAvailable)');
     await saveProjectInDB(project1.id, project1.title, project1.budget, project1.deadline, project1.isAvailable)
-    console.log(await getProjectsFullDBTable());
-    console.log(await getProjectXTitleFromDB(1));
-    console.log(await getProjectXBudgetFromDB(1));
-    console.log(await getProjectXDeadlineFromDB(1));
-    console.log(await getProjectXIsAvailableFromDB(1));
+    console.log(await getProjectIDUsingTitleFromDB("tap30"));
 
 
 
@@ -44,6 +40,9 @@ function getProjectXDeadlineFromDB(projectID){
 }
 function getProjectXIsAvailableFromDB(projectID){
     return db.get('SELECT isAvailable FROM projects WHERE id = ?', [projectID]);
+}
+function getProjectIDUsingTitleFromDB(projectTitle){
+    return db.get('SELECT id FROM projects WHERE title = ?', [projectTitle])
 }
 
 
