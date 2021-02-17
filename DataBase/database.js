@@ -23,6 +23,9 @@ let account1 = new accountClass(1, "yasamingol", map_project1, [], []);
     await saveAccountInDB(account1.id,account1.username);
     await createBidsDB();
     await saveBidInDB(1,"yasamingol","tap30",34567);
+    await createAuctionsDB();
+    await saveAuctionInDB(1,"top30","yasamingol");
+    console.log(await getAuctionsFullDBTable());
     console.log(await getBidsFullDBTable())
     console.log(await getProjectsFullDBTable())
     console.log(await getAccountsFullDBTable())
@@ -106,4 +109,27 @@ function getBidXBidAmountFromDB(bidID){
 }
 function getBidIDUsingUsernameFromDB(bidUsername){
     return db.get('SELECT id FROM Bids WHERE  username = ?', [bidUsername]);
+}
+/************************************************AuctionDBFunctions**************************************************/
+function createAuctionsDB(){
+    db.exec('CREATE TABLE Auctions (id, projectTitle, winnerUsername)');
+}
+function saveAuctionInDB(id, projectTitle, winnerUsername){
+    db.run('INSERT INTO Auctions VALUES (?,?,?)', [id, projectTitle, winnerUsername]);
+}
+function updateAuctionWinnerInDB(auctionID,username){
+    db.run('UPDATE Auctions SET winnerUsername = ? WHERE id = ?',
+        username,
+        auctionID
+    )
+}
+function getAuctionsFullDBTable(){
+    return db.all('SELECT * FROM Auctions');
+}
+
+function getAuctionXProjectTitleFromDB(auctionID){
+    return db.get('SELECT projectTitle FROM Auctions WHERE id = ?', [auctionID]);
+}
+function getAuctionXWinnerFromDB(auctionID){
+    return db.get('SELECT winnerUsername FROM Auctions WHERE id = ?', [auctionID]);
 }
