@@ -1,4 +1,25 @@
+/************************************************SettingUp-DataBase*************************************************/
 const databaseClass = require('../DataBase/database');
+const sqlite3 = require('sqlite3');
+const sqlite = require('sqlite');
+
+//using database
+(async () => {
+    databaseClass.db = await sqlite.open({
+        filename: '/home/tapsi/IdeaProjects/concurency/DataBase/database.db',
+        driver: sqlite3.Database
+    })
+    await databaseClass.createProjectsDB(databaseClass.db);
+    await databaseClass.createAccountsDB(databaseClass.db);
+    await databaseClass.createBidsDB(databaseClass.db);
+    await databaseClass.createAuctionsDB(databaseClass.db);
+    console.log("DataBase created succesfully :)")
+
+    // await databaseClass.saveProjectInDB(1,"tap30",300,"2020/03/03",true);
+
+})()
+
+
 /****************************************************Preperation******************************************************/
 //requirements
 const request = require('request');
@@ -13,12 +34,15 @@ const auctionClass = require("../Classes/Auction");
 let allSkills = [];
 
 //using API to get DATA
+/*
 (async () => {
     await getAllProjectsFromServer(request);
     await getAllSkillsFromServer(request);
     await getAllAccountsFromServer(request);
     await loadMenus();
 })();
+
+ */
 
 
 /***************************************************Main-Menus********************************************************/
