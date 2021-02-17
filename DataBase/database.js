@@ -21,6 +21,8 @@ let project2 = new projectClass(2, "snap", map_project2, 8000, [], new Date(2022
     await db.exec('CREATE TABLE projects (id,title, skills, budget,deadline,isAvailable)');
     await db.run('INSERT INTO projects VALUES ("1","yasamingol","A:30","90","2020/03/04","true")');
     await db.run('INSERT INTO projects VALUES ("2","ali","B:40","9797","2020/03/04","true")');
+    await db.run('INSERT INTO projects VALUES (?,?,?,?,?,?)',[project1.id,project1.title,project1.skills,project1.budget,project1.title,project1.isAvailable]);
+
 
 
     console.log(await db.all('SELECT * FROM projects'))
