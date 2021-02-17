@@ -32,16 +32,22 @@ let account1 = new accountClass(1, "yasamingol", map_project1, [], []);
 })()
 /************************************************ProjectsDBFunctions**************************************************/
 function createProjectsDB() {
-    db.exec('CREATE TABLE projects (id, title, budget,deadline,isAvailable)');
+    db.exec('CREATE TABLE projects (id, title, budget,deadline,isAvailable,assignedAccountId)');
 }
 
 function saveProjectInDB(id, title, budget, deadline, isAvailable) {
-    db.run('INSERT INTO projects VALUES (?,?,?,?,?)', [id, title, budget, deadline, isAvailable]);
+    db.run('INSERT INTO projects VALUES (?,?,?,?,?,?)', [id, title, budget, deadline, isAvailable,-1]);
 }
 
 function updateProjectAvailabilityInDB(projectID) {
     db.run('UPDATE projects SET isAvailable = ? WHERE id = ?',
         false,
+        projectID
+    )
+}
+function updateProjectAssignedAccountIdInDB(projectID,accountID){
+    db.run('UPDATE projects SET assignedAccountId = ? WHERE id = ?',
+        accountID,
         projectID
     )
 }
@@ -132,4 +138,35 @@ function getAuctionXProjectTitleFromDB(auctionID){
 }
 function getAuctionXWinnerFromDB(auctionID){
     return db.get('SELECT winnerUsername FROM Auctions WHERE id = ?', [auctionID]);
+}
+/*************************************************SkillsDBFunctions***************************************************/
+function createSkillsDB(){
+    db.exec('CREATE TABLE Skills (id, skillName,skillPoint,accountID,projectID)');
+}
+function saveAccountSkillInDB(id, skillName,skillPoint,accountID){
+    db.run('INSERT INTO Skills VALUES (?,?,?,?,?)', [id, skillName,skillPoint,accountID,-1]);
+}
+function saveProjectSkillInDB(id, skillName,skillPoint,projectID){
+    db.run('INSERT INTO Skills VALUES (?,?,?,?,?)', [id, skillName,skillPoint,-1,projectID]);
+}
+function updateAccountSkillPointInDB(skillID,skillPoint){
+    db.run('UPDATE Skills SET skillPoint = ? WHERE id = ?',
+        skillPoint,
+        skillID
+    )
+}
+function getSkillsFullDBTable(){
+    return db.all('SELECT * FROM Skills')
+}
+function getSkillXSkillNameFromDB(skillID){
+    return db.get('SELECT skillName FROM Skills WHERE id = ?', [skillID]);
+}
+function getSkillXSkillPointFromDB(skillID){
+    return db.get('SELECT skillPoint FROM Skills WHERE id = ?', [skillID]);
+}
+function getSkillXAccountIDFromDB(skillID){
+    return db.get('SELECT accountID FROM Skills WHERE id = ?', [skillID]);
+}
+function getSkillXProjectIDFromDB(skillID){
+    return db.get('SELECT projectID FROM Skills WHERE id = ?', [skillID]);
 }
