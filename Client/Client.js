@@ -14,16 +14,17 @@ const sqlite = require('sqlite');
     await databaseClass.createBidsDB(databaseClass.db);
     await databaseClass.createAuctionsDB(databaseClass.db);
     await databaseClass.createSkillsDB(databaseClass.db);
-    console.log("DataBase created succesfully :)")
+    console.log("DataBase created successfully :)")
     // await loadMenus();
 
-    //test
+//test for getXBY...
+
     let project = new projectClass(0,"tap30",-1,900,-1,"2022/03/03",true);
     await databaseClass.saveProjectInDB(databaseClass.db,project);
-    let projectId = await databaseClass.getProjectIDUsingTitleFromDB(databaseClass.db,"tap30");
-    console.log(projectId);
 
+    // let projectId = await databaseClass.getProjectIDUsingTitleFromDB(databaseClass.db,"tap30");
 
+    console.log(await databaseClass.foreachInProjectsFromDB(databaseClass.db));
 
 })()
 
@@ -42,15 +43,15 @@ const auctionClass = require("../Classes/Auction");
 let allSkills = [];
 
 //using API to get DATA
-/*
+
 (async () => {
-    await getAllProjectsFromServer(request);
-    await getAllSkillsFromServer(request);
-    await getAllAccountsFromServer(request);
-    await loadMenus();
+    // await getAllProjectsFromServer(request);
+    // await getAllSkillsFromServer(request);
+    // await getAllAccountsFromServer(request);
+    // await loadMenus();
 })();
 
- */
+
 
 
 /***************************************************Main-Menus********************************************************/
@@ -167,6 +168,7 @@ function showAvailableMenus() {
 }
 
 function viewAllProjects() {
+
     projectClass.allProjects.forEach((project) => {
         console.log(project.id + "." + project.title);
     })
