@@ -17,7 +17,7 @@ class Project {
     }
 
     static async getProjectByTitle(title) {
-        let projectID = await databaseClass.getProjlectIDUsingTitleFromDB(databaseClass.db,title);
+
     }
 
 }

@@ -20,8 +20,8 @@ const sqlite = require('sqlite');
     //test
     let project = new projectClass(0,"tap30",-1,900,-1,"2022/03/03",true);
     await databaseClass.saveProjectInDB(databaseClass.db,project);
-    let projectPrime = await projectClass.getProjectByTitle("tap30");
-    console.log("salam salam");
+    let projectId = await databaseClass.getProjectIDUsingTitleFromDB(databaseClass.db,"tap30");
+    console.log(projectId);
 
 
 
@@ -156,6 +156,7 @@ async function loadMenus() {
 //serializing
     serializeAllData();
 }
+/**************************get/set methods that need to be converted into their own classes***************************/
 
 /***********************************************Main-Functions*********************************************************/
 function showAvailableMenus() {
