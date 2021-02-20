@@ -19,7 +19,12 @@ const sqlite = require('sqlite');
     await databaseClass.saveProjectInDB(databaseClass.db,project);
     let account = new accountClass(0,"yasamingol",-1,-1,-1);
     await databaseClass.saveAccountInDB(databaseClass.db,account);
+    await databaseClass.saveAccountSkillInDB(databaseClass.db,0,"A",200,0);
+    await databaseClass.saveAccountSkillInDB(databaseClass.db,1,"B",400,0);
+    let skillsOfAccount = await databaseClass.getSkillsOfAccountXFromDB(databaseClass.db,0) ;
+    console.log(skillsOfAccount[0].id);
     await loadMenus();
+    let skillsOfAccount = await databaseClass.getSkillsOfAccountXFromDB(databaseClass.db, 0);
 
 
 })()
@@ -47,8 +52,6 @@ let allSkills = [];
 })();
 
 
-
-
 /***************************************************Main-Menus********************************************************/
 async function loadMenus() {
     const prompt = require('prompt-sync')();
@@ -74,7 +77,7 @@ async function loadMenus() {
         } else if (selectedMenu === "2") {
             console.log("\nWelcome to ((view available projects)) menu!".cyan + " command : <username> ".green);
             command = prompt("");
-            viewAvailableProjects(command);
+            await viewAvailableProjects(command);
 
 
         } else if (selectedMenu === "3") {
@@ -152,6 +155,7 @@ async function loadMenus() {
 //serializing
     serializeAllData();
 }
+
 /**************************get/set methods that need to be converted into their own classes***************************/
 
 /***********************************************Main-Functions*********************************************************/
@@ -164,30 +168,31 @@ function showAvailableMenus() {
 
 async function viewAllProjects() {
     let numberOfProjects = await databaseClass.getNumberOfRowsOfProjectsFromDB(databaseClass.db);
-    for(let i=0;i<numberOfProjects;i++){
-        let projectsTitle = await databaseClass.getProjectXTitleFromDB(databaseClass.db,i);
-        console.log(i + "."+ projectsTitle.title);
+    for (let i = 0; i < numberOfProjects; i++) {
+        let projectsTitle = await databaseClass.getProjectXTitleFromDB(databaseClass.db, i);
+        console.log(i + "." + projectsTitle.title);
     }
 }
 
-///!!!!
-function viewAvailableProjects(command) {
+async function viewAvailableProjects(username) {
     let hasMinOneAvailable = false;
-    projectClass.allProjects.forEach((project) => {
-        if (checkIfSkilledEnough(command, project.title)) {
-            console.log(" Available projects :\n ".green + project.id + "." + project.title);
+    let numberOfProjects = await databaseClass.getNumberOfRowsOfProjectsFromDB(databaseClass.db);
+    for (let i = 0; i < numberOfProjects; i++) {
+        let projectsTitle = await databaseClass.getProjectXTitleFromDB(databaseClass.db, i);
+        if (await checkIfSkilledEnough(username, projectsTitle)) {
+            console.log(" Available projects :\n ".green + i + "." + projectsTitle.title);
             hasMinOneAvailable = true;
         }
-    })
+    }
     if (!hasMinOneAvailable) console.log("There is no project available for you now!".red);
 
 }
 
 async function viewAllAccounts() {
     let numberOfAccounts = await databaseClass.getNumberOfRowsOfAccountsFromDB(databaseClass.db);
-    for(let i=0; i<numberOfAccounts; i++){
-        let accountName = await databaseClass.getAccountXUsernameFromDB(databaseClass.db,i);
-        console.log(i+"."+accountName.username);
+    for (let i = 0; i < numberOfAccounts; i++) {
+        let accountName = await databaseClass.getAccountXUsernameFromDB(databaseClass.db, i);
+        console.log(i + "." + accountName.username);
     }
 }
 
@@ -435,19 +440,43 @@ function checkIfConfirmedBefore(user1, user2, skill) {
 }
 
 
-function checkIfSkilledEnough(userName, projectName) {
+async function checkIfSkilledEnough(userName, projectName) {
     let isSkilled = true;
-    let account = accountClass.getAccountByUsername(userName);
-    let project = projectClass.getProjectByTitle(projectName);
-    project.skills.forEach((value1, key1) => {
-        if (account.skills.has(key1)) {
-            if (parseInt(account.skills.get(key1)) < parseInt(value1)) {
+    let accountID = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db,userName);
+    let projectID = await databaseClass.getProjectIDUsingTitleFromDB(databaseClass.db,projectName);
+    let projectsSkillsMap = await getAllSkillsMapOfProject(projectID);
+    let accountsSkillsMap = await getAllSkillsMapOfAccount(accountID);
+    projectsSkillsMap.forEach((value1, key1) => {
+        if (accountsSkillsMap.has(key1)) {
+            if (parseInt(accountsSkillsMap.get(key1)) < parseInt(value1)) {
                 isSkilled = false;
             }
         } else isSkilled = false;
     })
     return isSkilled;
 
+}
+
+async function getAllSkillsMapOfAccount(accountID) {
+    let skillArray = await databaseClass.getSkillsOfAccountXFromDB(databaseClass.db, accountID);
+    return await convertSkillsArrayToSkillsMap(skillArray);
+
+
+}
+async function getAllSkillsMapOfProject(projectID){
+    let skillsArray = await databaseClass.getSkillsOfProjectXFromDB(databaseClass.db,projectID);
+    return await convertSkillsArrayToSkillsMap(skillsArray);
+}
+
+async function convertSkillsArrayToSkillsMap(arr){
+    let skillMap = new Map();
+    for (let i = 0; i < arr.length; i++) {
+        let skillID = arr[i].id;
+        let skillName = await databaseClass.getSkillXSkillNameFromDB(databaseClass.db, skillID);
+        let skillPoint = await databaseClass.getSkillXSkillPointFromDB(databaseClass.db, skillID);
+        skillMap.set(skillName,skillPoint);
+    }
+    return skillMap;
 }
 
 
