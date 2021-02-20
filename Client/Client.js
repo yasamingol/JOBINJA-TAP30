@@ -9,20 +9,20 @@ const sqlite = require('sqlite');
         filename: '/home/tapsi/IdeaProjects/concurency/DataBase/database.db',
         driver: sqlite3.Database
     })
-    // await databaseClass.createProjectsDB(databaseClass.db);
-    // await databaseClass.createAccountsDB(databaseClass.db);
-    // await databaseClass.createBidsDB(databaseClass.db);
-    // await databaseClass.createAuctionsDB(databaseClass.db);
-    // await databaseClass.createSkillsDB(databaseClass.db);
-    // console.log("DataBase created successfully :)")
-    // let project = new projectClass(0,"tap30",-1,900,-1,"2022/03/03",true);
-    // let tap30Skill1 = await databaseClass.saveProjectSkillInDB(databaseClass.db,0,"A",20,0);
-    // let tap30Skill2 = await databaseClass.saveProjectSkillInDB(databaseClass.db,1,"B",10,0);
-    // await databaseClass.saveProjectInDB(databaseClass.db,project);
-    // let account = new accountClass(0,"yasamingol",-1,-1,-1);
-    // await databaseClass.saveAccountInDB(databaseClass.db,account);
-    // await databaseClass.saveAccountSkillInDB(databaseClass.db,2,"A",200,0);
-    // await databaseClass.saveAccountSkillInDB(databaseClass.db,3,"B",400,0);
+    await databaseClass.createProjectsDB(databaseClass.db);
+    await databaseClass.createAccountsDB(databaseClass.db);
+    await databaseClass.createBidsDB(databaseClass.db);
+    await databaseClass.createAuctionsDB(databaseClass.db);
+    await databaseClass.createSkillsDB(databaseClass.db);
+    console.log("DataBase created successfully :)")
+    let project = new projectClass(0,"tap30",-1,900,-1,"2022/03/03",true);
+    let tap30Skill1 = await databaseClass.saveProjectSkillInDB(databaseClass.db,0,"A",20,0);
+    let tap30Skill2 = await databaseClass.saveProjectSkillInDB(databaseClass.db,1,"B",10,0);
+    await databaseClass.saveProjectInDB(databaseClass.db,project);
+    let account = new accountClass(0,"yasamingol",-1,-1,-1);
+    await databaseClass.saveAccountInDB(databaseClass.db,account);
+    await databaseClass.saveAccountSkillInDB(databaseClass.db,2,"A",200,0);
+    await databaseClass.saveAccountSkillInDB(databaseClass.db,3,"B",400,0);
     await loadMenus();
 
 
@@ -244,7 +244,7 @@ async function register(arr) {
 
 async function saveRegisterInfoInDB(account) {
     await databaseClass.saveAccountInDB(databaseClass.db, account);
-    let counter = 0;
+    let counter = await databaseClass.getNumberOfRowsOfAccountsFromDB(databaseClass.db);
     for (const [key, value] of account.skills) {
         await databaseClass.saveAccountSkillInDB(databaseClass.db, counter, key, value, account.id);
         counter++;
@@ -260,14 +260,14 @@ async function addProject(arr) {
     let budget = arr[arr.length - 2];
     let deadline = stringToDateConverter(arr[arr.length - 1]);
     buildSkillsMap(arr, skills, arr.length - 2);
-    let project = new projectClass(id, title, skills, budget, [], deadline, true);
+    let project = new projectClass(id, title, skills, budget, -1, deadline, true);
     await saveAddProjectInfoInDB(project);
     console.log("project built successfully!\n".red);
 }
 
 async function saveAddProjectInfoInDB(project) {
-    await databaseClass.saveProjectInDB(databaseClass.db, 0, project);
-    let counter = 0;
+    await databaseClass.saveProjectInDB(databaseClass.db, project);
+    let counter = await databaseClass.getNumberOfRowsOfSkillsFromDB(databaseClass.db);
     for (const [key, value] of project.skills) {
         await databaseClass.saveProjectSkillInDB(databaseClass.db, counter, key, value, project.id);
         counter++
