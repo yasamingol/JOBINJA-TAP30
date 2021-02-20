@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const Account = require('../Classes/Account');
 
+
 //using database
 (async () => {
     databaseClass.db = await sqlite.open({
