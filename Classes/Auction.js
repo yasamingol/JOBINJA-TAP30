@@ -1,10 +1,10 @@
 
 class Auction{
     static  allAuctions = [];
-    constructor(id,projectTitle,accountWinner) {
+    constructor(id,projectID,accountID) {
         this.id = id;
-        this.projectTitle = projectTitle;
-        this.accuntWinner = accountWinner;
+        this.projectID = projectID;
+        this.accountID = accountID;
         Auction.allAuctions[Auction.allAuctions.length] = this;
     }
 }
