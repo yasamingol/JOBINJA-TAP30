@@ -14,16 +14,23 @@ const sqlite = require('sqlite');
     await databaseClass.createBidsDB(databaseClass.db);
     await databaseClass.createAuctionsDB(databaseClass.db);
     await databaseClass.createSkillsDB(databaseClass.db);
+    await databaseClass.createConfirmationsDB(databaseClass.db);
     console.log("DataBase created successfully :)")
-    let project = new projectClass(0,"tap30",-1,900,-1,"2022/03/03",true);
-    let tap30Skill1 = await databaseClass.saveProjectSkillInDB(databaseClass.db,0,"A",20,0);
-    let tap30Skill2 = await databaseClass.saveProjectSkillInDB(databaseClass.db,1,"B",10,0);
-    await databaseClass.saveProjectInDB(databaseClass.db,project);
-    let account = new accountClass(0,"yasamingol",-1,-1,-1);
-    await databaseClass.saveAccountInDB(databaseClass.db,account);
-    await databaseClass.saveAccountSkillInDB(databaseClass.db,2,"A",200,0);
-    await databaseClass.saveAccountSkillInDB(databaseClass.db,3,"B",400,0);
+    let project = new projectClass(0, "tap30", -1, 900, -1, "2022/03/03", true);
+    let tap30Skill1 = await databaseClass.saveProjectSkillInDB(databaseClass.db, 0, "A", 20, 0);
+    let tap30Skill2 = await databaseClass.saveProjectSkillInDB(databaseClass.db, 1, "B", 10, 0);
+    await databaseClass.saveProjectInDB(databaseClass.db, project);
+    let account = new accountClass(0, "yasamingol", -1, -1, -1);
+    await databaseClass.saveAccountInDB(databaseClass.db, account);
+    let account1 = new accountClass(1, "jafar", -1, -1, -1);
+    await databaseClass.saveAccountInDB(databaseClass.db, account1);
+    await databaseClass.saveAccountSkillInDB(databaseClass.db, 2, "A", 200, 0);
+    await databaseClass.saveAccountSkillInDB(databaseClass.db, 3, "B", 400, 0);
+    await databaseClass.saveAccountSkillInDB(databaseClass.db, 4, "J", 400, 1);
     await getAllSkillsFromServer(request);
+    // await databaseClass.saveConfirmationInDB(databaseClass.db,0,4,0);
+    // let result = await checkIfConfirmedBefore(0,4);
+    // console.log(result);
     await loadMenus();
 
 
@@ -107,7 +114,7 @@ async function loadMenus() {
             console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" + "confirmSkill <your_username> <other_username> <skill>".green);
             const command = prompt("");
             arr = command.split(" ");
-            confirmSkill(arr);
+            await confirmSkill(arr);
 
 
         } else if (selectedMenu === "8") {
@@ -146,6 +153,10 @@ async function loadMenus() {
         } else if (selectedMenu === "13") {
             console.log("exit");
             commandIsValid = true;
+
+
+        } else if (selectedMenu === "14") {
+            console.log(await databaseClass.getConfirmationsFullDBTable(databaseClass.db));
 
 
         } else console.log("command is invalid! try again".red);
@@ -295,14 +306,13 @@ async function addBid(arr) {
     let projectId = await databaseClass.getProjectIDUsingTitleFromDB(databaseClass.db, projectTitle);
     let accountId = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db, biddingUsername);
     let bidId = await databaseClass.getNumberOfRowsOfBidsFromDB(databaseClass.db);
-   await handlingAddBidErrors(bidId,accountId.id, projectId.id, bidAmount);
+    await handlingAddBidErrors(bidId, accountId.id, projectId.id, bidAmount);
 
     console.log(await databaseClass.getBidsFullDBTable(databaseClass.db));
 }
 
 
-
-async function handlingAddBidErrors(bidId,biddingUserId, projectId, bidAmount) {
+async function handlingAddBidErrors(bidId, biddingUserId, projectId, bidAmount) {
     if (await !databaseClass.getProjectXIsAvailableFromDB(databaseClass.db, projectId)) {
         console.log("cannot bid! project has already been taken.".red);
     } else if (await !checkIfSkilledEnough(biddingUserId, projectId)) {
@@ -312,7 +322,7 @@ async function handlingAddBidErrors(bidId,biddingUserId, projectId, bidAmount) {
     } else if (await !checkIfValidDateToBid(projectId)) {
         console.log("you cannot bid on this project! it has ended".red);
     } else {
-        let bid = new bidClass(bidId,biddingUserId, projectId, bidAmount);
+        let bid = new bidClass(bidId, biddingUserId, projectId, bidAmount);
         await databaseClass.saveBidInDB(databaseClass.db, bid);
         console.log("bid created successfully!\n".red);
 
@@ -425,28 +435,33 @@ async function checkIfAccountHasSkill(accountID, skillID) {
 
 }
 
-function confirmSkill(arr) {
-    let thisUser = accountClass.getAccountByUsername(arr[1]);
-    let otherUser = accountClass.getAccountByUsername(arr[2]);
-    let skillName = arr[3];
-    if (!checkIfConfirmedBefore(thisUser, otherUser, skillName)) {
-        let skillRate = otherUser.skills.get(skillName);
-        otherUser.skills.delete(skillName);
-        otherUser.skills.set(skillName, parseInt(skillRate) + 1);
-        thisUser.skillConfirmationList.set(otherUser.username, skillName);
+async function confirmSkill(arr) {
+    let sourceUserID = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db, arr[1]);
+    let otherUserID = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db, arr[2]);
+    let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountIDFromDB(databaseClass.db, arr[3], otherUserID.id);
+    let hasConfirmedBefore = await checkIfConfirmedBefore(sourceUserID.id, skillID.id);
+    if (!hasConfirmedBefore) {
+        await addPointTOSkillForConfirmation(skillID.id);
+        await createNewConfirmation(skillID.id, sourceUserID.id);
         console.log(arr[1] + " confirmed " + arr[2] + " s ((" + arr[3] + ")) skill\n ");
     } else console.log("cannot confirm this skillSet! you have done it once before!".red);
 
 }
 
-function checkIfConfirmedBefore(user1, user2, skill) {
-    if (user1.skillConfirmationList.has(user2, skill)) {
-        let skillFound = user1.skillConfirmationList.get(user2);
-        if (skillFound === skill) {
-            return true;
-        } else return false
-    } else return false
+async function addPointTOSkillForConfirmation(skillId) {
+    let skillPoint = await databaseClass.getSkillXSkillPointFromDB(databaseClass.db, skillId);
+    await databaseClass.updateAccountSkillPointInDB(databaseClass.db, skillId, skillPoint.skillPoint + 1);
+}
 
+async function createNewConfirmation(skillId, sourceUserId) {
+    let confirmationId = await databaseClass.getNumberOfRowsOfConfirmationFromDB(databaseClass.db);
+    await databaseClass.saveConfirmationInDB(databaseClass.db, confirmationId, skillId, sourceUserId);
+}
+
+async function checkIfConfirmedBefore(userSourceID, skillID) {
+    let result = await databaseClass.getConfirmationFromDB(databaseClass.db, skillID, userSourceID);
+    if (result === undefined) return false;
+    else return true;
 }
 
 
