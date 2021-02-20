@@ -2,6 +2,7 @@
 const databaseClass = require('../DataBase/database');
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
+const Account = require('../Classes/Account');
 
 //using database
 (async () => {
@@ -9,28 +10,9 @@ const sqlite = require('sqlite');
         filename: '/home/tapsi/IdeaProjects/concurency/DataBase/database.db',
         driver: sqlite3.Database
     })
-    await databaseClass.createProjectsDB(databaseClass.db);
-    await databaseClass.createAccountsDB(databaseClass.db);
-    await databaseClass.createBidsDB(databaseClass.db);
-    await databaseClass.createAuctionsDB(databaseClass.db);
-    await databaseClass.createSkillsDB(databaseClass.db);
-    await databaseClass.createConfirmationsDB(databaseClass.db);
-    console.log("DataBase created successfully :)")
-    let project = new projectClass(0, "tap30", -1, 900, -1, "2022/03/03", true);
-    let tap30Skill1 = await databaseClass.saveProjectSkillInDB(databaseClass.db, 0, "A", 20, 0);
-    let tap30Skill2 = await databaseClass.saveProjectSkillInDB(databaseClass.db, 1, "B", 10, 0);
-    await databaseClass.saveProjectInDB(databaseClass.db, project);
-    let account = new accountClass(0, "yasamingol", -1, -1, -1);
-    await databaseClass.saveAccountInDB(databaseClass.db, account);
-    let account1 = new accountClass(1, "jafar", -1, -1, -1);
-    await databaseClass.saveAccountInDB(databaseClass.db, account1);
-    await databaseClass.saveAccountSkillInDB(databaseClass.db, 2, "A", 200, 0);
-    await databaseClass.saveAccountSkillInDB(databaseClass.db, 3, "B", 400, 0);
-    await databaseClass.saveAccountSkillInDB(databaseClass.db, 4, "J", 400, 1);
+    await createAllDataBases();
+    await createSomeExampleCases();
     await getAllSkillsFromServer(request);
-    // await databaseClass.saveConfirmationInDB(databaseClass.db,0,4,0);
-    // let result = await checkIfConfirmedBefore(0,4);
-    // console.log(result);
     await loadMenus();
 
 
@@ -167,9 +149,33 @@ async function loadMenus() {
 //     serializeAllData();
 }
 
-/**************************get/set methods that need to be converted into their own classes***************************/
 
 /***********************************************Main-Functions*********************************************************/
+async function createSomeExampleCases(){
+    let project = new projectClass(0, "tap30", -1, 900, -1, "2022/03/03", true);
+    let tap30Skill1 = await databaseClass.saveProjectSkillInDB(databaseClass.db, 0, "A", 20, 0);
+    let tap30Skill2 = await databaseClass.saveProjectSkillInDB(databaseClass.db, 1, "B", 10, 0);
+    await databaseClass.saveProjectInDB(databaseClass.db, project);
+    let account = new accountClass(0, "yasamingol", -1, -1, -1);
+    await databaseClass.saveAccountInDB(databaseClass.db, account);
+    let account1 = new accountClass(1, "jafar", -1, -1, -1);
+    await databaseClass.saveAccountInDB(databaseClass.db, account1);
+    await databaseClass.saveAccountSkillInDB(databaseClass.db, 2, "A", 200, 0);
+    await databaseClass.saveAccountSkillInDB(databaseClass.db, 3, "B", 400, 0);
+    await databaseClass.saveAccountSkillInDB(databaseClass.db, 4, "J", 400, 1);
+}
+async function createAllDataBases(){
+    await databaseClass.createProjectsDB(databaseClass.db);
+    await databaseClass.createAccountsDB(databaseClass.db);
+    await databaseClass.createBidsDB(databaseClass.db);
+    await databaseClass.createAuctionsDB(databaseClass.db);
+    await databaseClass.createSkillsDB(databaseClass.db);
+    await databaseClass.createConfirmationsDB(databaseClass.db);
+    console.log("DataBase created successfully :)")
+
+}
+
+
 function showAvailableMenus() {
     console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
         "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
