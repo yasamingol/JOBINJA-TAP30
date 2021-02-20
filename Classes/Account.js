@@ -2,6 +2,8 @@
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 let databaseClass;
+
+
 class Account {
     static setDb(db){
         databaseClass = db;

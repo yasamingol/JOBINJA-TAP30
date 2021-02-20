@@ -1,4 +1,4 @@
-/************************************************SettingUp-DataBase*************************************************/
+/***************************************************SettingUpDataBase**************************************************/
 const databaseClass = require('../DataBase/database');
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
@@ -14,20 +14,19 @@ const Account = require('../Classes/Account');
     await createSomeExampleCases();
     await getAllSkillsFromServer(request);
     await loadMenus();
-
-
 })()
-
-/****************************************************Preperation******************************************************/
+/*****************************************************Preperation******************************************************/
 //requirements
 const request = require('request');
 const util = require('util');
 const axios = require('axios')
+
 //importing classes
 const accountClass = require("../Classes/Account");
 const projectClass = require("../Classes/Project");
 const bidClass = require("../Classes/Bid");
 const auctionClass = require("../Classes/Auction");
+
 //global vars
 let allSkills = [];
 
@@ -149,7 +148,6 @@ async function createAllDataBases() {
     await databaseClass.createSkillsDB(databaseClass.db);
     await databaseClass.createConfirmationsDB(databaseClass.db);
     console.log("DataBase created successfully :)")
-
 }
 
 function showAvailableMenus() {
@@ -159,41 +157,12 @@ function showAvailableMenus() {
         " \n 13.exit  \n 14.holdAuction \n Please enter the menu number you want to enter : ");
 }
 
-async function viewAllProjects() {
-    let numberOfProjects = await databaseClass.getNumberOfRowsOfProjectsFromDB(databaseClass.db);
-    for (let i = 0; i < numberOfProjects; i++) {
-        let projectsTitle = await databaseClass.getProjectXTitleFromDB(databaseClass.db, i);
-        console.log(i + "." + projectsTitle.title);
-    }
-}
-
-async function viewAvailableProjects(username) {
-    let hasMinOneAvailable = false;
-    let accountID = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db, username);
-    let numberOfProjects = await databaseClass.getNumberOfRowsOfProjectsFromDB(databaseClass.db);
-    for (let i = 0; i < numberOfProjects; i++) {
-        let projectsTitle = await databaseClass.getProjectXTitleFromDB(databaseClass.db, i);
-        if (await checkIfSkilledEnough(accountID.id, i)) {
-            console.log(i + "." + projectsTitle.title)
-            hasMinOneAvailable = true;
-        }
-    }
-    if (!hasMinOneAvailable) console.log("There is no project available for you now!".red);
-
-}
 
 async function getProjectById(id) {
     let project = await buildFullProjectByGettingID(id);
     console.log(project);
 }
 
-async function viewAllAccounts() {
-    let numberOfAccounts = await databaseClass.getNumberOfRowsOfAccountsFromDB(databaseClass.db);
-    for (let i = 0; i < numberOfAccounts; i++) {
-        let accountName = await databaseClass.getAccountXUsernameFromDB(databaseClass.db, i);
-        console.log(i + "." + accountName.username);
-    }
-}
 
 async function getAccountById(id) {
     let account = await buildFullAccountByGettingID(id);
@@ -232,7 +201,38 @@ function serializeAllData() {
     serializeAuctions();
 }
 
-/***********************************************ClientMenu-Functions*****************************************************/
+/***********************************************ClientMenu-Functions***************************************************/
+async function viewAllAccounts() {
+    let numberOfAccounts = await databaseClass.getNumberOfRowsOfAccountsFromDB(databaseClass.db);
+    for (let i = 0; i < numberOfAccounts; i++) {
+        let accountName = await databaseClass.getAccountXUsernameFromDB(databaseClass.db, i);
+        console.log(i + "." + accountName.username);
+    }
+}
+
+async function viewAllProjects() {
+    let numberOfProjects = await databaseClass.getNumberOfRowsOfProjectsFromDB(databaseClass.db);
+    for (let i = 0; i < numberOfProjects; i++) {
+        let projectsTitle = await databaseClass.getProjectXTitleFromDB(databaseClass.db, i);
+        console.log(i + "." + projectsTitle.title);
+    }
+}
+
+async function viewAvailableProjects(username) {
+    let hasMinOneAvailable = false;
+    let accountID = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db, username);
+    let numberOfProjects = await databaseClass.getNumberOfRowsOfProjectsFromDB(databaseClass.db);
+    for (let i = 0; i < numberOfProjects; i++) {
+        let projectsTitle = await databaseClass.getProjectXTitleFromDB(databaseClass.db, i);
+        if (await checkIfSkilledEnough(accountID.id, i)) {
+            console.log(i + "." + projectsTitle.title)
+            hasMinOneAvailable = true;
+        }
+    }
+    if (!hasMinOneAvailable) console.log("There is no project available for you now!".red);
+
+}
+
 //register
 async function register(arr) {
     let id = await databaseClass.getNumberOfRowsOfAccountsFromDB(databaseClass.db);
@@ -295,26 +295,29 @@ async function addBid(arr) {
     let accountId = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db, biddingUsername);
     let bidId = await databaseClass.getNumberOfRowsOfBidsFromDB(databaseClass.db);
     await handlingAddBidErrors(bidId, accountId.id, projectId.id, bidAmount);
-
-    console.log(await databaseClass.getBidsFullDBTable(databaseClass.db));
 }
 
 
 async function handlingAddBidErrors(bidId, biddingUserId, projectId, bidAmount) {
-    if (await !databaseClass.getProjectXIsAvailableFromDB(databaseClass.db, projectId)) {
+
+    if (!(await databaseClass.getProjectXIsAvailableFromDB(databaseClass.db, projectId))) {
         console.log("cannot bid! project has already been taken.".red);
-    } else if (await !checkIfSkilledEnough(biddingUserId, projectId)) {
+    } else if (!(await checkIfSkilledEnough(biddingUserId, projectId))) {
         console.log("cannot bid! not skilled enough.".red);
-    } else if (await !checkIfBidEnough(projectId, bidAmount)) {
+    } else if (!(await !checkIfBidEnough(projectId, bidAmount))) {
         console.log("cannot bid! bid amount not acceptable".red);
-    } else if (await !checkIfValidDateToBid(projectId)) {
+    } else if (!(await !checkIfValidDateToBid(projectId))) {
         console.log("you cannot bid on this project! it has ended".red);
     } else {
-        let bid = new bidClass(bidId, biddingUserId, projectId, bidAmount);
-        await databaseClass.saveBidInDB(databaseClass.db, bid);
-        console.log("bid created successfully!\n".red);
-
+        await createBid(bidId, biddingUserId, projectId, bidAmount)
     }
+}
+
+
+async function createBid(bidId, biddingUserId, projectId, bidAmount){
+    let bid = new bidClass(bidId, biddingUserId, projectId, bidAmount);
+    await databaseClass.saveBidInDB(databaseClass.db, bid);
+    console.log("bid created successfully!\n".red);
 }
 
 async function checkIfBidEnough(projectId, userBidAmount) {
@@ -330,7 +333,6 @@ async function checkIfValidDateToBid(projectId) {
     return projectDeadline >= localDate;
 
 }
-
 
 //holdAuctions
 async function holdAuctionsForAllProjects() {
@@ -351,6 +353,8 @@ async function holdAuction(projectId) {
     console.log("\nThe winner of the auction is : ".red );
     console.log(await databaseClass.getAccountXUsernameFromDB(databaseClass.db,accountWinnerID));
 }
+
+
 async function createNewAuction(winnerID,projectID){
     let auctionID = await databaseClass.getNumberOfRowsOfAuctionsFromDB(databaseClass.db);
     return new auctionClass(auctionID,projectID,winnerID);
@@ -415,6 +419,7 @@ async function addSkill(arr) {
     } else console.log("such skill does not exist!".red);
 }
 
+
 function checkIfSkillIsValid(givenSkill) {
     let skillIsValid = false;
     allSkills.forEach((skill) => {
@@ -422,6 +427,8 @@ function checkIfSkillIsValid(givenSkill) {
     })
     return skillIsValid;
 }
+
+
 
 async function removeSkill(arr) {
     console.log(await databaseClass.getSkillsFullDBTable(databaseClass.db))
@@ -434,6 +441,8 @@ async function removeSkill(arr) {
 
     } else console.log("user does not have such skill!".red);
 }
+
+
 
 async function checkIfAccountHasSkill(accountID, skillID) {
     let hasThisSkill = false;
@@ -538,6 +547,50 @@ function stringToDateConverter(string) {
     let date = new Date(arr[0], arr[1], arr[2], 0, 0, 0);
     console.log(date);
     return date;
+}
+
+/**********************************************Calling-API_Server-Methods*********************************************/
+
+async function getAllProjectsFromServer(request) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects');
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    deserializeAllProjects(JSON.parse(body));
+}
+
+async function getAllSkillsFromServer(request) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:5000/api/skills');
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    deserializeAllSkills(body);
+
+}
+
+async function getAllAccountsFromServer(request) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts');
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    deserializeAllAccounts(JSON.parse(body));
+}
+
+async function getProjectByIdUsingAPI(request, id) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects/' + id);
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    console.log(JSON.parse(body));
+}
+
+async function getAccountByIDUsingAPI(request, id) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts/' + id);
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    console.log(JSON.parse(body));
+
 }
 
 /***************************************************Serialize*********************************************************/
@@ -652,51 +705,6 @@ function deserializeAllSkills(body) {
 }
 
 module.exports = {holdAuction, calculateBestBid, calculateUserSkill, checkIfSkilledEnough, checkIfBidEnough};
-
-
-/**********************************************Calling-API_Server-Methods*********************************************/
-
-async function getAllProjectsFromServer(request) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects');
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    deserializeAllProjects(JSON.parse(body));
-}
-
-async function getAllSkillsFromServer(request) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:5000/api/skills');
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    deserializeAllSkills(body);
-
-}
-
-async function getAllAccountsFromServer(request) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts');
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    deserializeAllAccounts(JSON.parse(body));
-}
-
-async function getProjectByIdUsingAPI(request, id) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects/' + id);
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    console.log(JSON.parse(body));
-}
-
-async function getAccountByIDUsingAPI(request, id) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts/' + id);
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    console.log(JSON.parse(body));
-
-}
 
 /************************************************building-testExamples**********************************************/
 async function createSomeExampleCases() {
