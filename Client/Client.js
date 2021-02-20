@@ -13,8 +13,7 @@ const Account = require('../Classes/Account');
     await createAllDataBases();
     await createSomeExampleCases();
     await getAllSkillsFromServer(request);
-    await holdAuction(0);
-    // await loadMenus();
+    await loadMenus();
 
 
 })()
@@ -51,7 +50,7 @@ async function loadMenus() {
     while (!commandIsValid) {
 
         //checking the expiration date for auctions
-        holdAuctions();
+        // holdAuctions();
 
         //Menus
         let arr = [];
@@ -169,7 +168,7 @@ function showAvailableMenus() {
     console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
         "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
         "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.login \n 12.addProject" +
-        " \n 13.exit \n Please enter the menu number you want to enter : ");
+        " \n 13.exit  \n 14.holdAuction \n Please enter the menu number you want to enter : ");
 }
 
 async function viewAllProjects() {
@@ -217,7 +216,7 @@ async function getAccountById(id) {
 async function buildFullAccountByGettingID(id) {
     let username = await databaseClass.getAccountXUsernameFromDB(databaseClass.db, id);
     let skills = await getAllSkillsMapOfAccount(id);
-    return new accountClass(id, username, skills, -1, -1);
+    return new accountClass(id, username.username, skills, -1, -1);
 
 }
 
@@ -361,8 +360,8 @@ async function holdAuction(projectId) {
     await createNewAuction(accountWinnerID,projectId);
     await databaseClass.updateProjectAvailabilityInDB(databaseClass.db,projectId);
     await assignProject(accountWinnerID, projectId);
-    console.log("\nThe winner of the auction is : ".red + accountWinnerID.red);
-    return accountWinnerID;
+    console.log("\nThe winner of the auction is : ".red );
+    console.log(await databaseClass.getAccountXUsernameFromDB(databaseClass.db,accountWinnerID));
 }
 async function createNewAuction(winnerID,projectID){
     let auctionID = await databaseClass.getNumberOfRowsOfAuctionsFromDB(databaseClass.db);
@@ -386,10 +385,10 @@ async function calculateBestBid(projectId) {
         let userSkill = parseInt(await calculateUserSkill(bid));
         if (userSkill > bestBid) {
             bestBid = userSkill;
-            bestUserId = await databaseClass.getBidXUserIDFromDB(databaseClass.db,i);
+            bestUserId = bid.userID;
         }
     }
-    return bestUserId.userId;
+    return bestUserId;
 }
 
 async function createListOfBidsForProject(projectID) {
