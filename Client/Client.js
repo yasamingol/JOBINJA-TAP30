@@ -23,11 +23,11 @@ const sqlite = require('sqlite');
     await databaseClass.saveAccountInDB(databaseClass.db,account);
     await databaseClass.saveAccountSkillInDB(databaseClass.db,2,"A",200,0);
     await databaseClass.saveAccountSkillInDB(databaseClass.db,3,"B",400,0);
+    await getAllSkillsFromServer(request);
     await loadMenus();
 
 
 })()
-
 
 /****************************************************Preperation******************************************************/
 //requirements
@@ -114,7 +114,7 @@ async function loadMenus() {
             console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate>".green);
             const command = prompt("");
             arr = command.split(" ");
-            addSkill(arr);
+            await addSkill(arr);
 
 
         } else if (selectedMenu === "9") {
@@ -284,7 +284,6 @@ function buildSkillsMap(arr, skills, length) {
     }
 }
 
-
 //addBid
 async function addBid(arr) {
     let biddingUser = arr[1];
@@ -360,13 +359,14 @@ function assignProject(username, projectName) {
 
 
 //add/remove/confirm Skill
-function addSkill(arr) {
-    let account = accountClass.getAccountByUsername(arr[1]);
-    let arrSkiles = [];
-    arrSkiles = arr[2].split(":");
-    if (checkIfSkillIsValid(arrSkiles[0])) {
-        account.skills.set(arrSkiles[0], arrSkiles[1]);
+async function addSkill(arr) {
+    let accountID = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db,arr[1]);
+    let skillID = await databaseClass.getNumberOfRowsOfSkillsFromDB(databaseClass.db);
+    let arrSkilles = arr[2].split(":");
+    if (checkIfSkillIsValid(arrSkilles[0])) {
+        await databaseClass.saveAccountSkillInDB(databaseClass.db,skillID,arrSkilles[0], arrSkilles[1],accountID.id);
         console.log("skill added successfully!\n".red);
+        console.log(await databaseClass.getSkillsFullDBTable(databaseClass.db))
     } else console.log("such skill does not exist!".red);
 }
 
