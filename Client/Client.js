@@ -295,9 +295,8 @@ async function addBid(arr) {
     let projectId = await databaseClass.getProjectIDUsingTitleFromDB(databaseClass.db, projectTitle);
     let accountId = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db, biddingUsername);
     let bidId = await databaseClass.getNumberOfRowsOfBidsFromDB(databaseClass.db);
-    let bid = await handlingAddBidErrors(bidId,accountId.id, projectId.id, bidAmount);
-    await databaseClass.saveBidInDB(databaseClass.db, bid);
-    console.log("bid created successfully!\n".red);
+   await handlingAddBidErrors(bidId,accountId.id, projectId.id, bidAmount);
+
     console.log(await databaseClass.getBidsFullDBTable(databaseClass.db));
 }
 
@@ -313,15 +312,18 @@ async function handlingAddBidErrors(bidId,biddingUserId, projectId, bidAmount) {
     } else if (await !checkIfValidDateToBid(projectId)) {
         console.log("you cannot bid on this project! it has ended".red);
     } else {
-        return new bidClass(bidId,biddingUserId, projectId, bidAmount);
+        let bid = new bidClass(bidId,biddingUserId, projectId, bidAmount);
+        await databaseClass.saveBidInDB(databaseClass.db, bid);
+        console.log("bid created successfully!\n".red);
 
     }
 }
 
 async function checkIfBidEnough(projectId, userBidAmount) {
-    let mainBidAmount = await databaseClass.getBidXBidAmountFromDB(databaseClass.db, projectId);
-    if (userBidAmount <= mainBidAmount) return true;
-    else return false;
+    let bidIsEnough = false;
+    let mainBidAmount = await databaseClass.getProjectXBudgetFromDB(databaseClass.db, projectId);
+    if (userBidAmount <= mainBidAmount.budget) bidIsEnough = true;
+    return bidIsEnough;
 }
 
 async function checkIfValidDateToBid(projectId) {
