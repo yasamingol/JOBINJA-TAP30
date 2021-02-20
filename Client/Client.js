@@ -139,8 +139,10 @@ async function loadMenus() {
 
 
         } else if (selectedMenu === "14") {
-            console.log(await databaseClass.getConfirmationsFullDBTable(databaseClass.db));
-
+            console.log("\nwelcome to  Auction menu!\nyou can hold an Auction for a project: " + "holdAuction <projectId>".green);
+            const command = prompt("");
+            arr = command.split(" ");
+            await holdAuction(parseInt(arr[1]));
 
         } else console.log("command is invalid! try again".red);
 
@@ -215,7 +217,7 @@ async function getAccountById(id) {
 async function buildFullAccountByGettingID(id) {
     let username = await databaseClass.getAccountXUsernameFromDB(databaseClass.db, id);
     let skills = await getAllSkillsMapOfAccount(id);
-    return new accountClass(id, username.username, skills, -1, -1);
+    return new accountClass(id, username, skills, -1, -1);
 
 }
 
@@ -387,7 +389,7 @@ async function calculateBestBid(projectId) {
             bestUserId = await databaseClass.getBidXUserIDFromDB(databaseClass.db,i);
         }
     }
-    return bestUserId;
+    return bestUserId.userId;
 }
 
 async function createListOfBidsForProject(projectID) {
@@ -724,7 +726,7 @@ async function createSomeExampleCases() {
     await databaseClass.saveAccountSkillInDB(databaseClass.db, 4, "A", 2000, 1);
     await databaseClass.saveAccountSkillInDB(databaseClass.db, 5, "B", 4000, 1);
     let bid1 = new bidClass(0,0,0,20);
-    let bid2 = new bidClass(1,2,0,30);
+    let bid2 = new bidClass(1,1,0,30);
     await databaseClass.saveBidInDB(databaseClass.db,bid1);
     await databaseClass.saveBidInDB(databaseClass.db,bid2);
 }
