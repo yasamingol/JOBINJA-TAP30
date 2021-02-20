@@ -152,8 +152,8 @@ async function loadMenus() {
 
     }
 
-//serializing
-    serializeAllData();
+//serializing in phase_1
+//     serializeAllData();
 }
 
 /**************************get/set methods that need to be converted into their own classes***************************/
@@ -233,10 +233,11 @@ function serializeAllData() {
 /***********************************************ClientMenu-Functions*****************************************************/
 //register
 async function register(arr) {
+    let id = await databaseClass.getNumberOfRowsOfAccountsFromDB(databaseClass.db);
     let username = arr[1];
     let skills = new Map;
     buildSkillsMap(arr, skills, arr.length);
-    let account = new accountClass(0, username, skills, [], new Map);
+    let account = new accountClass(id, username, skills, [], new Map);
     await saveRegisterInfoInDB(account);
     console.log("registered successfully!\n".red);
 
@@ -244,7 +245,7 @@ async function register(arr) {
 
 async function saveRegisterInfoInDB(account) {
     await databaseClass.saveAccountInDB(databaseClass.db, account);
-    let counter = await databaseClass.getNumberOfRowsOfAccountsFromDB(databaseClass.db);
+    let counter = await databaseClass.getNumberOfRowsOfSkillsFromDB(databaseClass.db);
     for (const [key, value] of account.skills) {
         await databaseClass.saveAccountSkillInDB(databaseClass.db, counter, key, value, account.id);
         counter++;
