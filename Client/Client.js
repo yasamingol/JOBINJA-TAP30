@@ -15,16 +15,10 @@ const sqlite = require('sqlite');
     await databaseClass.createAuctionsDB(databaseClass.db);
     await databaseClass.createSkillsDB(databaseClass.db);
     console.log("DataBase created successfully :)")
-    // await loadMenus();
-
-//test for getXBY...
-
     let project = new projectClass(0,"tap30",-1,900,-1,"2022/03/03",true);
     await databaseClass.saveProjectInDB(databaseClass.db,project);
+    await loadMenus();
 
-    // let projectId = await databaseClass.getProjectIDUsingTitleFromDB(databaseClass.db,"tap30");
-
-    console.log(await databaseClass.foreachInProjectsFromDB(databaseClass.db));
 
 })()
 
@@ -43,7 +37,6 @@ const auctionClass = require("../Classes/Auction");
 let allSkills = [];
 
 //using API to get DATA
-
 (async () => {
     // await getAllProjectsFromServer(request);
     // await getAllSkillsFromServer(request);
@@ -73,7 +66,7 @@ async function loadMenus() {
 
         if (selectedMenu === "1") {
             console.log("\n View all projects menu :".cyan);
-            viewAllProjects();
+            await viewAllProjects();
 
 
         } else if (selectedMenu === "2") {
@@ -167,13 +160,15 @@ function showAvailableMenus() {
         " \n 13.exit \n Please enter the menu number you want to enter : ");
 }
 
-function viewAllProjects() {
-
-    projectClass.allProjects.forEach((project) => {
-        console.log(project.id + "." + project.title);
-    })
+async function viewAllProjects() {
+    let numberOfProjects = await databaseClass.getNumberOfRowsOfProjectsFromDB(databaseClass.db);
+    for(let i=0;i<numberOfProjects;i++){
+        let projectsTitle = await databaseClass.getProjectXTitleFromDB(databaseClass.db,0);
+        console.log(i + "."+ projectsTitle.title);
+    }
 }
 
+///!!!!
 function viewAvailableProjects(command) {
     let hasMinOneAvailable = false;
     projectClass.allProjects.forEach((project) => {
@@ -186,10 +181,12 @@ function viewAvailableProjects(command) {
 
 }
 
-function viewAllAccounts() {
-    accountClass.allAccounts.forEach((account) => {
-        console.log(account.id + "." + account.username);
-    })
+async function viewAllAccounts() {
+    let numberOfAccounts = await databaseClass.getNumberOfRowsOfAccountsFromDB(databaseClass.db);
+    for(let i=0; i<numberOfAccounts; i++){
+        let accountName = databaseClass.getAccountXUsernameFromDB(databaseClass.db,i);
+        console.log(i+"."+accountName);
+    }
 }
 
 function serializeAllData() {
@@ -267,12 +264,13 @@ async function saveRegisterInfoInDB(account) {
 
 //addProject
 async function addProject(arr) {
+    let id = await databaseClass.getNumberOfRowsOfProjectsFromDB(databaseClass.db);
     let title = arr[1];
     let skills = new Map;
     let budget = arr[arr.length - 2];
     let deadline = stringToDateConverter(arr[arr.length - 1]);
     buildSkillsMap(arr, skills, arr.length - 2);
-    let project = new projectClass(0, title, skills, budget, [], deadline, true);
+    let project = new projectClass(id, title, skills, budget, [], deadline, true);
     await saveAddProjectInfoInDB(project);
     console.log("project built successfully!\n".red);
 }
