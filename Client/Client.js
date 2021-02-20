@@ -9,20 +9,20 @@ const sqlite = require('sqlite');
         filename: '/home/tapsi/IdeaProjects/concurency/DataBase/database.db',
         driver: sqlite3.Database
     })
-    await databaseClass.createProjectsDB(databaseClass.db);
-    await databaseClass.createAccountsDB(databaseClass.db);
-    await databaseClass.createBidsDB(databaseClass.db);
-    await databaseClass.createAuctionsDB(databaseClass.db);
-    await databaseClass.createSkillsDB(databaseClass.db);
-    console.log("DataBase created successfully :)")
-    let project = new projectClass(0,"tap30",-1,900,-1,"2022/03/03",true);
-    let tap30Skill1 = await databaseClass.saveProjectSkillInDB(databaseClass.db,0,"A",20,0);
-    let tap30Skill2 = await databaseClass.saveProjectSkillInDB(databaseClass.db,1,"B",10,0);
-    await databaseClass.saveProjectInDB(databaseClass.db,project);
-    let account = new accountClass(0,"yasamingol",-1,-1,-1);
-    await databaseClass.saveAccountInDB(databaseClass.db,account);
-    await databaseClass.saveAccountSkillInDB(databaseClass.db,2,"A",200,0);
-    await databaseClass.saveAccountSkillInDB(databaseClass.db,3,"B",400,0);
+    // await databaseClass.createProjectsDB(databaseClass.db);
+    // await databaseClass.createAccountsDB(databaseClass.db);
+    // await databaseClass.createBidsDB(databaseClass.db);
+    // await databaseClass.createAuctionsDB(databaseClass.db);
+    // await databaseClass.createSkillsDB(databaseClass.db);
+    // console.log("DataBase created successfully :)")
+    // let project = new projectClass(0,"tap30",-1,900,-1,"2022/03/03",true);
+    // let tap30Skill1 = await databaseClass.saveProjectSkillInDB(databaseClass.db,0,"A",20,0);
+    // let tap30Skill2 = await databaseClass.saveProjectSkillInDB(databaseClass.db,1,"B",10,0);
+    // await databaseClass.saveProjectInDB(databaseClass.db,project);
+    // let account = new accountClass(0,"yasamingol",-1,-1,-1);
+    // await databaseClass.saveAccountInDB(databaseClass.db,account);
+    // await databaseClass.saveAccountSkillInDB(databaseClass.db,2,"A",200,0);
+    // await databaseClass.saveAccountSkillInDB(databaseClass.db,3,"B",400,0);
     await loadMenus();
 
 
@@ -83,7 +83,7 @@ async function loadMenus() {
         } else if (selectedMenu === "3") {
             console.log("\nWelcome to ((view project)) menu!".cyan + "command : <project-id>".green);
             command = prompt("");
-            await getProjectById(request, command);
+            await getProjectById(parseInt(command));
 
         } else if (selectedMenu === "4") {
             console.log("\nView all accounts menu".cyan);
@@ -93,7 +93,7 @@ async function loadMenus() {
         } else if (selectedMenu === "5") {
             console.log("Welcome to ((view account)) menu!".cyan + "command : <account-id>".green);
             command = prompt("");
-            await getAccountByID(request, command);
+            await getAccountById(parseInt(command));
 
 
         } else if (selectedMenu === "6") {
@@ -188,6 +188,10 @@ async function viewAvailableProjects(username) {
     if (!hasMinOneAvailable) console.log("There is no project available for you now!".red);
 
 }
+async function getProjectById(id){
+    let project = await buildFullProjectByGettingID(id);
+    console.log(project);
+}
 
 async function viewAllAccounts() {
     let numberOfAccounts = await databaseClass.getNumberOfRowsOfAccountsFromDB(databaseClass.db);
@@ -196,56 +200,34 @@ async function viewAllAccounts() {
         console.log(i + "." + accountName.username);
     }
 }
+async function getAccountById(id){
+    let account = await buildFullAccountByGettingID(id);
+    console.log(account);
+
+}
+
+async function buildFullAccountByGettingID(id){
+    let username = await databaseClass.getAccountXUsernameFromDB(databaseClass.db,id);
+    let skills = await getAllSkillsMapOfAccount(id);
+    return new accountClass(id,username,skills,-1,-1);
+
+}
+async function buildFullProjectByGettingID(id){
+    let title = await databaseClass.getProjectXTitleFromDB(databaseClass.db,id);
+    let skills = await getAllSkillsMapOfProject(id);
+    let budget = await databaseClass.getProjectXBudgetFromDB(databaseClass.db,id);
+    let deadLine = await databaseClass.getProjectXDeadlineFromDB(databaseClass.db,id);
+    let isAvailable = await databaseClass.getProjectXIsAvailableFromDB(databaseClass.db,id);
+    return new projectClass(id,title,skills,budget,-1,deadLine,isAvailable);
+
+}
+
 
 function serializeAllData() {
     serializeAccounts();
     serializeProjects();
     serializeBides();
     serializeAuctions();
-}
-
-/**********************************************Calling-API_Server-Methods*********************************************/
-
-async function getAllProjectsFromServer(request) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects');
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    deserializeAllProjects(JSON.parse(body));
-}
-
-async function getAllSkillsFromServer(request) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:5000/api/skills');
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    deserializeAllSkills(body);
-
-}
-
-async function getAllAccountsFromServer(request) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts');
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    deserializeAllAccounts(JSON.parse(body));
-}
-
-async function getProjectById(request, id) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects/' + id);
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    console.log(JSON.parse(body));
-}
-
-async function getAccountByID(request, id) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts/' + id);
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    console.log(JSON.parse(body));
-
 }
 
 /***********************************************ClientMenu-Functions*****************************************************/
@@ -459,8 +441,6 @@ async function checkIfSkilledEnough(accountID, projectID) {
 async function getAllSkillsMapOfAccount(accountID) {
     let skillArray = await databaseClass.getSkillsOfAccountXFromDB(databaseClass.db, accountID);
     return await convertSkillsArrayToSkillsMap(skillArray);
-
-
 }
 async function getAllSkillsMapOfProject(projectID){
     let skillsArray = await databaseClass.getSkillsOfProjectXFromDB(databaseClass.db,projectID);
@@ -645,3 +625,48 @@ function deserializeAllSkills(body) {
 }
 
 module.exports = {holdAuction, calculateBestBid, calculateUserSkill, checkIfSkilledEnough, checkIfBidEnough};
+
+
+/**********************************************Calling-API_Server-Methods*********************************************/
+
+async function getAllProjectsFromServer(request) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects');
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    deserializeAllProjects(JSON.parse(body));
+}
+
+async function getAllSkillsFromServer(request) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:5000/api/skills');
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    deserializeAllSkills(body);
+
+}
+
+async function getAllAccountsFromServer(request) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts');
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    deserializeAllAccounts(JSON.parse(body));
+}
+
+async function getProjectByIdUsingAPI(request, id) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects/' + id);
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    console.log(JSON.parse(body));
+}
+
+async function getAccountByIDUsingAPI(request, id) {
+    const promisifiedRequest = util.promisify(request);
+    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts/' + id);
+    console.error('error:', error);
+    console.log('statusCode:', response && response.statusCode);
+    console.log(JSON.parse(body));
+
+}
