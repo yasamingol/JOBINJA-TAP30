@@ -17,6 +17,8 @@ const sqlite = require('sqlite');
     console.log("DataBase created successfully :)")
     let project = new projectClass(0,"tap30",-1,900,-1,"2022/03/03",true);
     await databaseClass.saveProjectInDB(databaseClass.db,project);
+    let account = new accountClass(0,"yasamingol",-1,-1,-1);
+    await databaseClass.saveAccountInDB(databaseClass.db,account);
     await loadMenus();
 
 
@@ -82,7 +84,7 @@ async function loadMenus() {
 
         } else if (selectedMenu === "4") {
             console.log("\nView all accounts menu".cyan);
-            viewAllAccounts();
+            await viewAllAccounts();
 
 
         } else if (selectedMenu === "5") {
@@ -163,7 +165,7 @@ function showAvailableMenus() {
 async function viewAllProjects() {
     let numberOfProjects = await databaseClass.getNumberOfRowsOfProjectsFromDB(databaseClass.db);
     for(let i=0;i<numberOfProjects;i++){
-        let projectsTitle = await databaseClass.getProjectXTitleFromDB(databaseClass.db,0);
+        let projectsTitle = await databaseClass.getProjectXTitleFromDB(databaseClass.db,i);
         console.log(i + "."+ projectsTitle.title);
     }
 }
@@ -184,8 +186,8 @@ function viewAvailableProjects(command) {
 async function viewAllAccounts() {
     let numberOfAccounts = await databaseClass.getNumberOfRowsOfAccountsFromDB(databaseClass.db);
     for(let i=0; i<numberOfAccounts; i++){
-        let accountName = databaseClass.getAccountXUsernameFromDB(databaseClass.db,i);
-        console.log(i+"."+accountName);
+        let accountName = await databaseClass.getAccountXUsernameFromDB(databaseClass.db,i);
+        console.log(i+"."+accountName.username);
     }
 }
 
