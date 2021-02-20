@@ -31,15 +31,6 @@ const auctionClass = require("../Classes/Auction");
 //global vars
 let allSkills = [];
 
-//using API to get DATA
-(async () => {
-    // await getAllProjectsFromServer(request);
-    // await getAllSkillsFromServer(request);
-    // await getAllAccountsFromServer(request);
-    // await loadMenus();
-})();
-
-
 /***************************************************Main-Menus********************************************************/
 async function loadMenus() {
     const prompt = require('prompt-sync')();
@@ -48,9 +39,6 @@ async function loadMenus() {
     console.log("Welcome to JobInja!".red)
     let commandIsValid = false;
     while (!commandIsValid) {
-
-        //checking the expiration date for auctions
-        // holdAuctions();
 
         //Menus
         let arr = [];
