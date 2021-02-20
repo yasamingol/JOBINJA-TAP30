@@ -106,6 +106,13 @@ async function loadMenus() {
 }
 
 /***********************************************LoadMenu-Functions*****************************************************/
+function showAvailableMenus() {
+    console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
+        "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
+        "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.addProject \n 12.holdAuction"  +
+        " \n 13.exit \n Please enter the menu number you want to enter : ");
+}
+
 async function loadAllProjectsMenu() {
     console.log("\n View all projects menu :".cyan);
     await viewAllProjects();
@@ -185,24 +192,7 @@ async function loadHoldAuctionMenu(){
 
 }
 
-/***********************************************MainMenu-Functions*****************************************************/
-async function createAllDataBases() {
-    await databaseClass.createProjectsDB(databaseClass.db);
-    await databaseClass.createAccountsDB(databaseClass.db);
-    await databaseClass.createBidsDB(databaseClass.db);
-    await databaseClass.createAuctionsDB(databaseClass.db);
-    await databaseClass.createSkillsDB(databaseClass.db);
-    await databaseClass.createConfirmationsDB(databaseClass.db);
-    console.log("DataBase created successfully :)".green)
-}
-
-function showAvailableMenus() {
-    console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
-        "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
-        "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.addProject \n 12.holdAuction"  +
-        " \n 13.exit \n Please enter the menu number you want to enter : ");
-}
-
+/***********************************************MainFunctionsInMenu***************************************************/
 
 async function getProjectById(id) {
     let project = await buildFullProjectByGettingID(id);
@@ -240,15 +230,6 @@ async function buildFullBidUsingBidID(bidID) {
     return new bidClass(bidID, userId.userId, projectId.projectId, bidAmount.bidAmount);
 }
 
-
-function serializeAllData() {
-    serializeAccounts();
-    serializeProjects();
-    serializeBides();
-    serializeAuctions();
-}
-
-/*********************************************OperationsInMenu-Functions***********************************************/
 async function viewAllAccounts() {
     let numberOfAccounts = await databaseClass.getNumberOfRowsOfAccountsFromDB(databaseClass.db);
     for (let i = 0; i < numberOfAccounts; i++) {
@@ -264,6 +245,18 @@ async function viewAllProjects() {
         console.log(i + "." + projectsTitle.title);
     }
 }
+
+async function getAllSkillsMapOfAccount(accountID) {
+    let skillArray = await databaseClass.getSkillsOfAccountXFromDB(databaseClass.db, accountID);
+    return await convertSkillsArrayToSkillsMap(skillArray);
+}
+
+async function getAllSkillsMapOfProject(projectID) {
+    let skillsArray = await databaseClass.getSkillsOfProjectXFromDB(databaseClass.db, projectID);
+    return await convertSkillsArrayToSkillsMap(skillsArray);
+}
+
+/*****************************************Logical/Computational-Functions*********************************************/
 
 async function viewAvailableProjects(username) {
     let hasMinOneAvailable = false;
@@ -351,15 +344,14 @@ async function handlingAddBidErrors(bidId, biddingUserId, projectId, bidAmount) 
         console.log("cannot bid! project has already been taken.".red);
     } else if (!(await checkIfSkilledEnough(biddingUserId, projectId))) {
         console.log("cannot bid! not skilled enough.".red);
-    } else if (!(await !checkIfBidEnough(projectId, bidAmount))) {
+    } else if (!(await checkIfBidEnough(projectId, bidAmount))) {
         console.log("cannot bid! bid amount not acceptable".red);
-    } else if (!(await !checkIfValidDateToBid(projectId))) {
+    } else if (!(await checkIfValidDateToBid(projectId))) {
         console.log("you cannot bid on this project! it has ended".red);
     } else {
         await createBid(bidId, biddingUserId, projectId, bidAmount)
     }
 }
-
 
 async function createBid(bidId, biddingUserId, projectId, bidAmount) {
     let bid = new bidClass(bidId, biddingUserId, projectId, bidAmount);
@@ -455,7 +447,7 @@ async function assignProject(userID, projectID) {
 }
 
 
-//add/remove/confirm Skill
+//add/remove
 async function addSkill(arr) {
     let accountID = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db, arr[1]);
     let skillID = await databaseClass.getNumberOfRowsOfSkillsFromDB(databaseClass.db);
@@ -502,6 +494,8 @@ async function checkIfAccountHasSkill(accountID, skillID) {
 
 }
 
+
+//confirm Skill
 async function confirmSkill(arr) {
     let sourceUserID = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db, arr[1]);
     let otherUserID = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db, arr[2]);
@@ -547,15 +541,6 @@ async function checkIfSkilledEnough(accountID, projectID) {
 
 }
 
-async function getAllSkillsMapOfAccount(accountID) {
-    let skillArray = await databaseClass.getSkillsOfAccountXFromDB(databaseClass.db, accountID);
-    return await convertSkillsArrayToSkillsMap(skillArray);
-}
-
-async function getAllSkillsMapOfProject(projectID) {
-    let skillsArray = await databaseClass.getSkillsOfProjectXFromDB(databaseClass.db, projectID);
-    return await convertSkillsArrayToSkillsMap(skillsArray);
-}
 
 async function convertSkillsArrayToSkillsMap(arr) {
     let skillMap = new Map();
@@ -718,6 +703,13 @@ function serializeAuctions() {
 
 }
 
+function serializeAllData() {
+    serializeAccounts();
+    serializeProjects();
+    serializeBides();
+    serializeAuctions();
+}
+
 /**************************************************Deserialize********************************************************/
 
 function deserializeAllAccounts(arr) {
@@ -751,7 +743,20 @@ function deserializeAllSkills(body) {
 
 module.exports = {holdAuction, calculateBestBid, calculateUserSkill, checkIfSkilledEnough, checkIfBidEnough};
 
-/************************************************building-testExamples**********************************************/
+
+/************************************************TestExamplesFormDB***************************************************/
+
+async function createAllDataBases() {
+    await databaseClass.createProjectsDB(databaseClass.db);
+    await databaseClass.createAccountsDB(databaseClass.db);
+    await databaseClass.createBidsDB(databaseClass.db);
+    await databaseClass.createAuctionsDB(databaseClass.db);
+    await databaseClass.createSkillsDB(databaseClass.db);
+    await databaseClass.createConfirmationsDB(databaseClass.db);
+    console.log("DataBase created successfully :)".green)
+}
+
+
 async function createSomeExampleCases() {
     let project = new projectClass(0, "tap30", -1, 900, -1, "2022/03/03", true);
     let tap30Skill1 = await databaseClass.saveProjectSkillInDB(databaseClass.db, 0, "A", 20, 0);
