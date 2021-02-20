@@ -121,7 +121,7 @@ async function loadMenus() {
             console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using" + "removeSkill <username> <skill>".green);
             const command = prompt("");
             arr = command.split(" ");
-            removeSkill(arr);
+            await removeSkill(arr);
 
 
         } else if (selectedMenu === "10") {
@@ -366,7 +366,6 @@ async function addSkill(arr) {
     if (checkIfSkillIsValid(arrSkilles[0])) {
         await databaseClass.saveAccountSkillInDB(databaseClass.db,skillID,arrSkilles[0], arrSkilles[1],accountID.id);
         console.log("skill added successfully!\n".red);
-        console.log(await databaseClass.getSkillsFullDBTable(databaseClass.db))
     } else console.log("such skill does not exist!".red);
 }
 
@@ -378,19 +377,24 @@ function checkIfSkillIsValid(givenSkill) {
     return skillIsValid;
 }
 
-function removeSkill(arr) {
-    let account = accountClass.getAccountByUsername(arr[1]);
-    let skillName = arr[2];
-    if (checkIfAccountHasSkill(account, skillName)) {
-        account.skills.delete(skillName);
+async function removeSkill(arr) {
+    console.log(await databaseClass.getSkillsFullDBTable(databaseClass.db))
+    let accountID = await databaseClass.getAccountIDUsingUsernameFromDB(databaseClass.db,arr[1]);
+    let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountIDFromDB(databaseClass.db,arr[2],accountID.id);
+    if (await checkIfAccountHasSkill(accountID.id, skillID.id)) {
+        await databaseClass.deleteSkillOfAccountUsingSkillNameFromDB(databaseClass.db,skillID.id);
         console.log("skill removed successfully!\n".red);
+        console.log(await databaseClass.getSkillsFullDBTable(databaseClass.db))
+
     } else console.log("user does not have such skill!".red);
 }
 
-function checkIfAccountHasSkill(account, skillName) {
+async function checkIfAccountHasSkill(accountID, skillID) {
     let hasThisSkill = false;
-    account.skills.forEach((value, key) => {
-        if (key === skillName) {
+    let skillsMap = await getAllSkillsMapOfAccount(accountID);
+    let skillName = await databaseClass.getSkillXSkillNameFromDB(databaseClass.db,skillID);
+    skillsMap.forEach((value, key) => {
+        if (key === skillName.skillName) {
             hasThisSkill = true;
         }
     })
