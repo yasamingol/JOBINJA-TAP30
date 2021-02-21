@@ -216,7 +216,8 @@ async function getAccountById(id) {
 async function buildFullAccountByGettingID(id) {
     let username = await databaseClass.getAccountXUsernameFromDB(databaseClass.db, id);
     let skills = await getAllSkillsMapOfAccount(id);
-    return new accountClass(id, username.username, skills, -1, -1);
+    let assignedProjectList = await databaseClass.getAllProjectsOfAssignedToAnAccountFormDB(databaseClass.db,id);
+    return new accountClass(id, username.username, skills, assignedProjectList, -1);
 
 }
 
@@ -227,7 +228,10 @@ async function buildFullProjectByGettingID(id) {
     let deadLine = await databaseClass.getProjectXDeadlineFromDB(databaseClass.db, id);
     let isAvailable = await databaseClass.getProjectXIsAvailableFromDB(databaseClass.db, id);
     let assignedAccountId = await databaseClass.getProjectXWinnerIDFromDB(databaseClass.db,id);
-    return new projectClass(id, title.title, skills, budget.budget, -1, deadLine.deadline, isAvailable.isAvailable,assignedAccountId.assignedAccountId);
+    let listOfBids = await createListOfBidsForProject(id);
+
+    return new projectClass(id, title.title, skills, budget.budget, listOfBids,
+        deadLine.deadline, isAvailable.isAvailable,assignedAccountId.assignedAccountId);
 
 }
 
