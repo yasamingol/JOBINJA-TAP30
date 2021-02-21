@@ -11,13 +11,13 @@ const Account = require('../Classes/Account');
         filename: '/home/tapsi/IdeaProjects/concurency/DataBase/database.db',
         driver: sqlite3.Database
     })
-     await createAllDataBases();
-     await createSomeExampleCases();
-
+    await createAllDataBases();
+    await createSomeExampleCases();
     await getAllSkillsFromServer(request);
     await loadMenus();
+
 })()
-/****************************************************Requirements*****************************************************/
+/****************************************************Requirements******************************************************/
 //requirements
 const request = require('request');
 const util = require('util');
@@ -34,7 +34,7 @@ const auctionClass = require("../Classes/Auction");
 //global vars
 let allSkills = [];
 
-/***************************************************Main-Menus********************************************************/
+/****************************************************Main-Menus********************************************************/
 async function loadMenus() {
 
     let command;
@@ -110,7 +110,7 @@ async function loadMenus() {
 function showAvailableMenus() {
     console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
         "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
-        "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.addProject \n 12.holdAuction"  +
+        "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.addProject \n 12.holdAuction" +
         " \n 13.exit \n Please enter the menu number you want to enter : ");
 }
 
@@ -144,14 +144,16 @@ async function loadGetAccountByIdMenu() {
 }
 
 async function loadAddBidMenu() {
-    console.log("\nwelcome to  bid menu!\nyou can add a new bid using : " + "bid <username> <projectTitle> <bidAmount>".green);
+    console.log("\nwelcome to  bid menu!\nyou can add a new bid using : "
+        + "bid <username> <projectTitle> <bidAmount>".green);
     const command = prompt("");
     arr = command.split(" ");
     await addBid(arr);
 }
 
 async function loadConfirmSkillMenu() {
-    console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" + "confirmSkill <your_username> <other_username> <skill>".green);
+    console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" +
+        "confirmSkill <your_username> <other_username> <skill>".green);
     const command = prompt("");
     arr = command.split(" ");
     await confirmSkill(arr);
@@ -165,7 +167,8 @@ async function loadAddSkillMenu() {
 }
 
 async function loadRemoveSkillMenu() {
-    console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using" + "removeSkill <username> <skill>".green);
+    console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using"
+        + "removeSkill <username> <skill>".green);
     const command = prompt("");
     arr = command.split(" ");
     await removeSkill(arr);
@@ -178,15 +181,18 @@ async function loadRegisterMenu() {
     await register(arr);
 }
 
-async function loadAddProjectMenu(){
-    console.log("\nwelcome to  addProject menu!\nyou can add a new project using : " + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)>".green);
+async function loadAddProjectMenu() {
+    console.log("\nwelcome to  addProject menu!\nyou can add a new project using : "
+        + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)>".green);
     // const command = readOneLine();
     const command = prompt("");
     arr = command.split(" ");
     await addProject(arr);
 }
-async function loadHoldAuctionMenu(){
-    console.log("\nwelcome to  Auction menu!\nyou can hold an Auction for a project: " + "holdAuction <projectId>".green);
+
+async function loadHoldAuctionMenu() {
+    console.log("\nwelcome to  Auction menu!\nyou can hold an Auction for a project: "
+        + "holdAuction <projectId>".green);
     const command = prompt("");
     arr = command.split(" ");
     await holdAuction(parseInt(arr[1]));
@@ -220,7 +226,8 @@ async function buildFullProjectByGettingID(id) {
     let budget = await databaseClass.getProjectXBudgetFromDB(databaseClass.db, id);
     let deadLine = await databaseClass.getProjectXDeadlineFromDB(databaseClass.db, id);
     let isAvailable = await databaseClass.getProjectXIsAvailableFromDB(databaseClass.db, id);
-    return new projectClass(id, title.title, skills, budget.budget, -1, deadLine.deadline, isAvailable.isAvailable);
+    let assignedAccountId = await databaseClass.getProjectXWinnerIDFromDB(databaseClass.db,id);
+    return new projectClass(id, title.title, skills, budget.budget, -1, deadLine.deadline, isAvailable.isAvailable,assignedAccountId.assignedAccountId);
 
 }
 
@@ -304,7 +311,7 @@ async function addProject(arr) {
     let budget = arr[arr.length - 2];
     let deadline = stringToDateConverter(arr[arr.length - 1]);
     buildSkillsMap(arr, skills, arr.length - 2);
-    let project = new projectClass(id, title, skills, budget, -1, deadline, true);
+    let project = new projectClass(id, title, skills, budget, -1, deadline, true,-1);
     await saveAddProjectInfoInDB(project);
     console.log("project built successfully!\n".green);
 }
@@ -387,9 +394,9 @@ async function holdAuctionsForAllProjects() {
 }
 
 async function holdAuction(projectId) {
-    if(!(await databaseClass.getProjectXIsAvailableFromDB(databaseClass.db,projectId)).isAvailable){
+    if (!(await databaseClass.getProjectXIsAvailableFromDB(databaseClass.db, projectId)).isAvailable) {
         console.log("project is not available! already taken.".red)
-    }else {
+    } else {
         let accountWinnerID = await calculateBestBid(projectId);
         await createNewAuction(accountWinnerID, projectId);
         await databaseClass.updateProjectAvailabilityInDB(databaseClass.db, projectId);
