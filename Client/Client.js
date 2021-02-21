@@ -212,9 +212,12 @@ async function loadAddProjectMenu() {
     console.log("\nwelcome to  addProject menu!\nyou can add a new project using : "
         + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)>".green);
     // const command = readOneLine();
-    const command = prompt("");
-    arr = command.split(" ");
-    let addProjectArr =  await addProject(arr);
+    let inputArr = prompt("").split(" ");
+    let title = inputArr[1];
+    let budget = inputArr[inputArr.length -2];
+    let deadLine = inputArr[inputArr.length -1];
+    let skillsArr = inputArr.slice(2,inputArr.length-2);
+    let addProjectArr =  await addProject(title,budget,deadLine,skillsArr);
     addProjectArr.forEach((message) => {
         console.log(message);
     })
@@ -225,9 +228,9 @@ async function loadAddProjectMenu() {
 async function loadHoldAuctionMenu() {
     console.log("\nwelcome to  Auction menu!\nyou can hold an Auction for a project: "
         + "holdAuction <projectId>".green);
-    const command = prompt("");
-    arr = command.split(" ");
-    console.log(await holdAuction(parseInt(arr[1])));
+    let inputArr = prompt("").split(" ");
+    let projectId = parseInt(inputArr[1]);
+    console.log(await holdAuction(projectId));
 
 }
 
@@ -334,7 +337,7 @@ async function register(username,skillsArr) {
     let messagesDuringRegistration = [];
     let id = await databaseClass.getNumberOfRowsOfAccountsTable();
     let skills = new Map;
-    messagesDuringRegistration = buildSkillsMap(skillsArr, skills, skillsArr.length);
+    messagesDuringRegistration = buildSkillsMap(skillsArr, skills);
     let account = new accountClass(id, username, skills, [], new Map);
     await saveRegisterInfoInDB(account);
     messagesDuringRegistration[messagesDuringRegistration.length] = ( "registered successfully!\n".green);
@@ -353,14 +356,12 @@ async function saveRegisterInfoInDB(account) {
 
 
 //addProject
-async function addProject(arr) {
+async function addProject(title,budget,deadLine,skillsArr) {
     let messagesDuringAddProject = [];
     let id = await databaseClass.getNumberOfRowsInProjectsTable();
-    let title = arr[1];
     let skills = new Map;
-    let budget = arr[arr.length - 2];
-    let deadline = stringToDateConverter(arr[arr.length - 1]);
-    messagesDuringAddProject = buildSkillsMap(arr, skills, arr.length - 2);
+    let deadline = stringToDateConverter(deadLine);
+    messagesDuringAddProject = buildSkillsMap(skillsArr, skills);
     let project = new projectClass(id, title, skills, budget, -1, deadline, true, -1);
     await saveAddProjectInfoInDB(project);
     messagesDuringAddProject[messagesDuringAddProject.length] = ("project built successfully!\n".green);
@@ -376,10 +377,10 @@ async function saveAddProjectInfoInDB(project) {
     }
 }
 
-function buildSkillsMap(arr, skills, length) {
+function buildSkillsMap(skillsArr, skills) {
     let arrOfMessagesWhileBuildingSKillsMap = [];
-    for (let i = 0; i < length; i++) {
-        let arrSkills = arr[i].split(":");
+    for (let i = 0; i < skillsArr.length; i++) {
+        let arrSkills = skillsArr[i].split(":");
         let skillName = arrSkills[0];
         let skillPoint = arrSkills[1];
         if (checkIfSkillIsValid(skillName)) {
@@ -538,8 +539,8 @@ async function assignProject(userID, projectID) {
 async function addSkill(username,arrSkills) {
     let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
     let skillID = await databaseClass.getNumberOfRowsInSkillsTable();
-    if (checkIfSkillIsValid(arrSkilles[0])) {
-        await databaseClass.saveAccountSkill(skillID, arrSkilles[0], arrSkilles[1], accountID);
+    if (checkIfSkillIsValid(arrSkills[0])) {
+        await databaseClass.saveAccountSkill(skillID, arrSkills[0], arrSkills[1], accountID);
         return ("skill added successfully!\n".green);
     } else {
         return ("such skill does not exist!".red);
