@@ -282,7 +282,7 @@ async function register(arr) {
     buildSkillsMap(arr, skills, arr.length);
     let account = new accountClass(id, username, skills, [], new Map);
     await saveRegisterInfoInDB(account);
-    console.log("registered successfully!\n".red);
+    console.log("registered successfully!\n".green);
 
 }
 
@@ -306,7 +306,7 @@ async function addProject(arr) {
     buildSkillsMap(arr, skills, arr.length - 2);
     let project = new projectClass(id, title, skills, budget, -1, deadline, true);
     await saveAddProjectInfoInDB(project);
-    console.log("project built successfully!\n".red);
+    console.log("project built successfully!\n".green);
 }
 
 async function saveAddProjectInfoInDB(project) {
@@ -357,7 +357,7 @@ async function handlingAddBidErrors(bidId, biddingUserId, projectId, bidAmount) 
 async function createBid(bidId, biddingUserId, projectId, bidAmount) {
     let bid = new bidClass(bidId, biddingUserId, projectId, bidAmount);
     await databaseClass.saveBidInDB(databaseClass.db, bid);
-    console.log("bid created successfully!\n".red);
+    console.log("bid created successfully!\n".green);
 }
 
 async function checkIfBidEnough(projectId, userBidAmount) {
@@ -388,13 +388,13 @@ async function holdAuctionsForAllProjects() {
 
 async function holdAuction(projectId) {
     if(!(await databaseClass.getProjectXIsAvailableFromDB(databaseClass.db,projectId)).isAvailable){
-        console.log("project is not available! already taken.")
+        console.log("project is not available! already taken.".red)
     }else {
         let accountWinnerID = await calculateBestBid(projectId);
         await createNewAuction(accountWinnerID, projectId);
         await databaseClass.updateProjectAvailabilityInDB(databaseClass.db, projectId);
         await assignProject(accountWinnerID, projectId);
-        console.log("\nThe winner of the auction is : ".red);
+        console.log("\nThe winner of the auction is : ".green);
         console.log(await databaseClass.getAccountXUsernameFromDB(databaseClass.db, accountWinnerID));
     }
 }
@@ -460,7 +460,7 @@ async function addSkill(arr) {
     let arrSkilles = arr[2].split(":");
     if (checkIfSkillIsValid(arrSkilles[0])) {
         await databaseClass.saveAccountSkillInDB(databaseClass.db, skillID, arrSkilles[0], arrSkilles[1], accountID.id);
-        console.log("skill added successfully!\n".red);
+        console.log("skill added successfully!\n".green);
     } else console.log("such skill does not exist!".red);
 }
 
@@ -480,7 +480,7 @@ async function removeSkill(arr) {
     let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountIDFromDB(databaseClass.db, arr[2], accountID.id);
     if (await checkIfAccountHasSkill(accountID.id, skillID.id)) {
         await databaseClass.deleteSkillOfAccountUsingSkillNameFromDB(databaseClass.db, skillID.id);
-        console.log("skill removed successfully!\n".red);
+        console.log("skill removed successfully!\n".green);
 
     } else console.log("user does not have such skill!".red);
 }
