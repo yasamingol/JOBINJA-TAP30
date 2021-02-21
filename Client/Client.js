@@ -104,7 +104,7 @@ async function loadMenus() {
 //     serializeAllData();
 }
 
-/***********************************************LoadMenu-Functions*****************************************************/
+/***********************************************View-Functions*****************************************************/
 function showAvailableMenus() {
     console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
         "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
