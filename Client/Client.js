@@ -37,10 +37,8 @@ let allSkills = [];
 /****************************************************Main-Menus********************************************************/
 async function loadMenus() {
 
-    let command;
     console.log("Welcome to JobInja!".red)
-    let commandIsValid = false;
-    while (!commandIsValid) {
+    while (true) {
 
         //Menus
         let arr = [];
@@ -96,7 +94,7 @@ async function loadMenus() {
 
         } else if (selectedMenu === "13") {
             console.log("exit");
-            commandIsValid = true;
+            break;
 
         } else console.log("command is invalid! try again".red);
 
@@ -331,9 +329,14 @@ async function saveAddProjectInfoInDB(project) {
 
 function buildSkillsMap(arr, skills, length) {
     for (let i = 2; i < length; i++) {
-        let arrSkiles = [];
-        arrSkiles = arr[i].split(":");
-        skills.set(arrSkiles[0], arrSkiles[1]);
+        let arrSkills = arr[i].split(":");
+        let skillName = arrSkills[0];
+        let skillPoint = arrSkills[1];
+        if(checkIfSkillIsValid(skillName)) {
+            skills.set(skillName, skillPoint);
+        }else{
+            console.log("skill ".red+skillName.red+" is invalid".red);
+        }
 
     }
 }
@@ -401,12 +404,16 @@ async function holdAuction(projectId) {
     if (!(await databaseClass.getProjectAvailabilityUsingProjectId(projectId))) {
         console.log("project is not available! already taken.".red)
     } else {
-        let accountWinnerID = await calculateBestBid(projectId);
-        await createNewAuction(accountWinnerID, projectId);
-        await databaseClass.updateProjectAvailability(projectId);
-        await assignProject(accountWinnerID, projectId);
-        console.log("\nThe winner of the auction is : ".green);
-        console.log(await databaseClass.getAccountUsernameUsingAccountId(accountWinnerID));
+        let accountWinnerID = await findTheBestUserIdBidingOnProject(projectId);
+        if(accountWinnerID!==null) {
+            await createNewAuction(accountWinnerID, projectId);
+            await databaseClass.updateProjectAvailability(projectId);
+            await assignProject(accountWinnerID, projectId);
+            console.log("\nThe winner of the auction is : ".green);
+            console.log(await databaseClass.getAccountUsernameUsingAccountId(accountWinnerID));
+        }else {
+            console.log("there are no bids on this project! cannot hold auction".red);
+        }
     }
 }
 
@@ -424,10 +431,18 @@ async function isAuctionDay(projectId) {
 
 }
 
-async function calculateBestBid(projectId) {
+async function findTheBestUserIdBidingOnProject(projectId) {
+    let listOfBidIDsForProject = await createListOfBidsForProject(projectId);
+    if(listOfBidIDsForProject.length !== 0) {
+        return await calculateToFindTheBestBid(listOfBidIDsForProject);
+
+    }else{
+        return null;
+    }
+}
+async function calculateToFindTheBestBid(listOfBidIDsForProject){
     let bestBid = 0;
     let bestUserId;
-    let listOfBidIDsForProject = await createListOfBidsForProject(projectId);
     for (let i = 0; i < listOfBidIDsForProject.length; i++) {
         let bid = await buildFullBidUsingBidID(i);
         let userSkill = parseInt(await calculateUserSkill(bid));
@@ -757,7 +772,7 @@ function deserializeAllSkills(body) {
     allSkills = JSON.parse(body);
 }
 
-module.exports = {holdAuction, calculateBestBid, calculateUserSkill, checkIfSkilledEnough, checkIfBidEnough};
+module.exports = {holdAuction, calculateBestBid: findTheBestUserIdBidingOnProject, calculateUserSkill, checkIfSkilledEnough, checkIfBidEnough};
 
 
 /************************************************TestExamplesFormDB***************************************************/
