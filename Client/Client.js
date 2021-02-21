@@ -197,9 +197,10 @@ async function loadRemoveSkillMenu() {
 
 async function loadRegisterMenu() {
     console.log("Welcome to ((register)) menu!".cyan + "command : register <username> <skill:point> ".green);
-    command = prompt("");
-    arr = command.split(" ");
-    let registerMessagesArr = await register(arr);
+    let inputArr = prompt("").split(" ");
+    let username = inputArr[1];
+    let skillsArr = inputArr.slice(2,inputArr.length);
+    let registerMessagesArr = await register(username,skillsArr);
     registerMessagesArr.forEach((message) => {
         console.log(message);
     })
@@ -329,12 +330,11 @@ async function viewAvailableProjects(username) {
 }
 
 //register
-async function register(arr) {
+async function register(username,skillsArr) {
     let messagesDuringRegistration = [];
     let id = await databaseClass.getNumberOfRowsOfAccountsTable();
-    let username = arr[1];
     let skills = new Map;
-    messagesDuringRegistration = buildSkillsMap(arr, skills, arr.length);
+    messagesDuringRegistration = buildSkillsMap(skillsArr, skills, skillsArr.length);
     let account = new accountClass(id, username, skills, [], new Map);
     await saveRegisterInfoInDB(account);
     messagesDuringRegistration[messagesDuringRegistration.length] = ( "registered successfully!\n".green);
@@ -378,7 +378,7 @@ async function saveAddProjectInfoInDB(project) {
 
 function buildSkillsMap(arr, skills, length) {
     let arrOfMessagesWhileBuildingSKillsMap = [];
-    for (let i = 2; i < length; i++) {
+    for (let i = 0; i < length; i++) {
         let arrSkills = arr[i].split(":");
         let skillName = arrSkills[0];
         let skillPoint = arrSkills[1];
