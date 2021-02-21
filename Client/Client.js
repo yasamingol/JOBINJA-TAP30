@@ -112,8 +112,10 @@ function showAvailableMenus() {
         " \n 13.exit \n Please enter the menu number you want to enter : ");
 }
 
+
 async function loadAllProjectsMenu() {
     console.log("\n View all projects menu :".cyan);
+
     let projectsArray = await viewAllProjects();
     projectsArray.forEach((project) => {
         console.log(project);
@@ -124,63 +126,82 @@ async function loadViewAvailableProjectsMenu() {
     console.log("\nWelcome to ((view available projects)) menu!".cyan + " command : <username> ".green);
     command = prompt("");
     console.log("\n Available projects : ".green);
-    await viewAvailableProjects(command);
+
+    let availableProjectsArr = await viewAvailableProjects(command);
+    availableProjectsArr.forEach((project) => {
+        console.log(project);
+    })
 }
 
 async function loadGetProjectByIdMenu() {
     console.log("\nWelcome to ((view project)) menu!".cyan + "command : <project-id>".green);
     command = prompt("");
-    await getProjectById(parseInt(command));
+    console.log(await getProjectById(parseInt(command)));
 }
+
 
 async function loadViewAllAccountsMenu() {
     console.log("\nView all accounts menu".cyan);
-    await viewAllAccounts();
+    let allAccountsArr = await viewAllAccounts();
+    allAccountsArr.forEach((account) => {
+        console.log(account);
+    })
 }
+
 
 async function loadGetAccountByIdMenu() {
     console.log("Welcome to ((view account)) menu!".cyan + "command : <account-id>".green);
     command = prompt("");
-    await getAccountById(parseInt(command));
+    console.log(await getAccountById(parseInt(command)));
 }
+
 
 async function loadAddBidMenu() {
     console.log("\nwelcome to  bid menu!\nyou can add a new bid using : "
         + "bid <username> <projectTitle> <bidAmount>".green);
     const command = prompt("");
     arr = command.split(" ");
-    await addBid(arr);
+    console.log(await addBid(arr));
 }
+
 
 async function loadConfirmSkillMenu() {
     console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" +
         "confirmSkill <your_username> <other_username> <skill>".green);
     const command = prompt("");
     arr = command.split(" ");
-    await confirmSkill(arr);
+    console.log(await confirmSkill(arr));
 }
+
 
 async function loadAddSkillMenu() {
     console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate>".green);
     const command = prompt("");
     arr = command.split(" ");
-    await addSkill(arr);
+    console.log(await addSkill(arr));
 }
+
 
 async function loadRemoveSkillMenu() {
     console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using"
         + "removeSkill <username> <skill>".green);
     const command = prompt("");
     arr = command.split(" ");
-    await removeSkill(arr);
+    console.log(await removeSkill(arr));
 }
+
 
 async function loadRegisterMenu() {
     console.log("Welcome to ((register)) menu!".cyan + "command : register <username> <skill:point> ".green);
     command = prompt("");
     arr = command.split(" ");
-    await register(arr);
+    let registerMessagesArr = await register(arr);
+    registerMessagesArr.forEach((message) => {
+        console.log(message);
+    })
+
 }
+
 
 async function loadAddProjectMenu() {
     console.log("\nwelcome to  addProject menu!\nyou can add a new project using : "
@@ -190,6 +211,7 @@ async function loadAddProjectMenu() {
     arr = command.split(" ");
     await addProject(arr);
 }
+
 
 async function loadHoldAuctionMenu() {
     console.log("\nwelcome to  Auction menu!\nyou can hold an Auction for a project: "
@@ -204,13 +226,13 @@ async function loadHoldAuctionMenu() {
 
 async function getProjectById(id) {
     let project = await buildFullProjectByGettingID(id);
-    console.log(project);
+    return project;
 }
 
 
 async function getAccountById(id) {
     let account = await buildFullAccountByGettingID(id);
-    console.log(account);
+    return account;
 
 }
 
@@ -232,7 +254,7 @@ async function buildFullProjectByGettingID(id) {
     let listOfBids = await createListOfBidsForProject(id);
 
     return new projectClass(id, title, skills, budget, listOfBids,
-        deadLine, isAvailable,assignedAccountId);
+        deadLine, isAvailable, assignedAccountId);
 
 }
 
@@ -244,11 +266,13 @@ async function buildFullBidUsingBidID(bidID) {
 }
 
 async function viewAllAccounts() {
+    let allAccountsArr = [];
     let numberOfAccounts = await databaseClass.getNumberOfRowsOfAccountsTable();
     for (let i = 0; i < numberOfAccounts; i++) {
         let accountName = await databaseClass.getAccountUsernameUsingAccountId(i);
-        console.log(i + "." + accountName);
+        allAccountsArr[i] = (i + "." + accountName);
     }
+    return allAccountsArr;
 }
 
 async function viewAllProjects() {
@@ -274,29 +298,39 @@ async function getAllSkillsMapOfProject(projectID) {
 /*****************************************Logical/Computational-Functions*********************************************/
 
 async function viewAvailableProjects(username) {
+    let availableProjectArr = [];
+    let error = [];
     let hasMinOneAvailable = false;
     let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
     let numberOfProjects = await databaseClass.getNumberOfRowsInProjectsTable();
     for (let i = 0; i < numberOfProjects; i++) {
         let projectsTitle = await databaseClass.getProjectTitleUsingProjectId(i);
         if (await checkIfSkilledEnough(accountID, i)) {
-            console.log(i + "." + projectsTitle)
+            availableProjectArr[i] = (i + "." + projectsTitle);
             hasMinOneAvailable = true;
         }
     }
-    if (!hasMinOneAvailable) console.log("There is no project available for you now!".red);
+    if (hasMinOneAvailable) {
+        return availableProjectArr;
+    }
+    else {
+        error[0] = "There is no project available for you now!".red;
+        return error;
+    }
 
 }
 
 //register
 async function register(arr) {
+    let messagesDuringRegistration = [];
     let id = await databaseClass.getNumberOfRowsOfAccountsTable();
     let username = arr[1];
     let skills = new Map;
-    buildSkillsMap(arr, skills, arr.length);
+    messagesDuringRegistration = buildSkillsMap(arr, skills, arr.length);
     let account = new accountClass(id, username, skills, [], new Map);
     await saveRegisterInfoInDB(account);
-    console.log("registered successfully!\n".green);
+    messagesDuringRegistration[messagesDuringRegistration.length] = ( "registered successfully!\n".green);
+    return messagesDuringRegistration;
 
 }
 
@@ -318,7 +352,7 @@ async function addProject(arr) {
     let budget = arr[arr.length - 2];
     let deadline = stringToDateConverter(arr[arr.length - 1]);
     buildSkillsMap(arr, skills, arr.length - 2);
-    let project = new projectClass(id, title, skills, budget, -1, deadline, true,-1);
+    let project = new projectClass(id, title, skills, budget, -1, deadline, true, -1);
     await saveAddProjectInfoInDB(project);
     console.log("project built successfully!\n".green);
 }
@@ -333,50 +367,56 @@ async function saveAddProjectInfoInDB(project) {
 }
 
 function buildSkillsMap(arr, skills, length) {
+    let arrOfMessagesWhileBuildingSKillsMap = [];
     for (let i = 2; i < length; i++) {
         let arrSkills = arr[i].split(":");
         let skillName = arrSkills[0];
         let skillPoint = arrSkills[1];
-        if(checkIfSkillIsValid(skillName)) {
+        if (checkIfSkillIsValid(skillName)) {
             skills.set(skillName, skillPoint);
-        }else{
-            console.log("skill ".red+skillName.red+" is invalid".red);
+            arrOfMessagesWhileBuildingSKillsMap[i] = ("skill ".green + skillName.green + " added successfully".green);
+        } else {
+            arrOfMessagesWhileBuildingSKillsMap[i] = ("skill ".red + skillName.red + " is invalid".red);
         }
 
     }
+    return arrOfMessagesWhileBuildingSKillsMap;
 }
 
 //addBid
 async function addBid(arr) {
+    let addBidsFinalMessage;
     let biddingUsername = arr[1];
     let projectTitle = arr[2];
     let bidAmount = parseInt(arr[3]);
     let projectId = await databaseClass.getProjectIDUsingProjectTitle(projectTitle);
     let accountId = await databaseClass.getAccountIDUsingAccountUsername(biddingUsername);
     let bidId = await databaseClass.getNumberOfRowsInBidsTable();
-    await handlingAddBidErrors(bidId, accountId, projectId, bidAmount);
+    addBidsFinalMessage = await handlingAddBidErrors(bidId, accountId, projectId, bidAmount);
+    return addBidsFinalMessage;
 }
 
 
 async function handlingAddBidErrors(bidId, biddingUserId, projectId, bidAmount) {
 
     if (!(await databaseClass.getProjectAvailabilityUsingProjectId(projectId))) {
-        console.log("cannot bid! project has already been taken.".red);
+        return  "cannot bid! project has already been taken.".red;
     } else if (!(await checkIfSkilledEnough(biddingUserId, projectId))) {
-        console.log("cannot bid! not skilled enough.".red);
+        return  "cannot bid! not skilled enough.".red;
     } else if (!(await checkIfBidEnough(projectId, bidAmount))) {
-        console.log("cannot bid! bid amount not acceptable".red);
+        return  "cannot bid! bid amount not acceptable".red;
     } else if (!(await checkIfValidDateToBid(projectId))) {
-        console.log("you cannot bid on this project! it has ended".red);
+        return "you cannot bid on this project! it has ended".red;
     } else {
-        await createBid(bidId, biddingUserId, projectId, bidAmount)
+        return (await createBid(bidId, biddingUserId, projectId, bidAmount));
     }
 }
 
 async function createBid(bidId, biddingUserId, projectId, bidAmount) {
     let bid = new bidClass(bidId, biddingUserId, projectId, bidAmount);
     await databaseClass.saveBid(bid);
-    console.log("bid created successfully!\n".green);
+    return "bid created successfully!\n".green;
+
 }
 
 async function checkIfBidEnough(projectId, userBidAmount) {
@@ -410,13 +450,13 @@ async function holdAuction(projectId) {
         console.log("project is not available! already taken.".red)
     } else {
         let accountWinnerID = await findTheBestUserIdBidingOnProject(projectId);
-        if(accountWinnerID!==null) {
+        if (accountWinnerID !== null) {
             await createNewAuction(accountWinnerID, projectId);
             await databaseClass.updateProjectAvailability(projectId);
             await assignProject(accountWinnerID, projectId);
             console.log("\nThe winner of the auction is : ".green);
             console.log(await databaseClass.getAccountUsernameUsingAccountId(accountWinnerID));
-        }else {
+        } else {
             console.log("there are no bids on this project! cannot hold auction".red);
         }
     }
@@ -438,14 +478,15 @@ async function isAuctionDay(projectId) {
 
 async function findTheBestUserIdBidingOnProject(projectId) {
     let listOfBidIDsForProject = await createListOfBidsForProject(projectId);
-    if(listOfBidIDsForProject.length !== 0) {
+    if (listOfBidIDsForProject.length !== 0) {
         return await calculateToFindTheBestBid(listOfBidIDsForProject);
 
-    }else{
+    } else {
         return null;
     }
 }
-async function calculateToFindTheBestBid(listOfBidIDsForProject){
+
+async function calculateToFindTheBestBid(listOfBidIDsForProject) {
     let bestBid = 0;
     let bestUserId;
     for (let i = 0; i < listOfBidIDsForProject.length; i++) {
@@ -491,8 +532,10 @@ async function addSkill(arr) {
     let arrSkilles = arr[2].split(":");
     if (checkIfSkillIsValid(arrSkilles[0])) {
         await databaseClass.saveAccountSkill(skillID, arrSkilles[0], arrSkilles[1], accountID);
-        console.log("skill added successfully!\n".green);
-    } else console.log("such skill does not exist!".red);
+        return ("skill added successfully!\n".green);
+    } else {
+        return ("such skill does not exist!".red);
+    }
 }
 
 
@@ -511,9 +554,11 @@ async function removeSkill(arr) {
     let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountID(arr[2], accountID);
     if (await checkIfAccountHasSkill(accountID, skillID)) {
         await databaseClass.deleteSkillOfAccountUsingSkillName(skillID);
-        console.log("skill removed successfully!\n".green);
+        return ("skill removed successfully!\n".green);
 
-    } else console.log("user does not have such skill!".red);
+    } else {
+        return ("user does not have such skill!".red);
+    }
 }
 
 
@@ -540,8 +585,9 @@ async function confirmSkill(arr) {
     if (!hasConfirmedBefore) {
         await addPointTOSkillForConfirmation(skillID);
         await createNewConfirmation(skillID, sourceUserID);
-        console.log(arr[1] + " confirmed " + arr[2] + " s ((" + arr[3] + ")) skill\n ");
-    } else console.log("cannot confirm this skillSet! you have done it once before!".red);
+        return (arr[1] + " confirmed " + arr[2] + " s ((" + arr[3] + ")) skill\n ");
+
+    } else return ("cannot confirm this skillSet! you have done it once before!".red);
 
 }
 
@@ -777,7 +823,13 @@ function deserializeAllSkills(body) {
     allSkills = JSON.parse(body);
 }
 
-module.exports = {holdAuction, calculateBestBid: findTheBestUserIdBidingOnProject, calculateUserSkill, checkIfSkilledEnough, checkIfBidEnough};
+module.exports = {
+    holdAuction,
+    calculateBestBid: findTheBestUserIdBidingOnProject,
+    calculateUserSkill,
+    checkIfSkilledEnough,
+    checkIfBidEnough
+};
 
 
 /************************************************TestExamplesFormDB***************************************************/
