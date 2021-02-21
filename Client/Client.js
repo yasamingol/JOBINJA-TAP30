@@ -115,7 +115,6 @@ function showAvailableMenus() {
 
 async function loadAllProjectsMenu() {
     console.log("\n View all projects menu :".cyan);
-
     let projectsArray = await viewAllProjects();
     projectsArray.forEach((project) => {
         console.log(project);
@@ -124,10 +123,9 @@ async function loadAllProjectsMenu() {
 
 async function loadViewAvailableProjectsMenu() {
     console.log("\nWelcome to ((view available projects)) menu!".cyan + " command : <username> ".green);
-    command = prompt("");
+    let username = prompt("");
     console.log("\n Available projects : ".green);
-
-    let availableProjectsArr = await viewAvailableProjects(command);
+    let availableProjectsArr = await viewAvailableProjects(username);
     availableProjectsArr.forEach((project) => {
         console.log(project);
     })
@@ -135,8 +133,8 @@ async function loadViewAvailableProjectsMenu() {
 
 async function loadGetProjectByIdMenu() {
     console.log("\nWelcome to ((view project)) menu!".cyan + "command : <project-id>".green);
-    command = prompt("");
-    console.log(await getProjectById(parseInt(command)));
+    let projectId = parseInt(prompt(""));
+    console.log(await getProjectById(projectId));
 }
 
 
@@ -151,43 +149,49 @@ async function loadViewAllAccountsMenu() {
 
 async function loadGetAccountByIdMenu() {
     console.log("Welcome to ((view account)) menu!".cyan + "command : <account-id>".green);
-    command = prompt("");
-    console.log(await getAccountById(parseInt(command)));
+    let accountId = parseInt(prompt(""));
+    console.log(await getAccountById(accountId));
 }
 
 
 async function loadAddBidMenu() {
     console.log("\nwelcome to  bid menu!\nyou can add a new bid using : "
         + "bid <username> <projectTitle> <bidAmount>".green);
-    const command = prompt("");
-    arr = command.split(" ");
-    console.log(await addBid(arr));
+    let inputArr = prompt("").split(" ");
+    let biddingUsername = inputArr[1];
+    let projectTitle = inputArr[2];
+    let bidAmount = parseInt(inputArr[3]);
+    console.log(await addBid(biddingUsername,projectTitle,bidAmount));
 }
 
 
 async function loadConfirmSkillMenu() {
     console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" +
         "confirmSkill <your_username> <other_username> <skill>".green);
-    const command = prompt("");
-    arr = command.split(" ");
-    console.log(await confirmSkill(arr));
+    const inputArr = prompt("").split(" ");
+    let conformerAccountUsername = inputArr[1];
+    let targetAccountUsername = inputArr[2];
+    let skillName = inputArr[3];
+    console.log(await confirmSkill(conformerAccountUsername,targetAccountUsername,skillName));
 }
 
 
 async function loadAddSkillMenu() {
     console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate>".green);
-    const command = prompt("");
-    arr = command.split(" ");
-    console.log(await addSkill(arr));
+    const inputArr = prompt("").split(" ");
+    let username = inputArr[1];
+    let arrSkills = inputArr[2].split(":");
+    console.log(await addSkill(username,arrSkills));
 }
 
 
 async function loadRemoveSkillMenu() {
     console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using"
         + "removeSkill <username> <skill>".green);
-    const command = prompt("");
-    arr = command.split(" ");
-    console.log(await removeSkill(arr));
+    const inputArr = prompt("").split(" ");
+    let username = inputArr[1];
+    let skillName = inputArr[2];
+    console.log(await removeSkill(username,skillName));
 }
 
 
@@ -390,11 +394,8 @@ function buildSkillsMap(arr, skills, length) {
 }
 
 //addBid
-async function addBid(arr) {
+async function addBid(biddingUsername,projectTitle,bidAmount) {
     let addBidsFinalMessage;
-    let biddingUsername = arr[1];
-    let projectTitle = arr[2];
-    let bidAmount = parseInt(arr[3]);
     let projectId = await databaseClass.getProjectIDUsingProjectTitle(projectTitle);
     let accountId = await databaseClass.getAccountIDUsingAccountUsername(biddingUsername);
     let bidId = await databaseClass.getNumberOfRowsInBidsTable();
@@ -534,10 +535,9 @@ async function assignProject(userID, projectID) {
 
 
 //add/remove
-async function addSkill(arr) {
-    let accountID = await databaseClass.getAccountIDUsingAccountUsername(arr[1]);
+async function addSkill(username,arrSkills) {
+    let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
     let skillID = await databaseClass.getNumberOfRowsInSkillsTable();
-    let arrSkilles = arr[2].split(":");
     if (checkIfSkillIsValid(arrSkilles[0])) {
         await databaseClass.saveAccountSkill(skillID, arrSkilles[0], arrSkilles[1], accountID);
         return ("skill added successfully!\n".green);
@@ -556,10 +556,10 @@ function checkIfSkillIsValid(givenSkill) {
 }
 
 
-async function removeSkill(arr) {
+async function removeSkill(username,skillName) {
     console.log(await databaseClass.getSkillsFullDBTable())
-    let accountID = await databaseClass.getAccountIDUsingAccountUsername(arr[1]);
-    let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountID(arr[2], accountID);
+    let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
+    let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
     if (await checkIfAccountHasSkill(accountID, skillID)) {
         await databaseClass.deleteSkillOfAccountUsingSkillName(skillID);
         return ("skill removed successfully!\n".green);
@@ -585,15 +585,15 @@ async function checkIfAccountHasSkill(accountID, skillID) {
 
 
 //confirm Skill
-async function confirmSkill(arr) {
-    let sourceUserID = await databaseClass.getAccountIDUsingAccountUsername(arr[1]);
-    let otherUserID = await databaseClass.getAccountIDUsingAccountUsername(arr[2]);
-    let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountID(arr[3], otherUserID);
+async function confirmSkill(conformerAccountUsername,targetAccountUsername,skillName) {
+    let sourceUserID = await databaseClass.getAccountIDUsingAccountUsername(conformerAccountUsername);
+    let otherUserID = await databaseClass.getAccountIDUsingAccountUsername(targetAccountUsername);
+    let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, otherUserID);
     let hasConfirmedBefore = await checkIfConfirmedBefore(sourceUserID, skillID);
     if (!hasConfirmedBefore) {
         await addPointTOSkillForConfirmation(skillID);
         await createNewConfirmation(skillID, sourceUserID);
-        return (arr[1] + " confirmed " + arr[2] + " s ((" + arr[3] + ")) skill\n ");
+        return (conformerAccountUsername + " confirmed " + targetAccountUsername + " s ((" + skillName + ")) skill\n ");
 
     } else return ("cannot confirm this skillSet! you have done it once before!".red);
 
