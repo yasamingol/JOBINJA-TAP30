@@ -11,8 +11,8 @@ const Account = require('../Classes/Account');
         filename: '/home/tapsi/IdeaProjects/concurency/DataBase/database.db',
         driver: sqlite3.Database
     })
-    // await createAllDataBases();
-    // await createSomeExampleCases();
+     await createAllDataBases();
+     await createSomeExampleCases();
 
     await getAllSkillsFromServer(request);
     await loadMenus();
@@ -380,19 +380,23 @@ async function holdAuctionsForAllProjects() {
     let numberOfProjects = await databaseClass.getNumberOfRowsOfProjectsFromDB(databaseClass.db);
     for (let i = 0; i < numberOfProjects; i++) {
         let projectID = i;
-        if (await isAuctionDate(projectID)) {
+        if (await isAuctionDay(projectID)) {
             await holdAuction(projectID);
         }
     }
 }
 
 async function holdAuction(projectId) {
-    let accountWinnerID = await calculateBestBid(projectId);
-    await createNewAuction(accountWinnerID, projectId);
-    await databaseClass.updateProjectAvailabilityInDB(databaseClass.db, projectId);
-    await assignProject(accountWinnerID, projectId);
-    console.log("\nThe winner of the auction is : ".red);
-    console.log(await databaseClass.getAccountXUsernameFromDB(databaseClass.db, accountWinnerID));
+    if(!(await databaseClass.getProjectXIsAvailableFromDB(databaseClass.db,projectId)).isAvailable){
+        console.log("project is not available! already taken.")
+    }else {
+        let accountWinnerID = await calculateBestBid(projectId);
+        await createNewAuction(accountWinnerID, projectId);
+        await databaseClass.updateProjectAvailabilityInDB(databaseClass.db, projectId);
+        await assignProject(accountWinnerID, projectId);
+        console.log("\nThe winner of the auction is : ".red);
+        console.log(await databaseClass.getAccountXUsernameFromDB(databaseClass.db, accountWinnerID));
+    }
 }
 
 
@@ -402,7 +406,7 @@ async function createNewAuction(winnerID, projectID) {
 }
 
 
-async function isAuctionDate(projectId) {
+async function isAuctionDay(projectId) {
     let projectDeadline = await databaseClass.getProjectXDeadlineFromDB(databaseClass.db, projectId);
     let localDate = Date.now();
     return projectDeadline.deadline <= localDate;
