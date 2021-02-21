@@ -114,7 +114,10 @@ function showAvailableMenus() {
 
 async function loadAllProjectsMenu() {
     console.log("\n View all projects menu :".cyan);
-    await viewAllProjects();
+    let projectsArray = await viewAllProjects();
+    projectsArray.forEach((project) => {
+        console.log(project);
+    })
 }
 
 async function loadViewAvailableProjectsMenu() {
@@ -249,11 +252,13 @@ async function viewAllAccounts() {
 }
 
 async function viewAllProjects() {
+    let allProjectsArray = [];
     let numberOfProjects = await databaseClass.getNumberOfRowsInProjectsTable();
     for (let i = 0; i < numberOfProjects; i++) {
         let projectsTitle = await databaseClass.getProjectTitleUsingProjectId(i);
-        console.log(i + "." + projectsTitle);
+        allProjectsArray[i] = (i + "." + projectsTitle);
     }
+    return allProjectsArray;
 }
 
 async function getAllSkillsMapOfAccount(accountID) {
