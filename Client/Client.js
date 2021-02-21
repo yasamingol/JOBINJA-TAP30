@@ -209,7 +209,11 @@ async function loadAddProjectMenu() {
     // const command = readOneLine();
     const command = prompt("");
     arr = command.split(" ");
-    await addProject(arr);
+    let addProjectArr =  await addProject(arr);
+    addProjectArr.forEach((message) => {
+        console.log(message);
+    })
+
 }
 
 
@@ -218,7 +222,7 @@ async function loadHoldAuctionMenu() {
         + "holdAuction <projectId>".green);
     const command = prompt("");
     arr = command.split(" ");
-    await holdAuction(parseInt(arr[1]));
+    console.log(await holdAuction(parseInt(arr[1])));
 
 }
 
@@ -346,15 +350,17 @@ async function saveRegisterInfoInDB(account) {
 
 //addProject
 async function addProject(arr) {
+    let messagesDuringAddProject = [];
     let id = await databaseClass.getNumberOfRowsInProjectsTable();
     let title = arr[1];
     let skills = new Map;
     let budget = arr[arr.length - 2];
     let deadline = stringToDateConverter(arr[arr.length - 1]);
-    buildSkillsMap(arr, skills, arr.length - 2);
+    messagesDuringAddProject = buildSkillsMap(arr, skills, arr.length - 2);
     let project = new projectClass(id, title, skills, budget, -1, deadline, true, -1);
     await saveAddProjectInfoInDB(project);
-    console.log("project built successfully!\n".green);
+    messagesDuringAddProject[messagesDuringAddProject.length] = ("project built successfully!\n".green);
+    return messagesDuringAddProject;
 }
 
 async function saveAddProjectInfoInDB(project) {
@@ -446,20 +452,22 @@ async function holdAuctionsForAllProjects() {
 }
 
 async function holdAuction(projectId) {
+    let messageOfHoldAuction = "";
     if (!(await databaseClass.getProjectAvailabilityUsingProjectId(projectId))) {
-        console.log("project is not available! already taken.".red)
+        messageOfHoldAuction = ("project is not available! already taken.".red);
     } else {
         let accountWinnerID = await findTheBestUserIdBidingOnProject(projectId);
         if (accountWinnerID !== null) {
             await createNewAuction(accountWinnerID, projectId);
             await databaseClass.updateProjectAvailability(projectId);
             await assignProject(accountWinnerID, projectId);
-            console.log("\nThe winner of the auction is : ".green);
-            console.log(await databaseClass.getAccountUsernameUsingAccountId(accountWinnerID));
+            messageOfHoldAuction = ("\nThe winner of the auction is : ".green
+                + await databaseClass.getAccountUsernameUsingAccountId(accountWinnerID));
         } else {
-            console.log("there are no bids on this project! cannot hold auction".red);
+            messageOfHoldAuction = ("there are no bids on this project! cannot hold auction".red);
         }
     }
+    return messageOfHoldAuction;
 }
 
 
