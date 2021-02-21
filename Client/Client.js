@@ -11,8 +11,9 @@ const Account = require('../Classes/Account');
         filename: '/home/tapsi/IdeaProjects/concurency/DataBase/database.db',
         driver: sqlite3.Database
     })
-    await createAllDataBases();
-    await createSomeExampleCases();
+    // await createAllDataBases();
+    // await createSomeExampleCases();
+
     await getAllSkillsFromServer(request);
     await loadMenus();
 })()
@@ -367,7 +368,8 @@ async function checkIfBidEnough(projectId, userBidAmount) {
 }
 
 async function checkIfValidDateToBid(projectId) {
-    let projectDeadline = Date.parse(await databaseClass.getProjectXDeadlineFromDB(databaseClass.db, projectId));
+    let time = await databaseClass.getProjectXDeadlineFromDB(databaseClass.db, projectId);
+    let projectDeadline = Date.parse(time.deadline);
     let localDate = Date.now();
     return projectDeadline >= localDate;
 
@@ -475,7 +477,6 @@ async function removeSkill(arr) {
     if (await checkIfAccountHasSkill(accountID.id, skillID.id)) {
         await databaseClass.deleteSkillOfAccountUsingSkillNameFromDB(databaseClass.db, skillID.id);
         console.log("skill removed successfully!\n".red);
-        console.log(await databaseClass.getSkillsFullDBTable(databaseClass.db))
 
     } else console.log("user does not have such skill!".red);
 }
