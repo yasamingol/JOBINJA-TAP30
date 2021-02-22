@@ -1,9 +1,8 @@
 /***************************************************SettingUpDataBase**************************************************/
-const databaseClass = require('../DataBase/database');
+const databaseClass = require('../../DataBase/database');
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const Account = require('../Classes/Account');
-
+const Account = require('../Model/Classes/Account');
 
 //using database
 (async () => {
@@ -26,10 +25,10 @@ const prompt = require('prompt-sync')();
 const colors = require('colors');
 
 //importing classes
-const accountClass = require("../Classes/Account");
-const projectClass = require("../Classes/Project");
-const bidClass = require("../Classes/Bid");
-const auctionClass = require("../Classes/Auction");
+const accountClass = require("../Model/Classes/Account");
+const projectClass = require("../Model/Classes/Project");
+const bidClass = require("../Model/Classes/Bid");
+const auctionClass = require("../Model/Classes/Auction");
 
 //global vars
 let allSkills = [];
@@ -181,7 +180,9 @@ async function loadAddSkillMenu() {
     const inputArr = prompt("").split(" ");
     let username = inputArr[1];
     let arrSkills = inputArr[2].split(":");
-    console.log(await addSkill(username,arrSkills));
+    let skillName = arrSkills[0];
+    let skillPoint = arrSkills[1];
+    console.log(await addSkill(username,skillName,skillPoint));
 }
 
 
@@ -252,7 +253,7 @@ async function buildFullAccountByGettingID(id) {
     let username = await databaseClass.getAccountUsernameUsingAccountId(id);
     let skills = await getAllSkillsMapOfAccount(id);
     let assignedProjectList = await databaseClass.getAllProjectsAssignedToAnAccountUsingAccountId(id);
-    return new accountClass(id, username, skills, assignedProjectList, -1);
+    return new accountClass(id, username, skills, assignedProjectList, null);
 
 }
 
@@ -341,7 +342,7 @@ async function buildAvailableProjects(accountID, numberOfProjects){
 
 //register
 async function register(username,skillsArr) {
-    let messagesDuringRegistration = [];
+    let messagesDuringRegistration ;
     let id = await databaseClass.getNumberOfRowsOfAccountsTable();
     let skills = new Map;
     messagesDuringRegistration = buildSkillsMap(skillsArr, skills);
@@ -364,18 +365,18 @@ async function saveRegisterInfoInDB(account) {
 
 //addProject
 async function addProject(title,budget,deadLine,skillsArr) {
-    let messagesDuringAddProject = [];
+    let messagesDuringAddProject;
     let id = await databaseClass.getNumberOfRowsInProjectsTable();
     let skills = new Map;
     let deadline = stringToDateConverter(deadLine);
     messagesDuringAddProject = buildSkillsMap(skillsArr, skills);
-    let project = new projectClass(id, title, skills, budget, -1, deadline, true, -1);
-    await saveAddProjectInfoInDB(project);
+    let project = new projectClass(id, title, skills, budget, null, deadline, true, null);
+    await saveProjectInfo(project);
     messagesDuringAddProject[messagesDuringAddProject.length] = ("project built successfully!\n".green);
     return messagesDuringAddProject;
 }
 
-async function saveAddProjectInfoInDB(project) {
+async function saveProjectInfo(project) {
     await databaseClass.saveProject(project);
     let counter = await databaseClass.getNumberOfRowsInSkillsTable();
     for (const [key, value] of project.skills) {
@@ -465,16 +466,23 @@ async function holdAuction(projectId) {
     if (!(await databaseClass.getProjectAvailabilityUsingProjectId(projectId))) {
         messageOfHoldAuction = ("project is not available! already taken.".red);
     } else {
-        let accountWinnerID = await findTheBestUserIdBidingOnProject(projectId);
-        if (accountWinnerID !== null) {
-            await createNewAuction(accountWinnerID, projectId);
-            await databaseClass.updateProjectAvailability(projectId);
-            await assignProject(accountWinnerID, projectId);
-            messageOfHoldAuction = ("\nThe winner of the auction is : ".green
-                + await databaseClass.getAccountUsernameUsingAccountId(accountWinnerID));
-        } else {
-            messageOfHoldAuction = ("there are no bids on this project! cannot hold auction".red);
-        }
+        messageOfHoldAuction = await handlingAuctionProcess(projectId);
+    }
+    return messageOfHoldAuction;
+}
+
+
+async function handlingAuctionProcess(projetcId){
+    let messageOfHoldAuction = "";
+    let accountWinnerID = await findTheBestUserIdBidingOnProject(projectId);
+    if (accountWinnerID !== null) {
+        await createNewAuction(accountWinnerID, projectId);
+        await databaseClass.updateProjectAvailability(projectId);
+        await assignProject(accountWinnerID, projectId);
+        messageOfHoldAuction = ("\nThe winner of the auction is : ".green
+            + await databaseClass.getAccountUsernameUsingAccountId(accountWinnerID));
+    } else {
+        messageOfHoldAuction = ("there are no bids on this project! cannot hold auction".red);
     }
     return messageOfHoldAuction;
 }
@@ -543,11 +551,11 @@ async function assignProject(userID, projectID) {
 
 
 //add/remove
-async function addSkill(username,arrSkills) {
+async function addSkill(username,skillName,skillPoint) {
     let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
     let skillID = await databaseClass.getNumberOfRowsInSkillsTable();
-    if (checkIfSkillIsValid(arrSkills[0])) {
-        await databaseClass.saveAccountSkill(skillID, arrSkills[0], arrSkills[1], accountID);
+    if (checkIfSkillIsValid(skillName)) {
+        await databaseClass.saveAccountSkill(skillID, skillName, skillPoint, accountID);
         return ("skill added successfully!\n".green);
     } else {
         return ("such skill does not exist!".red);

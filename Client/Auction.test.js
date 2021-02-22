@@ -1,7 +1,7 @@
-const clientClass = require("./Client");
-const accountClass = require("../Classes/Account");
-const projectClass = require("../Classes/Project");
-const bidClass = require("../Classes/Bid");
+const clientClass = require("./Controller/Client");
+const accountClass = require("./Model/Classes/Account");
+const projectClass = require("./Model/Classes/Project");
+const bidClass = require("./Model/Classes/Bid");
 
 //building bids :
 let bid1 = new bidClass(1, "yasamingol", "tap30", 80);

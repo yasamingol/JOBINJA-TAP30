@@ -1,6 +1,6 @@
-const clientClass = require("./Client");
-const accountClass = require("../Classes/Account");
-const projectClass = require("../Classes/Project");
+const clientClass = require("./Controller/Client");
+const accountClass = require("./Model/Classes/Account");
+const projectClass = require("./Model/Classes/Project");
 
 
 //building accounts :
