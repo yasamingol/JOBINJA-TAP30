@@ -1,4 +1,4 @@
-const clientClass = require("./Controller/Client");
+const clientClass = require("./Controller/Client-Controller");
 const accountClass = require("./Model/Classes/Account");
 const projectClass = require("./Model/Classes/Project");
 const bidClass = require("./Model/Classes/Bid");
