@@ -2,7 +2,7 @@
 const databaseClass = require('../DataBase/database');
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const controllerClass = require("../Controller/Client-Controller.js");
+const controllerClass = require("../Controller/Controller.js");
 
 //using database
 (async () => {

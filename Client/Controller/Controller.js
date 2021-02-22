@@ -648,7 +648,8 @@ module.exports = {
     addSkill,
     removeSkill,
     confirmSkill,
-    getAllSkillsFromServer
+    getAllSkillsFromServer,
+    holdAuction
 
 
 }
