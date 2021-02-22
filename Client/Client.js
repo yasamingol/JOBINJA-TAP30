@@ -257,12 +257,13 @@ async function buildFullAccountByGettingID(id) {
 }
 
 async function buildFullProjectByGettingID(id) {
-    let title = await databaseClass.getProjectTitleUsingProjectId(id);
+    let projectFullString = await databaseClass.getProjectByID(id);
+    let title = projectFullString.title
     let skills = await getAllSkillsMapOfProject(id);
-    let budget = await databaseClass.getProjectBudgetUsingProjectId(id);
-    let deadLine = await databaseClass.getProjectDeadlineUsingProjectId(id);
-    let isAvailable = await databaseClass.getProjectAvailabilityUsingProjectId(id);
-    let assignedAccountId = await databaseClass.getProjectWinnerIDUsingProjectId(id);
+    let budget = projectFullString.budget;
+    let deadLine = projectFullString.deadline;
+    let isAvailable = projectFullString.isAvailable;
+    let assignedAccountId = projectFullString.assignedAccountId;
     let listOfBids = await createListOfBidsForProject(id);
 
     return new projectClass(id, title, skills, budget, listOfBids,
