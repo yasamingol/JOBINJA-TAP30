@@ -311,11 +311,21 @@ async function getAllSkillsMapOfProject(projectID) {
 /*****************************************Logical/Computational-Functions*********************************************/
 
 async function viewAvailableProjects(username) {
-    let availableProjectArr = [];
     let error = [];
-    let hasMinOneAvailable = false;
     let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
     let numberOfProjects = await databaseClass.getNumberOfRowsInProjectsTable();
+    let {availableProjectArr,hasMinOneAvailable} = await buildAvailableProjects(accountID,numberOfProjects);
+    if (hasMinOneAvailable) {
+        return availableProjectArr;
+    }
+    else {
+        error[0] = "There are no projects available for you now!".red;
+        return error;
+    }
+}
+async function buildAvailableProjects(accountID, numberOfProjects){
+    let availableProjectArr = [];
+    let hasMinOneAvailable = false;
     for (let i = 0; i < numberOfProjects; i++) {
         let projectsTitle = await databaseClass.getProjectTitleUsingProjectId(i);
         if (await checkIfSkilledEnough(accountID, i)) {
@@ -323,14 +333,10 @@ async function viewAvailableProjects(username) {
             hasMinOneAvailable = true;
         }
     }
-    if (hasMinOneAvailable) {
-        return availableProjectArr;
-    }
-    else {
-        error[0] = "There is no project available for you now!".red;
-        return error;
-    }
-
+    return {
+        availableProjectArr: availableProjectArr,
+        hasMinOneAvailable:hasMinOneAvailable
+    };
 }
 
 //register
