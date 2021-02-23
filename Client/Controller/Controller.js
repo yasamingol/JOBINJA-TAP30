@@ -15,9 +15,7 @@ const auctionClass = require("../Model/Classes/Auction");
 const viewClass = require("../View/Menus.js");
 const databaseClass = require('../DataBase/database.js');
 
-//global vars
-let userLoginToken = null;
-let loggedinUserId = null;
+
 /***********************************************MainFunctionsInMenu***************************************************/
 
 async function getProjectById(id) {
@@ -450,10 +448,8 @@ async function login(username, password) {
     if (account.password === password) {
         let token = await generateJWT(username, password);
         await databaseClass.saveLogin(accountId, token);
-        userLoginToken = token;
-        loggedinUserId = accountId;
-        return "login successfully".green;
-    }else {
+        return "login successfully! your loginToken : ".green + token;
+    } else {
         return "incorrect password! please try again.".red;
     }
 
@@ -509,38 +505,30 @@ async function checkIfTokenIsExpired(token) {
     );
     return isExpired;
 }
-async function checkTokenValidation(accountId,token){
-    let accountToken = await databaseClass.getLoginTokenUsingUserID(accountId);
-    if((await checkIfTokenIsExpired(token))){
+
+async function checkTokenValidation(token) {
+    let tokenId = await databaseClass.getLoginIdUsingToken(token);
+    if ((await checkIfTokenIsExpired(token)) || (tokenId===undefined)) {
         return false;
     }
-    if(!(accountToken===token)){
-        return false;
-    }
-    else{
+    else {
         return true;
     }
 }
-async function validateUserLoginToken(accountId){
-    if(userLoginToken===null){
+
+async function validateUserLoginToken(token) {
+    if (await checkTokenValidation(token)) {
         return {
-            isValid:false,
-        message:("need to login first! you have no access to this menu.".red)
+            isValid: true,
+            message: "\nvalid token:)".green
         };
-    }else {
-        if(await checkTokenValidation(loggedinUserId, userLoginToken)){
-            return {
-                isValid:true,
-                message:"valid token:)".green
-            };
-        }
-        else {
-            return {
-                isValid:false,
-                message:"invalid token!".red
-            };
-        }
+    } else {
+        return {
+            isValid: false,
+            message: "\ninvalid token! need to login first!".red
+        };
     }
+
 }
 
 

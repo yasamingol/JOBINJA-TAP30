@@ -10,8 +10,8 @@ const controllerClass = require("../Controller/Controller.js");
         filename: '/home/tapsi/IdeaProjects/concurency/Client/DataBase/database.db',
         driver: sqlite3.Database
     })
-    await createAllDataBases();
-    await createSomeExampleCases();
+    // await createAllDataBases();
+    // await createSomeExampleCases();
     await controllerClass.getAllSkillsFromServer(request);
     await loadMenus();
 
@@ -120,8 +120,9 @@ function showAvailableMenus() {
 
 
 async function loadAllProjectsMenu() {
-    console.log("\n View all projects menu :".cyan);
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation())){
+    console.log("\n View all projects menu : ".cyan + "<token>".green);
+    let token = prompt("");
+    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))){
         let projectsArray = await controllerClass.viewAllProjects();
         projectsArray.forEach((project) => {
             console.log(project);
@@ -131,9 +132,11 @@ async function loadAllProjectsMenu() {
 }
 
 async function loadViewAvailableProjectsMenu() {
-    console.log("\nWelcome to ((view available projects)) menu!".cyan + " command : <username> ".green);
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation())) {
-        let username = prompt("");
+    console.log("\nWelcome to ((view available projects)) menu!".cyan + " command : <username> <token>".green);
+    let inputArr = prompt("").split(" ");
+    let username = inputArr[0];
+    let token = inputArr[1];
+    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log("\n Available projects : ".green);
         let availableProjectsArr = await controllerClass.viewAvailableProjects(username);
         availableProjectsArr.forEach((project) => {
@@ -143,17 +146,20 @@ async function loadViewAvailableProjectsMenu() {
 }
 
 async function loadGetProjectByIdMenu() {
-    console.log("\nWelcome to ((view project)) menu!".cyan + "command : <project-id>".green);
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation())) {
-        let projectId = parseInt(prompt(""));
+    console.log("\nWelcome to ((view project)) menu!".cyan + "command : <project-id> <token>".green);
+    let inputArr = prompt("").split(" ");
+    let projectId = parseInt(inputArr[0]);
+    let token = inputArr[1];
+    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.getProjectById(projectId));
     }
 }
 
 
 async function loadViewAllAccountsMenu() {
-    console.log("\nView all accounts menu".cyan);
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation())) {
+    console.log("\nView all accounts menu".cyan + "<token>".green);
+    let token = prompt("");
+    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         let allAccountsArr = await controllerClass.viewAllAccounts();
         allAccountsArr.forEach((account) => {
             console.log(account);
@@ -163,9 +169,11 @@ async function loadViewAllAccountsMenu() {
 
 
 async function loadGetAccountByIdMenu() {
-    console.log("Welcome to ((view account)) menu!".cyan + "command : <account-id>".green);
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation())) {
-        let accountId = parseInt(prompt(""));
+    console.log("Welcome to ((view account)) menu!".cyan + "command : <account-id> <token>".green);
+    let inputArr = prompt("").split(" ");
+    let accountId = parseInt(inputArr[0]);
+    let token = inputArr[1];
+    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.getAccountById(accountId));
     }
 }
@@ -173,12 +181,13 @@ async function loadGetAccountByIdMenu() {
 
 async function loadAddBidMenu() {
     console.log("\nwelcome to  bid menu!\nyou can add a new bid using : "
-        + "bid <username> <projectTitle> <bidAmount>".green);
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation())) {
-        let inputArr = prompt("").split(" ");
-        let biddingUsername = inputArr[1];
-        let projectTitle = inputArr[2];
-        let bidAmount = parseInt(inputArr[3]);
+        + "bid <username> <projectTitle> <bidAmount> <token>".green);
+    let inputArr = prompt("").split(" ");
+    let biddingUsername = inputArr[1];
+    let projectTitle = inputArr[2];
+    let bidAmount = parseInt(inputArr[3]);
+    let token = inputArr[4];
+    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.addBid(biddingUsername, projectTitle, bidAmount));
     }
 }
@@ -186,22 +195,24 @@ async function loadAddBidMenu() {
 
 async function loadConfirmSkillMenu() {
     console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" +
-        "confirmSkill <your_username> <other_username> <skill>".green);
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation())) {
-        const inputArr = prompt("").split(" ");
-        let conformerAccountUsername = inputArr[1];
-        let targetAccountUsername = inputArr[2];
-        let skillName = inputArr[3];
+        "confirmSkill <your_username> <other_username> <skill> <token>".green);
+    const inputArr = prompt("").split(" ");
+    let conformerAccountUsername = inputArr[1];
+    let targetAccountUsername = inputArr[2];
+    let skillName = inputArr[3];
+    let token = inputArr[4];
+    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.confirmSkill(conformerAccountUsername, targetAccountUsername, skillName));
     }
 }
 
 
 async function loadAddSkillMenu() {
-    console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate>".green);
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation())) {
-        const inputArr = prompt("").split(" ");
-        let username = inputArr[1];
+    console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate> <token>".green);
+    const inputArr = prompt("").split(" ");
+    let username = inputArr[1];
+    let token = inputArr[3];
+    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         let arrSkills = inputArr[2].split(":");
         let skillName = arrSkills[0];
         let skillPoint = arrSkills[1];
@@ -212,18 +223,19 @@ async function loadAddSkillMenu() {
 
 async function loadRemoveSkillMenu() {
     console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using"
-        + "removeSkill <username> <skill>".green);
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation())) {
-        const inputArr = prompt("").split(" ");
-        let username = inputArr[1];
-        let skillName = inputArr[2];
+        + "removeSkill <username> <skill> <token>".green);
+    const inputArr = prompt("").split(" ");
+    let username = inputArr[1];
+    let skillName = inputArr[2];
+    let token = inputArr[3];
+    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.removeSkill(username, skillName));
     }
 }
 
 
 async function loadRegisterMenu() {
-    console.log("Welcome to ((register)) menu!".cyan + "command : register <username> <password> <skill:point> ".green);
+    console.log("Welcome to ((register)) menu!".cyan + "command : register <username> <password> <skill:point>".green);
     let inputArr = prompt("").split(" ");
     let username = inputArr[1];
     let password = inputArr[2];
@@ -238,13 +250,14 @@ async function loadRegisterMenu() {
 
 async function loadAddProjectMenu() {
     console.log("\nwelcome to  addProject menu!\nyou can add a new project using : "
-        + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)>".green);
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation())) {
-        let inputArr = prompt("").split(" ");
-        let title = inputArr[1];
-        let budget = inputArr[inputArr.length - 2];
-        let deadLine = inputArr[inputArr.length - 1];
-        let skillsArr = inputArr.slice(2, inputArr.length - 2);
+        + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)> <token>".green);
+    let inputArr = prompt("").split(" ");
+    let title = inputArr[1];
+    let budget = inputArr[inputArr.length - 3];
+    let deadLine = inputArr[inputArr.length - 2];
+    let skillsArr = inputArr.slice(2, inputArr.length - 3);
+    let token = inputArr[inputArr.length-1]
+    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         let addProjectArr = await controllerClass.addProject(title, budget, deadLine, skillsArr);
         addProjectArr.forEach((message) => {
             console.log(message);
@@ -256,12 +269,13 @@ async function loadAddProjectMenu() {
 
 async function loadHoldAuctionMenu() {
     console.log("\nwelcome to  Auction menu!\nyou can hold an Auction for a project: "
-        + "holdAuction <projectId>".green);
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation())) {
-        let inputArr = prompt("").split(" ");
-        let projectId = parseInt(inputArr[1]);
+        + "holdAuction <projectId> <token>".green);
+    let inputArr = prompt("").split(" ");
+    let projectId = parseInt(inputArr[1]);
+    let token = inputArr[2];
+    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.holdAuction(projectId));
-    }k
+    }
 
 }
 async function loadLoginMenu(){
@@ -273,8 +287,8 @@ async function loadLoginMenu(){
 }
 
 /******************************************************Tools**********************************************************/
-async function checkIfAnyErrorsApearedDuringTokenValidation(){
-    let {isValid,message} = await controllerClass.validateUserLoginToken();
+async function checkIfAnyErrorsApearedDuringTokenValidation(token){
+    let {isValid,message} = await controllerClass.validateUserLoginToken(token);
     if(!isValid){
         console.log(message);
         return true;
