@@ -15,6 +15,7 @@ const controllerClass = require("../Controller/Controller.js");
     await controllerClass.getAllSkillsFromServer(request);
     await loadMenus();
 
+
 })()
 
 

@@ -487,7 +487,8 @@ function stringToDateConverter(string) {
 async function generateJWT(username, password) {
     let user = {
         username: username,
-        password: password
+        password: password,
+        time:Date.now()
     };
 
     let tokenCreated = jwt.sign({user: user}, 'secret key', {expiresIn: '1h'});
@@ -508,7 +509,9 @@ async function checkIfTokenIsExpired(token) {
 
 async function checkTokenValidation(token) {
     let tokenId = await databaseClass.getLoginIdUsingToken(token);
-    if ((await checkIfTokenIsExpired(token)) || (tokenId===undefined) || !(await checkIfTokenIsForTheLatestLogin(token,tokenId)))
+    let isExpired = (await checkIfTokenIsExpired(token));
+    let isLatestLogin = await checkIfTokenIsForTheLatestLogin(token,tokenId)
+    if (isExpired || (tokenId===undefined) || !(isLatestLogin))
     {
         return false;
     }
