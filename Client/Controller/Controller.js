@@ -445,9 +445,10 @@ async function convertSkillsArrayToSkillsMap(arr) {
 async function login(username, password) {
     let accountId = await databaseClass.getAccountIDUsingAccountUsername(username);
     let account = await buildFullAccountByGettingID(accountId);
+    let time = Date.now();
     if (account.password === password) {
         let token = await generateJWT(username, password);
-        await databaseClass.saveLogin(accountId, token);
+        await databaseClass.saveLogin(accountId, token,time);
         return "login successfully! your loginToken : ".green + token;
     } else {
         return "incorrect password! please try again.".red;
