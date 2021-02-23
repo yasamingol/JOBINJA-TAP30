@@ -10,12 +10,21 @@ const controllerClass = require("../Controller/Controller.js");
         filename: '/home/tapsi/IdeaProjects/concurency/Client/DataBase/database.db',
         driver: sqlite3.Database
     })
-    await createAllDataBases();
-    await createSomeExampleCases();
-    await controllerClass.getAllSkillsFromServer(request);
-    await loadMenus();
+    // await createAllDataBases();
+    // await createSomeExampleCases();
+    //await controllerClass.getAllSkillsFromServer(request);
+    // await loadMenus();
+    let token = await controllerClass.generateJWT("yasamingol","2431380");
+    console.log(token);
+    await sleep(3000);
+    let tokenValidation = await controllerClass.checkIfTokenIsNotExpired(token);
+    console.log(tokenValidation);
 
 })()
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 /****************************************************requirements******************************************************/
 //requirements

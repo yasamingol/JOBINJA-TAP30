@@ -5,6 +5,7 @@ const util = require('util');
 const axios = require('axios');
 const prompt = require('prompt-sync')();
 const colors = require('colors');
+const jwt = require('jsonwebtoken');
 
 //importing classes
 const accountClass = require("../Model/Classes/Account");
@@ -95,16 +96,16 @@ async function viewAvailableProjects(username) {
     let error = [];
     let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
     let numberOfProjects = await databaseClass.getNumberOfRowsInProjectsTable();
-    let {availableProjectArr,hasMinOneAvailable} = await buildAvailableProjects(accountID,numberOfProjects);
+    let {availableProjectArr, hasMinOneAvailable} = await buildAvailableProjects(accountID, numberOfProjects);
     if (hasMinOneAvailable) {
         return availableProjectArr;
-    }
-    else {
+    } else {
         error[0] = "There are no projects available for you now!".red;
         return error;
     }
 }
-async function buildAvailableProjects(accountID, numberOfProjects){
+
+async function buildAvailableProjects(accountID, numberOfProjects) {
     let availableProjectArr = [];
     let hasMinOneAvailable = false;
     for (let i = 0; i < numberOfProjects; i++) {
@@ -116,19 +117,19 @@ async function buildAvailableProjects(accountID, numberOfProjects){
     }
     return {
         availableProjectArr: availableProjectArr,
-        hasMinOneAvailable:hasMinOneAvailable
+        hasMinOneAvailable: hasMinOneAvailable
     };
 }
 
 //register
-async function register(username,skillsArr) {
-    let messagesDuringRegistration ;
+async function register(username, skillsArr) {
+    let messagesDuringRegistration;
     let id = await databaseClass.getNumberOfRowsOfAccountsTable();
     let skills = new Map;
     messagesDuringRegistration = buildSkillsMap(skillsArr, skills);
     let account = new accountClass(id, username, skills, [], new Map);
     await saveRegisterInfoInDB(account);
-    messagesDuringRegistration[messagesDuringRegistration.length] = ( "registered successfully!\n".green);
+    messagesDuringRegistration[messagesDuringRegistration.length] = ("registered successfully!\n".green);
     return messagesDuringRegistration;
 
 }
@@ -144,7 +145,7 @@ async function saveRegisterInfoInDB(account) {
 
 
 //addProject
-async function addProject(title,budget,deadLine,skillsArr) {
+async function addProject(title, budget, deadLine, skillsArr) {
     let messagesDuringAddProject;
     let id = await databaseClass.getNumberOfRowsInProjectsTable();
     let skills = new Map;
@@ -183,7 +184,7 @@ function buildSkillsMap(skillsArr, skills) {
 }
 
 //addBid
-async function addBid(biddingUsername,projectTitle,bidAmount) {
+async function addBid(biddingUsername, projectTitle, bidAmount) {
     let addBidsFinalMessage;
     let projectId = await databaseClass.getProjectIDUsingProjectTitle(projectTitle);
     let accountId = await databaseClass.getAccountIDUsingAccountUsername(biddingUsername);
@@ -196,11 +197,11 @@ async function addBid(biddingUsername,projectTitle,bidAmount) {
 async function handlingAddBidErrors(bidId, biddingUserId, projectId, bidAmount) {
 
     if (!(await databaseClass.getProjectAvailabilityUsingProjectId(projectId))) {
-        return  "cannot bid! project has already been taken.".red;
+        return "cannot bid! project has already been taken.".red;
     } else if (!(await checkIfSkilledEnough(biddingUserId, projectId))) {
-        return  "cannot bid! not skilled enough.".red;
+        return "cannot bid! not skilled enough.".red;
     } else if (!(await checkIfBidEnough(projectId, bidAmount))) {
-        return  "cannot bid! bid amount not acceptable".red;
+        return "cannot bid! bid amount not acceptable".red;
     } else if (!(await checkIfValidDateToBid(projectId))) {
         return "you cannot bid on this project! it has ended".red;
     } else {
@@ -252,7 +253,7 @@ async function holdAuction(projectId) {
 }
 
 
-async function handlingAuctionProcess(projectId){
+async function handlingAuctionProcess(projectId) {
     let messageOfHoldAuction = "";
     let accountWinnerID = await findTheBestUserIdBidingOnProject(projectId);
     if (accountWinnerID !== null) {
@@ -331,7 +332,7 @@ async function assignProject(userID, projectID) {
 
 
 //add/remove
-async function addSkill(username,skillName,skillPoint) {
+async function addSkill(username, skillName, skillPoint) {
     let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
     let skillID = await databaseClass.getNumberOfRowsInSkillsTable();
     if (checkIfSkillIsValid(skillName)) {
@@ -352,7 +353,7 @@ function checkIfSkillIsValid(givenSkill) {
 }
 
 
-async function removeSkill(username,skillName) {
+async function removeSkill(username, skillName) {
     let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
     let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
     if (await checkIfAccountHasSkill(accountID, skillID)) {
@@ -380,7 +381,7 @@ async function checkIfAccountHasSkill(accountID, skillID) {
 
 
 //confirm Skill
-async function confirmSkill(conformerAccountUsername,targetAccountUsername,skillName) {
+async function confirmSkill(conformerAccountUsername, targetAccountUsername, skillName) {
     let sourceUserID = await databaseClass.getAccountIDUsingAccountUsername(conformerAccountUsername);
     let otherUserID = await databaseClass.getAccountIDUsingAccountUsername(targetAccountUsername);
     let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, otherUserID);
@@ -463,6 +464,29 @@ function stringToDateConverter(string) {
     console.log(date);
     return date;
 }
+
+async function generateJWT(username,password) {
+    let user = {
+        username: username,
+        password: password
+    };
+
+    let tokenCreated = jwt.sign({user: user}, 'secret key', {expiresIn: '8s'});
+    return tokenCreated;
+}
+async function checkIfTokenIsNotExpired(token){
+    let isExpired = false;
+    jwt.verify(token, 'secret key', function(err, decoded) {
+        if (err) {
+             isExpired = true;
+        }
+
+    }
+
+    );
+    return isExpired;
+}
+
 
 /**********************************************Calling-API_Server-Methods*********************************************/
 
@@ -634,7 +658,6 @@ module.exports = {
 };
 
 
-
 module.exports = {
     getProjectById,
     getAccountById,
@@ -649,7 +672,9 @@ module.exports = {
     removeSkill,
     confirmSkill,
     getAllSkillsFromServer,
-    holdAuction
+    holdAuction,
+    generateJWT,
+    checkIfTokenIsNotExpired
 
 
 }
