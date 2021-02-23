@@ -10,8 +10,8 @@ const controllerClass = require("../Controller/Controller.js");
         filename: '/home/tapsi/IdeaProjects/concurency/Client/DataBase/database.db',
         driver: sqlite3.Database
     })
-    // await createAllDataBases();
-    // await createSomeExampleCases();
+    await createAllDataBases();
+    await createSomeExampleCases();
     await controllerClass.getAllSkillsFromServer(request);
     await loadMenus();
 
