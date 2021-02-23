@@ -15,7 +15,8 @@ const auctionClass = require("../Model/Classes/Auction");
 const viewClass = require("../View/Menus.js");
 const databaseClass = require('../DataBase/database.js');
 
-
+//global vars
+let userLoginToken = null;
 /***********************************************MainFunctionsInMenu***************************************************/
 
 async function getProjectById(id) {
@@ -31,10 +32,12 @@ async function getAccountById(id) {
 }
 
 async function buildFullAccountByGettingID(id) {
-    let username = await databaseClass.getAccountUsernameUsingAccountId(id);
+    let accountFullString = await databaseClass.getFullAccountById(id);
+    let username = accountFullString.username;
+    let password = accountFullString.password;
     let skills = await getAllSkillsMapOfAccount(id);
     let assignedProjectList = await databaseClass.getAllProjectsAssignedToAnAccountUsingAccountId(id);
-    return new accountClass(id, username, skills, assignedProjectList, null);
+    return new accountClass(id, username, password, skills, assignedProjectList, null);
 
 }
 
@@ -122,12 +125,12 @@ async function buildAvailableProjects(accountID, numberOfProjects) {
 }
 
 //register
-async function register(username, skillsArr) {
+async function register(username, skillsArr, password) {
     let messagesDuringRegistration;
     let id = await databaseClass.getNumberOfRowsOfAccountsTable();
     let skills = new Map;
     messagesDuringRegistration = buildSkillsMap(skillsArr, skills);
-    let account = new accountClass(id, username, skills, [], new Map);
+    let account = new accountClass(id, username, password, skills, [], new Map);
     await saveRegisterInfoInDB(account);
     messagesDuringRegistration[messagesDuringRegistration.length] = ("registered successfully!\n".green);
     return messagesDuringRegistration;
@@ -439,6 +442,22 @@ async function convertSkillsArrayToSkillsMap(arr) {
     return skillMap;
 }
 
+//login
+async function login(username, password) {
+    let accountId = await databaseClass.getAccountIDUsingAccountUsername(username);
+    let account = await buildFullAccountByGettingID(accountId);
+    if (account.password === password) {
+        let token = await generateJWT(username, password);
+        await databaseClass.saveLogin(accountId, token);
+        userLoginToken = token;
+        return "login successfully".green;
+    }else {
+        return "incorrect password! please try again.".red;
+    }
+
+
+}
+
 
 /***********************************************Tool-Functions*********************************************************/
 
@@ -465,7 +484,9 @@ function stringToDateConverter(string) {
     return date;
 }
 
-async function generateJWT(username,password) {
+/******************************************************Token***********************************************************/
+
+async function generateJWT(username, password) {
     let user = {
         username: username,
         password: password
@@ -474,17 +495,41 @@ async function generateJWT(username,password) {
     let tokenCreated = jwt.sign({user: user}, 'secret key', {expiresIn: '8s'});
     return tokenCreated;
 }
-async function checkIfTokenIsNotExpired(token){
+
+async function checkIfTokenIsExpired(token) {
     let isExpired = false;
-    jwt.verify(token, 'secret key', function(err, decoded) {
-        if (err) {
-             isExpired = true;
+    jwt.verify(token, 'secret key', function (err, decoded) {
+            if (err) {
+                isExpired = true;
+            }
+
         }
-
-    }
-
     );
     return isExpired;
+}
+async function checkTokenValidation(accountId,token){
+    let accountToken = await databaseClass.getLoginTokenUsingUserID(accountId);
+    if((await checkIfTokenIsExpired(token))){
+        return false;
+    }
+    if(!(accountToken===token)){
+        return false;
+    }
+    else{
+        return true;
+    }
+}
+async function validateUserLoginToken(){
+    if(userLoginToken===null){
+        return "need to login first! you have no access to this menu.".red
+    }else {
+        if(await checkTokenValidation(userLoginToken)){
+            return "valid token:)".green;
+        }
+        else {
+            return "invalid token!".red;
+        }
+    }
 }
 
 
@@ -674,7 +719,9 @@ module.exports = {
     getAllSkillsFromServer,
     holdAuction,
     generateJWT,
-    checkIfTokenIsNotExpired
+    checkIfTokenIsNotExpired: checkIfTokenIsExpired,
+    login,
+    validateUserLoginToken
 
 
 }

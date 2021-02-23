@@ -8,9 +8,10 @@ class Account {
         databaseClass = db;
     }
     static  allAccounts = [];
-    constructor(id,username, skills,asignedProjectList,skillConfirmationList) {
+    constructor(id,username, password, skills,asignedProjectList,skillConfirmationList) {
         this.id = id;
         this.username = username;
+        this.password = password;
         this.skills = skills;
         this.asignedProjectList = asignedProjectList;
         this.skillConfirmationList = skillConfirmationList;
