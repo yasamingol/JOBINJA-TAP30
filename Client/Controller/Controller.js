@@ -511,15 +511,35 @@ async function checkIfTokenIsExpired(token) {
 async function checkTokenValidation(token) {
     let tokenId = await databaseClass.getLoginIdUsingToken(token);
     let isExpired = (await checkIfTokenIsExpired(token));
-    let isLatestLogin = await checkIfTokenIsForTheLatestLogin(token,tokenId)
-    if (isExpired || (tokenId===undefined) || !(isLatestLogin))
+    let isLatestLogin = await checkIfTokenIsForTheLatestLogin(token,tokenId);
+    if(isExpired){
+        return {
+            isValid:false,
+            message:"token has expired!"
+        }
+    }
+    if(tokenId===undefined){
+            return {
+                isValid:false,
+                message:"token is undefined!"
+            }
+    }
+    else if (!(isLatestLogin))
     {
-        return false;
+        return {
+            isValid:false,
+            message:"this is not your latest login! updated version of token is required."
+        }
     }
     else {
-        return true;
+        return {
+            isValid:true,
+            message:"token is valid."
+        }
     }
 }
+
+
 async function checkIfTokenIsForTheLatestLogin(token,tokenId){
     let accountId = await databaseClass.getAccountIdUsingToken(token);
     let latestTokenId = await databaseClass.getLastLoginTokenId(accountId);
@@ -532,15 +552,16 @@ async function checkIfTokenIsForTheLatestLogin(token,tokenId){
 }
 
 async function validateUserLoginToken(token) {
-    if (await checkTokenValidation(token)) {
+    let {isValid,message} = await checkTokenValidation(token)
+    if (isValid) {
         return {
             isValid: true,
-            message: "\nvalid token:)".green
+            message: message.green
         };
     } else {
         return {
             isValid: false,
-            message: "\ninvalid token! need to login first!".red
+            message: message.red
         };
     }
 
