@@ -274,13 +274,13 @@ async function loadLoginMenu(){
 
 /******************************************************Tools**********************************************************/
 async function checkIfAnyErrorsApearedDuringTokenValidation(){
-    let tokenValidationMessage = await controllerClass.validateUserLoginToken();
-    if(tokenValidationMessage==="need to login first! you have no access to this menu." || tokenValidationMessage==="invalid token!"){
-        console.log(tokenValidationMessage);
+    let {isValid,message} = await controllerClass.validateUserLoginToken();
+    if(!isValid){
+        console.log(message);
         return true;
     }
     else {
-        console.log(tokenValidationMessage);
+        console.log(message);
         return false;
     }
 }

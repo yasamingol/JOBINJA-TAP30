@@ -523,13 +523,22 @@ async function checkTokenValidation(accountId,token){
 }
 async function validateUserLoginToken(accountId){
     if(userLoginToken===null){
-        return "need to login first! you have no access to this menu.".red
+        return {
+            isValid:false,
+        message:("need to login first! you have no access to this menu.".red)
+        };
     }else {
         if(await checkTokenValidation(loggedinUserId, userLoginToken)){
-            return "valid token:)".green;
+            return {
+                isValid:true,
+                message:"valid token:)".green
+            };
         }
         else {
-            return "invalid token!".red;
+            return {
+                isValid:false,
+                message:"invalid token!".red
+            };
         }
     }
 }
