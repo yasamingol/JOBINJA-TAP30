@@ -508,11 +508,22 @@ async function checkIfTokenIsExpired(token) {
 
 async function checkTokenValidation(token) {
     let tokenId = await databaseClass.getLoginIdUsingToken(token);
-    if ((await checkIfTokenIsExpired(token)) || (tokenId===undefined)) {
+    if ((await checkIfTokenIsExpired(token)) || (tokenId===undefined) || !(await checkIfTokenIsForTheLatestLogin(token,tokenId)))
+    {
         return false;
     }
     else {
         return true;
+    }
+}
+async function checkIfTokenIsForTheLatestLogin(token,tokenId){
+    let accountId = await databaseClass.getAccountIdUsingToken(token);
+    let latestTokenId = await databaseClass.getLastLoginTokenId(accountId);
+    if(latestTokenId===tokenId){
+        return true;
+    }
+    else {
+        return false;
     }
 }
 
