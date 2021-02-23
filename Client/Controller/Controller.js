@@ -17,6 +17,7 @@ const databaseClass = require('../DataBase/database.js');
 
 //global vars
 let userLoginToken = null;
+let loggedinUserId = null;
 /***********************************************MainFunctionsInMenu***************************************************/
 
 async function getProjectById(id) {
@@ -450,6 +451,7 @@ async function login(username, password) {
         let token = await generateJWT(username, password);
         await databaseClass.saveLogin(accountId, token);
         userLoginToken = token;
+        loggedinUserId = accountId;
         return "login successfully".green;
     }else {
         return "incorrect password! please try again.".red;
@@ -492,7 +494,7 @@ async function generateJWT(username, password) {
         password: password
     };
 
-    let tokenCreated = jwt.sign({user: user}, 'secret key', {expiresIn: '8s'});
+    let tokenCreated = jwt.sign({user: user}, 'secret key', {expiresIn: '1h'});
     return tokenCreated;
 }
 
@@ -519,11 +521,11 @@ async function checkTokenValidation(accountId,token){
         return true;
     }
 }
-async function validateUserLoginToken(){
+async function validateUserLoginToken(accountId){
     if(userLoginToken===null){
         return "need to login first! you have no access to this menu.".red
     }else {
-        if(await checkTokenValidation(userLoginToken)){
+        if(await checkTokenValidation(loggedinUserId, userLoginToken)){
             return "valid token:)".green;
         }
         else {
