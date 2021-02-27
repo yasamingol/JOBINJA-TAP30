@@ -97,54 +97,6 @@ async function getAllProjectsAssignedToAnAccountUsingAccountId(accountID) {
 }
 
 
-/************************************************AccountsDBFunctions**************************************************/
-async function createAccountsTable() {
-    await db.exec('CREATE TABLE Accounts (id, username, password)');
-    console.log("Accounts DB created successfully");
-}
-
-async function saveAccount(account) {
-    await db.run('INSERT INTO Accounts VALUES (?,?,?)', [account.id, account.username, account.password]);
-    console.log("account saved to DB successfully");
-}
-
-async function getAccountsFullDBTable() {
-    return await db.all('SELECT * FROM Accounts');
-}
-
-async function getFullAccountById(accountId){
-    return await db.get('SELECT * FROM Accounts WHERE id = ?',accountId);
-}
-
-async function getAccountUsernameUsingAccountId(accountID) {
-    let accountUsername = await db.get('SELECT username FROM Accounts WHERE id = ?', [accountID]);
-    return accountUsername.username;
-}
-async function getAccountPasswordUsingAccountId(accountID){
-    let accountPassword = await db.get('SELECT password FROM Accounts WHERE id = ?', [accountID]);
-    return accountPassword.password;
-}
-
-async function getAccountIDUsingAccountUsername(accountUsername) {
-    let accountID =  await db.get('SELECT id FROM Accounts WHERE username = ?', [accountUsername])
-    return accountID.id;
-}
-
-async function getNumberOfRowsOfAccountsTable() {
-    let rowCounter = 0;
-    await db.each('SELECT id FROM Accounts ',
-        (err, row) => {
-            rowCounter++;
-            if (err) {
-                throw err
-            }
-        }
-    )
-    return rowCounter;
-
-}
-
-
 /************************************************BidsDBFunctions**************************************************/
 async function createBidsTable() {
     await db.exec('CREATE TABLE Bids (id, userId,projectId,bidAmount)');
@@ -420,11 +372,6 @@ module.exports = {
     getProjectDeadlineUsingProjectId,
     getProjectAvailabilityUsingProjectId,
     getProjectIDUsingProjectTitle,
-    createAccountsTable,
-    saveAccount,
-    getAccountsFullDBTable,
-    getAccountUsernameUsingAccountId,
-    getAccountIDUsingAccountUsername,
     createBidsTable,
     saveBid,
     getBidsAmountUsingBidId,
@@ -445,7 +392,6 @@ module.exports = {
     getNumberOfRowsInSkillsTable,
     getNumberOfRowsInAuctionsTable,
     getNumberOfRowsInBidsTable,
-    getNumberOfRowsOfAccountsTable,
     deleteSkillOfAccountUsingSkillName,
     getSkillIdUsingSkillNameAndAccountID,
     getSkillsOfAccountUsingAccountId,
@@ -466,8 +412,6 @@ module.exports = {
     db,
     getProjectsFullDBTable,
     getProjectByID,
-    getFullAccountById,
-    getAccountPasswordUsingAccountId,
     createLoginsTable,
     saveLogin,
     getLoginIdUsingToken,

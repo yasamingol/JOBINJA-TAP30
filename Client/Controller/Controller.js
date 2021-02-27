@@ -31,9 +31,9 @@ async function getAccountById(id) {
 }
 
 async function buildFullAccountByGettingID(id) {
-    let accountFullString = await databaseClass.getFullAccountById(id);
-    let username = accountFullString.username;
-    let password = accountFullString.password;
+    let accountFullString = await getFullAccountById(id);
+    let username = await getAccountUsernameUsingAccountId(id);
+    let password = String(await getAccountPasswordUsingAccountId(id));
     let skills = await getAllSkillsMapOfAccount(id);
     let assignedProjectList = await databaseClass.getAllProjectsAssignedToAnAccountUsingAccountId(id);
     return new accountClass(id, username, password, skills, assignedProjectList, null);
@@ -64,9 +64,9 @@ async function buildFullBidUsingBidID(bidID) {
 
 async function viewAllAccounts() {
     let allAccountsArr = [];
-    let numberOfAccounts = await databaseClass.getNumberOfRowsOfAccountsTable();
+    let numberOfAccounts = await getNumberOfRowsOfAccountsTable();
     for (let i = 0; i < numberOfAccounts; i++) {
-        let accountName = await databaseClass.getAccountUsernameUsingAccountId(i);
+        let accountName = await getAccountUsernameUsingAccountId(i);
         allAccountsArr[i] = (i + "." + accountName);
     }
     return allAccountsArr;
@@ -96,7 +96,7 @@ async function getAllSkillsMapOfProject(projectID) {
 
 async function viewAvailableProjects(username) {
     let error = [];
-    let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
+    let accountID = await getAccountIDUsingAccountUsername(username);
     let numberOfProjects = await databaseClass.getNumberOfRowsInProjectsTable();
     let {availableProjectArr, hasMinOneAvailable} = await buildAvailableProjects(accountID, numberOfProjects);
     if (hasMinOneAvailable) {
@@ -126,7 +126,7 @@ async function buildAvailableProjects(accountID, numberOfProjects) {
 //register
 async function register(username, skillsArr, password) {
     let messagesDuringRegistration;
-    let id = await databaseClass.getNumberOfRowsOfAccountsTable();
+    let id = await getNumberOfRowsOfAccountsTable();
     let skills = new Map;
     messagesDuringRegistration = buildSkillsMap(skillsArr, skills);
     let account = new accountClass(id, username, password, skills, [], new Map);
@@ -137,7 +137,7 @@ async function register(username, skillsArr, password) {
 }
 
 async function saveRegisterInfoInDB(account) {
-    await databaseClass.saveAccount(account);
+    await saveAccount(account.username,account.password);
     let counter = await databaseClass.getNumberOfRowsInSkillsTable();
     for (const [key, value] of account.skills) {
         await databaseClass.saveAccountSkill(counter, key, value, account.id);
@@ -189,7 +189,7 @@ function buildSkillsMap(skillsArr, skills) {
 async function addBid(biddingUsername, projectTitle, bidAmount) {
     let addBidsFinalMessage;
     let projectId = await databaseClass.getProjectIDUsingProjectTitle(projectTitle);
-    let accountId = await databaseClass.getAccountIDUsingAccountUsername(biddingUsername);
+    let accountId = await getAccountIDUsingAccountUsername(biddingUsername);
     let bidId = await databaseClass.getNumberOfRowsInBidsTable();
     addBidsFinalMessage = await handlingAddBidErrors(bidId, accountId, projectId, bidAmount);
     return addBidsFinalMessage;
@@ -263,7 +263,7 @@ async function handlingAuctionProcess(projectId) {
         await databaseClass.updateProjectAvailability(projectId);
         await assignProject(accountWinnerID, projectId);
         messageOfHoldAuction = ("\nThe winner of the auction is : ".green
-            + await databaseClass.getAccountUsernameUsingAccountId(accountWinnerID));
+            + await getAccountUsernameUsingAccountId(accountWinnerID));
     } else {
         messageOfHoldAuction = ("there are no bids on this project! cannot hold auction".red);
     }
@@ -335,7 +335,7 @@ async function assignProject(userID, projectID) {
 
 //add/remove
 async function addSkill(username, skillName, skillPoint) {
-    let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
+    let accountID = await getAccountIDUsingAccountUsername(username);
     let skillID = await databaseClass.getNumberOfRowsInSkillsTable();
     if (checkIfSkillIsValid(skillName)) {
         await databaseClass.saveAccountSkill(skillID, skillName, skillPoint, accountID);
@@ -356,7 +356,7 @@ function checkIfSkillIsValid(givenSkill) {
 
 
 async function removeSkill(username, skillName) {
-    let accountID = await databaseClass.getAccountIDUsingAccountUsername(username);
+    let accountID = await getAccountIDUsingAccountUsername(username);
     let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
     if (await checkIfAccountHasSkill(accountID, skillID)) {
         await databaseClass.deleteSkillOfAccountUsingSkillName(skillID);
@@ -384,8 +384,8 @@ async function checkIfAccountHasSkill(accountID, skillID) {
 
 //confirm Skill
 async function confirmSkill(conformerAccountUsername, targetAccountUsername, skillName) {
-    let sourceUserID = await databaseClass.getAccountIDUsingAccountUsername(conformerAccountUsername);
-    let otherUserID = await databaseClass.getAccountIDUsingAccountUsername(targetAccountUsername);
+    let sourceUserID = await getAccountIDUsingAccountUsername(conformerAccountUsername);
+    let otherUserID = await getAccountIDUsingAccountUsername(targetAccountUsername);
     let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, otherUserID);
     let hasConfirmedBefore = await checkIfConfirmedBefore(sourceUserID, skillID);
     if (!hasConfirmedBefore) {
@@ -443,7 +443,7 @@ async function convertSkillsArrayToSkillsMap(arr) {
 
 //login
 async function login(username, password) {
-    let accountId = await databaseClass.getAccountIDUsingAccountUsername(username);
+    let accountId = await getAccountIDUsingAccountUsername(username);
     let account = await buildFullAccountByGettingID(accountId);
     let time = Date.now();
     if (account.password === password) {
@@ -482,93 +482,7 @@ function stringToDateConverter(string) {
     console.log(date);
     return date;
 }
-
-/******************************************************Token***********************************************************/
-
-async function generateJWT(username, password) {
-    let user = {
-        username: username,
-        password: password,
-        time:Date.now()
-    };
-
-    let tokenCreated = jwt.sign({user: user}, 'secret key', {expiresIn: '1h'});
-    return tokenCreated;
-}
-
-async function checkIfTokenIsExpired(token) {
-    let isExpired = false;
-    jwt.verify(token, 'secret key', function (err, decoded) {
-            if (err) {
-                isExpired = true;
-            }
-
-        }
-    );
-    return isExpired;
-}
-
-async function checkTokenValidation(token) {
-    let tokenId = await databaseClass.getLoginIdUsingToken(token);
-    let isExpired = (await checkIfTokenIsExpired(token));
-    let isLatestLogin = await checkIfTokenIsForTheLatestLogin(token,tokenId);
-    if(isExpired){
-        return {
-            isValid:false,
-            message:"token has expired!"
-        }
-    }
-    if(tokenId===undefined){
-            return {
-                isValid:false,
-                message:"token is undefined!"
-            }
-    }
-    else if (!(isLatestLogin))
-    {
-        return {
-            isValid:false,
-            message:"this is not your latest login! updated version of token is required."
-        }
-    }
-    else {
-        return {
-            isValid:true,
-            message:"token is valid."
-        }
-    }
-}
-
-
-async function checkIfTokenIsForTheLatestLogin(token,tokenId){
-    let accountId = await databaseClass.getAccountIdUsingToken(token);
-    let latestTokenId = await databaseClass.getLastLoginTokenId(accountId);
-    if(latestTokenId===tokenId){
-        return true;
-    }
-    else {
-        return false;
-    }
-}
-
-async function validateUserLoginToken(token) {
-    let {isValid,message} = await checkTokenValidation(token)
-    if (isValid) {
-        return {
-            isValid: true,
-            message: message.green
-        };
-    } else {
-        return {
-            isValid: false,
-            message: message.red
-        };
-    }
-
-}
-
-
-/**********************************************Calling-API_Server-Methods*********************************************/
+/**********************************************PythonServer-Methods*********************************************/
 async function sendLoginInfoAndReciveTokenFromServer(username,password) {
     try {
         const response = await axios.post('http://localhost:5001/login', {
@@ -593,7 +507,87 @@ async function validateTokenFromServer(token){
         console.log(e)
     }
 }
+async function saveAccount(username,password){
+    try {
+        const response = await axios.post('http://localhost:5001/saveAccount', {
+            username: username,
+            password:password
+        });
+        return response.data;
 
+    } catch (e) {
+        console.log(e)
+    }
+}
+async function getAccountsFullDBTable(){
+    try {
+        const response = await axios.post('http://localhost:5001/getAccountsFullDBTable', {
+        });
+        return response.data;
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+async function getFullAccountById(accountId){
+    try {
+        const response = await axios.post('http://localhost:5001/getFullAccountById', {
+            id:accountId
+        });
+        return response.data;
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+async function getAccountUsernameUsingAccountId(accountId){
+    try {
+        const response = await axios.post('http://localhost:5001/getAccountUsernameUsingAccountId', {
+            id:accountId
+        });
+        return response.data;
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+async function getAccountPasswordUsingAccountId(accountId){
+    try {
+        const response = await axios.post('http://localhost:5001/getAccountPasswordUsingAccountId', {
+            id:accountId
+        });
+        return response.data;
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+async function getAccountIDUsingAccountUsername(username){
+    try {
+        const response = await axios.post('http://localhost:5001/getAccountIDUsingAccountUsername', {
+            username:username
+        });
+        return response.data;
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+async function getNumberOfRowsOfAccountsTable(){
+    try {
+        const response = await axios.post('http://localhost:5001/getNumberOfRowsOfAccountsTable', {
+        });
+        return response.data;
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+
+
+
+/**********************************************Calling-API_Server-Methods*********************************************/
 
 async function getAllProjectsFromServer(request) {
     const promisifiedRequest = util.promisify(request);
@@ -778,11 +772,9 @@ module.exports = {
     confirmSkill,
     getAllSkillsFromServer,
     holdAuction,
-    generateJWT,
-    checkIfTokenIsNotExpired: checkIfTokenIsExpired,
     login,
-    validateUserLoginToken,
-    validateTokenFromServer
+    validateTokenFromServer,
+    saveAccount
 
 
 }
