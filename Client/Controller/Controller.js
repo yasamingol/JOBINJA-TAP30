@@ -581,6 +581,18 @@ async function sendLoginInfoAndReciveTokenFromServer(username,password) {
         console.log(e)
     }
 }
+async function validateTokenFromServer(token){
+
+    try {
+        const response = await axios.post('http://localhost:5001/validateToken', {
+            token: token
+        });
+        return response.data;
+
+    } catch (e) {
+        console.log(e)
+    }
+}
 
 
 async function getAllProjectsFromServer(request) {
@@ -769,7 +781,8 @@ module.exports = {
     generateJWT,
     checkIfTokenIsNotExpired: checkIfTokenIsExpired,
     login,
-    validateUserLoginToken
+    validateUserLoginToken,
+    validateTokenFromServer
 
 
 }

@@ -289,16 +289,18 @@ async function loadLoginMenu(){
 
 /******************************************************Tools**********************************************************/
 async function checkIfAnyErrorsApearedDuringTokenValidation(token){
-    let {isValid,message} = await controllerClass.validateUserLoginToken(token);
-    if(!isValid){
-        console.log(message);
+    let validationMessage = await controllerClass.validateTokenFromServer(token)
+    let messageArr = validationMessage.split(":")
+    if(messageArr[0]=="False"){
+        console.log(messageArr[1].red);
         return true;
     }
     else {
-        console.log(message);
+        console.log(messageArr[1].green);
         return false;
     }
 }
+
 /************************************************TestExamplesFormDB***************************************************/
 
 async function createAllDataBases() {
