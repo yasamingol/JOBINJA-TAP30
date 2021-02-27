@@ -290,13 +290,12 @@ async function loadLoginMenu(){
 /******************************************************Tools**********************************************************/
 async function checkIfAnyErrorsApearedDuringTokenValidation(token){
     let validationMessage = await controllerClass.validateTokenFromServer(token)
-    let messageArr = validationMessage.split(":")
-    if(messageArr[0]=="False"){
-        console.log(messageArr[1].red);
+    if(validationMessage[0]===false){
+        console.log(validationMessage[1].red);
         return true;
     }
     else {
-        console.log(messageArr[1].green);
+        console.log(validationMessage[1].green);
         return false;
     }
 }
