@@ -447,8 +447,8 @@ async function login(username, password) {
     let account = await buildFullAccountByGettingID(accountId);
     let time = Date.now();
     if (account.password === password) {
-        let token = await generateJWT(username, password);
-        await databaseClass.saveLogin(accountId, token,time);
+        //inja bayad baraye khate baad az server token begirim
+        let token = await sendLoginInfoAndReciveTokenFromServer(username, password);
         return "login successfully! your loginToken : ".green + token;
     } else {
         return "incorrect password! please try again.".red;
@@ -569,6 +569,19 @@ async function validateUserLoginToken(token) {
 
 
 /**********************************************Calling-API_Server-Methods*********************************************/
+async function sendLoginInfoAndReciveTokenFromServer(username,password) {
+    try {
+        const response = await axios.post('http://localhost:5001/login', {
+            username: username,
+            password: password
+        });
+        return response.data;
+
+    } catch (e) {
+        console.log(e)
+    }
+}
+
 
 async function getAllProjectsFromServer(request) {
     const promisifiedRequest = util.promisify(request);
