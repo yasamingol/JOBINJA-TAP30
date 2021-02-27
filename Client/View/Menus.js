@@ -11,7 +11,7 @@ const controllerClass = require("../Controller/Controller.js");
         driver: sqlite3.Database
     })
     await createAllDataBases();
-    // await createSomeExampleCases();
+    await createSomeExampleCases();
     await controllerClass.getAllSkillsFromServer(request);
     await loadMenus();
 
@@ -319,9 +319,9 @@ async function createSomeExampleCases() {
     let tap30Skill2 = await databaseClass.saveProjectSkill(1, "B", 10, 0);
     await databaseClass.saveProject(project);
     let account = new accountClass(0, "yasamingol","2431380", -1, -1, -1);
-    await controllerClass.saveAccount(account);
+    await controllerClass.saveAccount(account.username,account.password);
     let account1 = new accountClass(1, "jafar","1234", -1, -1, -1);
-    await controllerClass.saveAccount(account1);
+    await controllerClass.saveAccount(account1.username,account1.password);
     await databaseClass.saveAccountSkill(2, "A", 200, 0);
     await databaseClass.saveAccountSkill(3, "B", 400, 0);
     await databaseClass.saveAccountSkill(4, "A", 2000, 1);
