@@ -22,5 +22,12 @@
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/Client/DataBase/database.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="testDB" uuid="464dbe7d-a7e3-4126-b1fe-bc532f1be312">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/Client/DataBase/testDB.db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

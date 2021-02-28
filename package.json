@@ -4,7 +4,7 @@
   "description": "",
   "main": "Server.js",
   "scripts": {
-    "migrate":"npx knex migrate:latest --knexfile ./Client/DataBase/knexfile.js",
+    "migrate": "npx knex migrate:latest --knexfile ./Client/DataBase/knexfile.js",
     "dev": "nodemon index.js",
     "test": "jest"
   },
