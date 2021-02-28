@@ -4,6 +4,7 @@
   "description": "",
   "main": "Server.js",
   "scripts": {
+    "migrate":"npx knex migrate:latest --knexfile ./Client/DataBase/knexfile.js",
     "dev": "nodemon index.js",
     "test": "jest"
   },
@@ -17,7 +18,7 @@
     "express": "^4.17.1",
     "got": "^11.8.1",
     "joi": "^17.4.0",
-    "knex": "^0.21.17",
+    "knex": "^0.21.18",
     "line-reader": "^0.4.0",
     "n-readlines": "^1.0.1",
     "needle": "^2.6.0",

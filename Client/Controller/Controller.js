@@ -584,9 +584,6 @@ async function getNumberOfRowsOfAccountsTable(){
     }
 }
 
-
-
-
 /**********************************************Calling-API_Server-Methods*********************************************/
 
 async function getAllProjectsFromServer(request) {
