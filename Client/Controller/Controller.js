@@ -586,14 +586,6 @@ async function getNumberOfRowsOfAccountsTable(){
 
 /**********************************************Calling-API_Server-Methods*********************************************/
 
-async function getAllProjectsFromServer(request) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects');
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    deserializeAllProjects(JSON.parse(body));
-}
-
 async function getAllSkillsFromServer(request) {
     const promisifiedRequest = util.promisify(request);
     const {error, response, body} = await promisifiedRequest('http://localhost:5000/api/skills');
@@ -603,147 +595,13 @@ async function getAllSkillsFromServer(request) {
 
 }
 
-async function getAllAccountsFromServer(request) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts');
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    deserializeAllAccounts(JSON.parse(body));
-}
-
-async function getProjectByIdUsingAPI(request, id) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:3000/api/projects/' + id);
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    console.log(JSON.parse(body));
-}
-
-async function getAccountByIDUsingAPI(request, id) {
-    const promisifiedRequest = util.promisify(request);
-    const {error, response, body} = await promisifiedRequest('http://localhost:4000/api/accounts/' + id);
-    console.error('error:', error);
-    console.log('statusCode:', response && response.statusCode);
-    console.log(JSON.parse(body));
-
-}
-
-/***************************************************Serialize*********************************************************/
-
-function serialize(name, jsonContent) {
-    const fs = require('fs');
-    fs.appendFile(name + ".json", jsonContent, 'utf8', function (err) {
-        if (err) {
-            return console.log(err);
-        }
-        console.log("The file was saved!".yellow);
-    });
-
-}
-
-function serializeAccounts() {
-    for (let i = 0; i < accountClass.allAccounts.length; i++) {
-        let account = accountClass.allAccounts[i];
-        let json = serializeAccount(account);
-        serialize("/home/tapsi/IdeaProjects/concurency/Client/Client-DataBase/Accounts/allAccounts" + "_" + i, json);
-
-    }
-}
-
-function serializeAccount(account) {
-    const myJson = {};
-    myJson.id = account.id;
-    myJson.username = account.username;
-    myJson.skills = mapToObj(account.skills);
-    myJson.asignedProjectList = account.asignedProjectList;
-    myJson.skillConfirmationList = mapToObj(account.skillConfirmationList);
-    const json = JSON.stringify(myJson);
-    return json;
-}
-
-function serializeProjects() {
-    for (let i = 0; i < projectClass.allProjects.length; i++) {
-        let project = projectClass.allProjects[i];
-        const myJson = {};
-        myJson.id = project.id;
-        myJson.title = project.title;
-        myJson.skills = mapToObj(project.skills);
-        myJson.budget = project.budget;
-        myJson.deadline = project.deadline;
-        myJson.isAvailable = project.isAvailable;
-        const json = JSON.stringify(myJson);
-        serialize("/home/tapsi/IdeaProjects/concurency/Client/Client-DataBase/Projects/allProjects" + "_" + i, json);
-
-    }
-}
-
-
-function serializeBides() {
-    for (let i = 0; i < bidClass.allBids.length; i++) {
-        let bid = bidClass.allBids[i];
-        const myJson = {};
-        myJson.id = bid.id;
-        myJson.username = bid.username;
-        myJson.projectaTitle = bid.projectaTitle;
-        myJson.bidAmount = bid.bidAmount;
-        const json = JSON.stringify(myJson);
-        serialize("/home/tapsi/IdeaProjects/concurency/Client/Client-DataBase/Bids/allBids" + "_" + i, json);
-
-
-    }
-}
-
-function serializeAuctions() {
-    for (let i = 0; i < auctionClass.allAuctions.length; i++) {
-        let auction = auctionClass.allAuctions[i];
-        const myJson = {};
-        myJson.id = auction.id;
-        myJson.projecTitle = auction.projectTitle;
-        myJson.usernameWinner = auction.accuntWinner;
-        const json = JSON.stringify(myJson);
-        serialize("/home/tapsi/IdeaProjects/concurency/Client/Client-DataBase/Auction/allAuctions" + "_" + i, json);
-
-
-    }
-
-}
-
-function serializeAllData() {
-    serializeAccounts();
-    serializeProjects();
-    serializeBides();
-    serializeAuctions();
-}
-
-/**************************************************Deserialize********************************************************/
-
-function deserializeAllAccounts(arr) {
-    for (let i = 0; i < arr.length; i++) {
-        let id = arr[i].id;
-        let username = arr[i].username;
-        let skillsArr = objToMap(arr[i].skills);
-        let asignedProjectList = arr[i].asignedProjectList;
-        let skillConfirmationList = objToMap(arr[i].skillConfirmationList);
-        new accountClass(id, username, skillsArr, asignedProjectList, skillConfirmationList);
-    }
-}
-
-function deserializeAllProjects(arr) {
-    for (let i = 0; i < arr.length; i++) {
-        let id = arr[i].id;
-        let title = arr[i].title;
-        let skillsArr = objToMap(arr[i].skills);
-        let budget = arr[i].budget;
-        let listOfBids = arr[i].listOfBids;
-        let deadline = arr[i].deadline;
-        let isAvailable = arr[i].isAvailable;
-        new projectClass(id, title, skillsArr, budget, listOfBids, deadline, isAvailable);
-    }
-}
-
 function deserializeAllSkills(body) {
     viewClass.allSkills = JSON.parse(body);
 }
+
+
+
+
 
 module.exports = {
     holdAuction,
