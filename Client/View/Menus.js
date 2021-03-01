@@ -4,21 +4,6 @@ const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const controllerClass = require("../Controller/Controller.js");
 
-//using database
-(async () => {
-    databaseClass.db = await sqlite.open({
-        filename: '/home/tapsi/IdeaProjects/concurency/Client/DataBase/database.db',
-        driver: sqlite3.Database
-    })
-    await createAllDataBases();
-    await createSomeExampleCases();
-    await controllerClass.getAllSkillsFromServer(request);
-    await loadMenus();
-
-
-})()
-
-
 /****************************************************requirements******************************************************/
 //requirements
 const request = require('request');
@@ -37,7 +22,14 @@ const auctionClass = require("../Model/Classes/Auction");
 
 //global vars
 let allSkills = [];
+//using database
+(async () => {
 
+    await controllerClass.getAllSkillsFromServer(request);
+    await loadMenus();
+
+
+})()
 /****************************************************Main-Menus********************************************************/
 async function loadMenus() {
 
@@ -290,7 +282,7 @@ async function loadLoginMenu(){
 /******************************************************Tools**********************************************************/
 async function checkIfAnyErrorsApearedDuringTokenValidation(token){
     let validationMessage = await controllerClass.validateTokenFromServer(token)
-    if(validationMessage[0]===false){
+    if(validationMessage[0][0]===false){
         console.log(validationMessage[1].red);
         return true;
     }

@@ -13,7 +13,7 @@ const projectClass = require("../Model/Classes/Project");
 const bidClass = require("../Model/Classes/Bid");
 const auctionClass = require("../Model/Classes/Auction");
 const viewClass = require("../View/Menus.js");
-const databaseClass = require('../DataBase/database.js');
+const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
 
 
 /***********************************************MainFunctionsInMenu***************************************************/
@@ -41,7 +41,7 @@ async function buildFullAccountByGettingID(id) {
 }
 
 async function buildFullProjectByGettingID(id) {
-    let projectFullString = await databaseClass.getProjectByID(id);
+    let projectFullString = await databaseClass.getProjectById(id);
     let title = projectFullString.title
     let skills = await getAllSkillsMapOfProject(id);
     let budget = projectFullString.budget;
@@ -56,9 +56,10 @@ async function buildFullProjectByGettingID(id) {
 }
 
 async function buildFullBidUsingBidID(bidID) {
-    let userId = await databaseClass.getBidsUserIDUsingBidId(bidID);
-    let projectId = await databaseClass.getBidsProjectIdUsingBidId(bidID);
-    let bidAmount = await databaseClass.getBidsAmountUsingBidId(bidID);
+    let bid = await databaseClass.getBidById(bidID)
+    let userId = bid.userID;
+    let projectId = bid.projectID;
+    let bidAmount = bid.bidAmount;
     return new bidClass(bidID, userId, projectId, bidAmount);
 }
 
@@ -74,21 +75,22 @@ async function viewAllAccounts() {
 
 async function viewAllProjects() {
     let allProjectsArray = [];
-    let numberOfProjects = await databaseClass.getNumberOfRowsInProjectsTable();
-    for (let i = 0; i < numberOfProjects; i++) {
-        let projectsTitle = await databaseClass.getProjectTitleUsingProjectId(i);
+    let numberOfProjects = await databaseClass.getNumberOfAllProjects();
+    for (let i = 1; i <= numberOfProjects; i++) {
+        let project = await databaseClass.getProjectById(i);
+        let projectsTitle = project.title;
         allProjectsArray[i] = (i + "." + projectsTitle);
     }
     return allProjectsArray;
 }
 
 async function getAllSkillsMapOfAccount(accountID) {
-    let skillArray = await databaseClass.getSkillsOfAccountUsingAccountId(accountID);
+    let skillArray = await databaseClass.getAccountSkills(accountID);
     return await convertSkillsArrayToSkillsMap(skillArray);
 }
 
 async function getAllSkillsMapOfProject(projectID) {
-    let skillsArray = await databaseClass.getSkillsOfProjectUsingProjectId(projectID);
+    let skillsArray = await databaseClass.getProjectSkills(projectID);
     return await convertSkillsArrayToSkillsMap(skillsArray);
 }
 
@@ -97,7 +99,7 @@ async function getAllSkillsMapOfProject(projectID) {
 async function viewAvailableProjects(username) {
     let error = [];
     let accountID = await getAccountIDUsingAccountUsername(username);
-    let numberOfProjects = await databaseClass.getNumberOfRowsInProjectsTable();
+    let numberOfProjects = await databaseClass.getNumberOfAllProjects();
     let {availableProjectArr, hasMinOneAvailable} = await buildAvailableProjects(accountID, numberOfProjects);
     if (hasMinOneAvailable) {
         return availableProjectArr;
@@ -110,8 +112,9 @@ async function viewAvailableProjects(username) {
 async function buildAvailableProjects(accountID, numberOfProjects) {
     let availableProjectArr = [];
     let hasMinOneAvailable = false;
-    for (let i = 0; i < numberOfProjects; i++) {
-        let projectsTitle = await databaseClass.getProjectTitleUsingProjectId(i);
+    for (let i = 1; i <= numberOfProjects; i++) {
+        let project = await databaseClass.getProjectById(i);
+        let projectsTitle = project.title;
         if (await checkIfSkilledEnough(accountID, i)) {
             availableProjectArr[i] = (i + "." + projectsTitle);
             hasMinOneAvailable = true;
@@ -138,7 +141,7 @@ async function register(username, skillsArr, password) {
 
 async function saveRegisterInfoInDB(account) {
     await saveAccount(account.username,account.password);
-    let counter = await databaseClass.getNumberOfRowsInSkillsTable();
+    let counter = await databaseClass.getNumberOfAllSkills();
     for (const [key, value] of account.skills) {
         await databaseClass.saveAccountSkill(counter, key, value, account.id);
         counter++;
@@ -149,7 +152,7 @@ async function saveRegisterInfoInDB(account) {
 //addProject
 async function addProject(title, budget, deadLine, skillsArr) {
     let messagesDuringAddProject;
-    let id = await databaseClass.getNumberOfRowsInProjectsTable();
+    let id = await databaseClass.getNumberOfAllProjects();
     let skills = new Map;
     let deadline = stringToDateConverter(deadLine);
     messagesDuringAddProject = buildSkillsMap(skillsArr, skills);
@@ -161,7 +164,7 @@ async function addProject(title, budget, deadLine, skillsArr) {
 
 async function saveProjectInfo(project) {
     await databaseClass.saveProject(project);
-    let counter = await databaseClass.getNumberOfRowsInSkillsTable();
+    let counter = await databaseClass.getNumberOfAllSkills();
     for (const [key, value] of project.skills) {
         await databaseClass.saveProjectSkill(counter, key, value, project.id);
         counter++
@@ -188,17 +191,17 @@ function buildSkillsMap(skillsArr, skills) {
 //addBid
 async function addBid(biddingUsername, projectTitle, bidAmount) {
     let addBidsFinalMessage;
-    let projectId = await databaseClass.getProjectIDUsingProjectTitle(projectTitle);
+    let project = await databaseClass.getProjectByProjectTitle(projectTitle)
+    let projectId = project.id;
     let accountId = await getAccountIDUsingAccountUsername(biddingUsername);
-    let bidId = await databaseClass.getNumberOfRowsInBidsTable();
-    addBidsFinalMessage = await handlingAddBidErrors(bidId, accountId, projectId, bidAmount);
+    addBidsFinalMessage = await handlingAddBidErrors(accountId, projectId, bidAmount);
     return addBidsFinalMessage;
 }
 
 
 async function handlingAddBidErrors(bidId, biddingUserId, projectId, bidAmount) {
-
-    if (!(await databaseClass.getProjectAvailabilityUsingProjectId(projectId))) {
+    let project = await databaseClass.getProjectById(projectId);
+    if (!(project.isAvailable)) {
         return "cannot bid! project has already been taken.".red;
     } else if (!(await checkIfSkilledEnough(biddingUserId, projectId))) {
         return "cannot bid! not skilled enough.".red;
@@ -219,15 +222,16 @@ async function createBid(bidId, biddingUserId, projectId, bidAmount) {
 }
 
 async function checkIfBidEnough(projectId, userBidAmount) {
+    let project = databaseClass.getProjectById(projectId);
     let bidIsEnough = false;
-    let mainBidAmount = await databaseClass.getProjectBudgetUsingProjectId(projectId);
+    let mainBidAmount = project.budget;
     if (userBidAmount <= mainBidAmount) bidIsEnough = true;
     return bidIsEnough;
 }
 
 async function checkIfValidDateToBid(projectId) {
-    let time = await databaseClass.getProjectDeadlineUsingProjectId(projectId);
-    let projectDeadline = Date.parse(time);
+    let project = await databaseClass.getProjectById(projectId);
+    let projectDeadline = project.deadline;
     let localDate = Date.now();
     return projectDeadline >= localDate;
 
@@ -235,8 +239,8 @@ async function checkIfValidDateToBid(projectId) {
 
 //holdAuctions
 async function holdAuctionsForAllProjects() {
-    let numberOfProjects = await databaseClass.getNumberOfRowsInProjectsTable();
-    for (let i = 0; i < numberOfProjects; i++) {
+    let numberOfProjects = await databaseClass.getNumberOfAllProjects();
+    for (let i = 1; i <= numberOfProjects; i++) {
         let projectID = i;
         if (await isAuctionDay(projectID)) {
             await holdAuction(projectID);
@@ -246,7 +250,8 @@ async function holdAuctionsForAllProjects() {
 
 async function holdAuction(projectId) {
     let messageOfHoldAuction = "";
-    if (!(await databaseClass.getProjectAvailabilityUsingProjectId(projectId))) {
+    let project = await databaseClass.getProjectById(projectId);
+    if (!(project.isAvailable)) {
         messageOfHoldAuction = ("project is not available! already taken.".red);
     } else {
         messageOfHoldAuction = await handlingAuctionProcess(projectId);
@@ -272,13 +277,14 @@ async function handlingAuctionProcess(projectId) {
 
 
 async function createNewAuction(winnerID, projectID) {
-    let auctionID = await databaseClass.getNumberOfRowsInAuctionsTable();
+    let auctionID = await databaseClass.getNumberOfAllAuctions();
     return new auctionClass(auctionID, projectID, winnerID);
 }
 
 
 async function isAuctionDay(projectId) {
-    let projectDeadline = await databaseClass.getProjectDeadlineUsingProjectId(projectId);
+    let project  = await databaseClass.getProjectById(projectId);
+    let projectDeadline = project.deadline
     let localDate = Date.now();
     return projectDeadline <= localDate;
 
@@ -297,7 +303,7 @@ async function findTheBestUserIdBidingOnProject(projectId) {
 async function calculateToFindTheBestBid(listOfBidIDsForProject) {
     let bestBid = 0;
     let bestUserId;
-    for (let i = 0; i < listOfBidIDsForProject.length; i++) {
+    for (let i = 1; i <= listOfBidIDsForProject.length; i++) {
         let bid = await buildFullBidUsingBidID(i);
         let userSkill = parseInt(await calculateUserSkill(bid));
         if (userSkill > bestBid) {
@@ -309,7 +315,7 @@ async function calculateToFindTheBestBid(listOfBidIDsForProject) {
 }
 
 async function createListOfBidsForProject(projectID) {
-    let listOfBids = await databaseClass.getBidsOfProjectUsingProjectId(projectID);
+    let listOfBids = await databaseClass.getBidsOfProjectByProjectId(projectID);
     return listOfBids;
 
 }
@@ -336,7 +342,7 @@ async function assignProject(userID, projectID) {
 //add/remove
 async function addSkill(username, skillName, skillPoint) {
     let accountID = await getAccountIDUsingAccountUsername(username);
-    let skillID = await databaseClass.getNumberOfRowsInSkillsTable();
+    let skillID = await databaseClass.getNumberOfAllSkills();
     if (checkIfSkillIsValid(skillName)) {
         await databaseClass.saveAccountSkill(skillID, skillName, skillPoint, accountID);
         return ("skill added successfully!\n".green);
@@ -371,7 +377,8 @@ async function removeSkill(username, skillName) {
 async function checkIfAccountHasSkill(accountID, skillID) {
     let hasThisSkill = false;
     let skillsMap = await getAllSkillsMapOfAccount(accountID);
-    let skillName = await databaseClass.getSkillNameUsingSkillId(skillID);
+    let skill = await databaseClass.getSkillById(skillID);
+    let skillName = skill.skillName;
     skillsMap.forEach((value, key) => {
         if (key === skillName) {
             hasThisSkill = true;
@@ -398,13 +405,13 @@ async function confirmSkill(conformerAccountUsername, targetAccountUsername, ski
 }
 
 async function addPointTOSkillForConfirmation(skillId) {
-    let skillPoint = await databaseClass.getSkillPointUsingSkillId(skillId);
+    let skill = await databaseClass.getSkillById(skillId);
+    let skillPoint = skill.skillPoint;
     await databaseClass.updateAccountSkillPoint(skillId, skillPoint + 1);
 }
 
 async function createNewConfirmation(skillId, sourceUserId) {
-    let confirmationId = await databaseClass.getNumberOfRowsInConfirmationTable();
-    await databaseClass.saveConfirmation(confirmationId, skillId, sourceUserId);
+    await databaseClass.saveConfirmation(skillId, sourceUserId);
 }
 
 async function checkIfConfirmedBefore(userSourceID, skillID) {
@@ -434,8 +441,9 @@ async function convertSkillsArrayToSkillsMap(arr) {
     let skillMap = new Map();
     for (let i = 0; i < arr.length; i++) {
         let skillID = arr[i].id;
-        let skillName = await databaseClass.getSkillNameUsingSkillId(skillID);
-        let skillPoint = await databaseClass.getSkillPointUsingSkillId(skillID);
+        let skill = await databaseClass.getSkillById(skillID)
+        let skillName = skill.skillName;
+        let skillPoint = skill.skillPoint;
         skillMap.set(skillName, skillPoint);
     }
     return skillMap;
@@ -629,7 +637,8 @@ module.exports = {
     holdAuction,
     login,
     validateTokenFromServer,
-    saveAccount
+    saveAccount,
+
 
 
 }
