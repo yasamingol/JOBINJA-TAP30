@@ -13,6 +13,19 @@ class Project extends Model {
     }
 
 }
+//projects functions
+async function saveProject(title, budget, deadline, isAvailable, assignedAccountId) {
+    await Project.query().insert(
+        {
+            title: title,
+            budget: budget,
+            deadline: deadline,
+            isAvailable: isAvailable,
+            assignedAccountId: assignedAccountId
+        })
+    console.log("project saved successfully!")
+}
+
 
 /******************************************************Skill**********************************************************/
 class Skill extends Model {
@@ -36,6 +49,29 @@ class Skill extends Model {
     }
 
 }
+//Skill
+async function saveAccountSkill(skillName,skillPoint,accountId){
+    await Skill.query().insert(
+        {
+            skillName: skillName,
+            skillPoint: skillPoint,
+            accountID: accountId,
+            projectID: -1
+        }
+    )
+    console.log("accountSkill saved successfully!")
+}
+async function saveProjectSkill(skillName,skillPoint,projectId){
+    await Skill.query().insert(
+        {
+            skillName: skillName,
+            skillPoint: skillPoint,
+            accountID: -1,
+            projectID: projectId
+        }
+    )
+    console.log("projectSkill saved successfully!")
+}
 
 /*****************************************************Auction*********************************************************/
 class Auction extends Model {
@@ -58,6 +94,17 @@ class Auction extends Model {
     }
 
 }
+async function saveAuction(projectId,winnerId){
+    await Auction.query().insert(
+        {
+            projectID:projectId,
+            winnerID:winnerId
+        }
+    )
+    console.log("auction saved successfully!")
+}
+
+
 
 /*******************************************************Bid***********************************************************/
 class Bid extends Model {
@@ -80,6 +127,19 @@ class Bid extends Model {
         }
     }
 }
+
+// Bids functions
+async function saveBid(userId,projectId,bidAmount){
+    await Bid.query().insert(
+        {
+            userID: userId,
+            projectID: projectId,
+            bidAmount: bidAmount
+        }
+    )
+    console.log("bid saved successfully!")
+}
+
 
 /**************************************************Confirmation*******************************************************/
 
@@ -104,16 +164,20 @@ class Confirmation extends Model {
     }
 }
 
-
-/*************************************************Query-Functions*****************************************************/
-
-async function getProjectsSkills(projectId){
-    const skills = await Skill.query().where('projectID',projectId);
-    return skills
+//Confirmation
+async function saveConfirmation(skillId,sourceAccountId){
+    await Confirmation.query().insert(
+        {
+            skillId: skillId,
+            sourceAccountId: sourceAccountId
+        }
+    )
+    console.log("confirmation saved successfully!")
 }
 
-(async () => {
-    console.log(await getProjectsSkills(0))
+/*********************************************Query-Functions-Test***************************************************/
 
+(async () => {
+    await saveProject("karpino",400,"2025/03/01",true,null)
 })()
 
