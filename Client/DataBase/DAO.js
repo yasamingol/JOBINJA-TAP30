@@ -29,6 +29,16 @@ async function getProjectById(id){
     let project  = await Project.query().findById(id);
     return project;
 }
+async function getProjectByProjectTitle(title){
+    let project = await Project.query().where('title',title)
+    return project;
+}
+async function updateProjectAvailability(id) {
+    await Project.query().update({isAvailable:false}).where('id',id);
+}
+async function updateProjectAssignedAccountId(projectID, accountID) {
+    await Project.query().update({assignedAccountId:accountID}).where('id',projectID);
+}
 
 
 /******************************************************Skill**********************************************************/
@@ -82,6 +92,11 @@ async function getSkillById(id){
     return skill;
 }
 
+async function updateAccountSkillPoint(skillID, skillPoint) {
+    await Skill.query().update({skillPoint:skillPoint}).where('id',skillID);
+}
+
+
 /*****************************************************Auction*********************************************************/
 class Auction extends Model {
     static get tableName() {
@@ -116,6 +131,10 @@ async function saveAuction(projectId,winnerId){
 async function getAuctionById(id){
     let auction = await Auction.query().findById(id);
     return auction;
+}
+
+async function updateAuctionWinner(auctionID, userID) {
+    await Auction.query().update({winnerID:userID}).where('id',auctionID);
 }
 
 
@@ -156,6 +175,10 @@ async function saveBid(userId,projectId,bidAmount){
 async function getBidById(id){
     let bid = await Bid.query().findById(id);
     return bid
+}
+async function getBidByUserId(userId){
+    let bid = await Bid.query().where('userID',userId)
+    return bid;
 }
 
 
@@ -201,6 +224,8 @@ async function getConfirmationById(id){
 /*********************************************Query-Functions-Test***************************************************/
 
 (async () => {
-    console.log(await getProjectById(1))
+    await updateProjectAssignedAccountId(1,1);
+    console.log(await Project.query())
+
 })()
 
