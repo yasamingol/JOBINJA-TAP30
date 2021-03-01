@@ -25,6 +25,10 @@ async function saveProject(title, budget, deadline, isAvailable, assignedAccount
         })
     console.log("project saved successfully!")
 }
+async function getProjectById(id){
+    let project  = await Project.query().findById(id);
+    return project;
+}
 
 
 /******************************************************Skill**********************************************************/
@@ -73,6 +77,11 @@ async function saveProjectSkill(skillName,skillPoint,projectId){
     console.log("projectSkill saved successfully!")
 }
 
+async function getSkillById(id){
+    let skill = await Skill.query().findById(id);
+    return skill;
+}
+
 /*****************************************************Auction*********************************************************/
 class Auction extends Model {
     static get tableName() {
@@ -102,6 +111,11 @@ async function saveAuction(projectId,winnerId){
         }
     )
     console.log("auction saved successfully!")
+}
+
+async function getAuctionById(id){
+    let auction = await Auction.query().findById(id);
+    return auction;
 }
 
 
@@ -139,6 +153,10 @@ async function saveBid(userId,projectId,bidAmount){
     )
     console.log("bid saved successfully!")
 }
+async function getBidById(id){
+    let bid = await Bid.query().findById(id);
+    return bid
+}
 
 
 /**************************************************Confirmation*******************************************************/
@@ -175,9 +193,14 @@ async function saveConfirmation(skillId,sourceAccountId){
     console.log("confirmation saved successfully!")
 }
 
+async function getConfirmationById(id){
+    let confirmation = await Confirmation.query().findById(id);
+    return confirmation;
+}
+
 /*********************************************Query-Functions-Test***************************************************/
 
 (async () => {
-    await saveProject("karpino",400,"2025/03/01",true,null)
+    console.log(await getProjectById(1))
 })()
 
