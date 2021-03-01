@@ -361,7 +361,8 @@ function checkIfSkillIsValid(givenSkill) {
 
 async function removeSkill(username, skillName) {
     let accountID = await getAccountIDUsingAccountUsername(username);
-    let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
+    let skill = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
+    let skillID = skill.id;
     if (await checkIfAccountHasSkill(accountID, skillID)) {
         await databaseClass.deleteSkillOfAccountUsingSkillName(skillID);
         return ("skill removed successfully!\n".green);
