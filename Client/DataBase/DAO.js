@@ -33,7 +33,7 @@ async function getProjectById(id) {
 }
 
 async function getProjectByProjectTitle(title) {
-    let project = await Project.query().where('title', title)
+    let project = await Project.query().where('title', title).first()
     return project;
 }
 
@@ -49,7 +49,8 @@ async function getAllProjectsAssignedToAnAccountUsingAccountId(accountID) {
     let projectsAssignedToAccount = await Project.query().where('assignedAccountId', accountID);
     return projectsAssignedToAccount;
 }
-async function getNumberOfAllProjects(){
+
+async function getNumberOfAllProjects() {
     let projects = await Project.query()
     return projects.length;
 }
@@ -128,9 +129,10 @@ async function deleteSkillOfAccountUsingSkillName(skillId) {
 }
 
 async function getSkillIdUsingSkillNameAndAccountID(skillName, accountId) {
-    let skillId = await Skill.query().where('skillName', skillName).where('accountID', accountId);
-    return skillId
+    let skill = await Skill.query().where('skillName', skillName).andWhere('accountID', accountId).first();
+    return skill
 }
+
 async function getNumberOfAllSkills() {
     let allSkills = await Skill.query();
     return allSkills.length;
@@ -177,7 +179,8 @@ async function getAuctionById(id) {
 async function updateAuctionWinner(auctionID, userID) {
     await Auction.query().update({winnerID: userID}).where('id', auctionID);
 }
-async function getNumberOfAllAuctions(){
+
+async function getNumberOfAllAuctions() {
     let allAuctions = Auction.query();
     return allAuctions.length;
 }
@@ -209,7 +212,7 @@ class Bid extends Model {
 async function saveBid(userId, projectId, bidAmount) {
     await Bid.query().insert(
         {
-            userID: userId,
+            accountID: userId,
             projectID: projectId,
             bidAmount: bidAmount
         }
@@ -270,13 +273,11 @@ async function getConfirmationById(id) {
     let confirmation = await Confirmation.query().findById(id);
     return confirmation;
 }
-async function getConfirmationUsingSkillIdAndAccountId(skillId,accountId){
-    let confirmation  = await Confirmation.query().where('skillId',skillId).where('sourceAccountId',accountId);
+
+async function getConfirmationUsingSkillIdAndAccountId(skillId, accountId) {
+    let confirmation = await Confirmation.query().where('skillId', skillId).where('sourceAccountId', accountId).throwIfNotFound(undefined);
     return confirmation;
 }
-
-
-
 
 
 module.exports = {

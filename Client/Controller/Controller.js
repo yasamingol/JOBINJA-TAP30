@@ -141,10 +141,8 @@ async function register(username, skillsArr, password) {
 
 async function saveRegisterInfoInDB(account) {
     await saveAccount(account.username,account.password);
-    let counter = await databaseClass.getNumberOfAllSkills();
     for (const [key, value] of account.skills) {
-        await databaseClass.saveAccountSkill(counter, key, value, account.id);
-        counter++;
+        await databaseClass.saveAccountSkill(key, value, account.id);
     }
 }
 
@@ -199,7 +197,7 @@ async function addBid(biddingUsername, projectTitle, bidAmount) {
 }
 
 
-async function handlingAddBidErrors(bidId, biddingUserId, projectId, bidAmount) {
+async function handlingAddBidErrors( biddingUserId, projectId, bidAmount) {
     let project = await databaseClass.getProjectById(projectId);
     if (!(project.isAvailable)) {
         return "cannot bid! project has already been taken.".red;
@@ -210,19 +208,19 @@ async function handlingAddBidErrors(bidId, biddingUserId, projectId, bidAmount) 
     } else if (!(await checkIfValidDateToBid(projectId))) {
         return "you cannot bid on this project! it has ended".red;
     } else {
-        return (await createBid(bidId, biddingUserId, projectId, bidAmount));
+        return (await createBid( biddingUserId, projectId, bidAmount));
     }
 }
 
-async function createBid(bidId, biddingUserId, projectId, bidAmount) {
-    let bid = new bidClass(bidId, biddingUserId, projectId, bidAmount);
+async function createBid(biddingUserId, projectId, bidAmount) {
+    let bid = new bidClass(-1, biddingUserId, projectId, bidAmount);
     await databaseClass.saveBid(bid);
     return "bid created successfully!\n".green;
 
 }
 
 async function checkIfBidEnough(projectId, userBidAmount) {
-    let project = databaseClass.getProjectById(projectId);
+    let project = await databaseClass.getProjectById(projectId);
     let bidIsEnough = false;
     let mainBidAmount = project.budget;
     if (userBidAmount <= mainBidAmount) bidIsEnough = true;
@@ -233,7 +231,7 @@ async function checkIfValidDateToBid(projectId) {
     let project = await databaseClass.getProjectById(projectId);
     let projectDeadline = project.deadline;
     let localDate = Date.now();
-    return projectDeadline >= localDate;
+    return parseInt(projectDeadline) >= parseInt(localDate/10000000000);
 
 }
 
@@ -393,7 +391,8 @@ async function checkIfAccountHasSkill(accountID, skillID) {
 async function confirmSkill(conformerAccountUsername, targetAccountUsername, skillName) {
     let sourceUserID = await getAccountIDUsingAccountUsername(conformerAccountUsername);
     let otherUserID = await getAccountIDUsingAccountUsername(targetAccountUsername);
-    let skillID = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, otherUserID);
+    let skill = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, otherUserID);
+    let skillID = skill.id
     let hasConfirmedBefore = await checkIfConfirmedBefore(sourceUserID, skillID);
     if (!hasConfirmedBefore) {
         await addPointTOSkillForConfirmation(skillID);
