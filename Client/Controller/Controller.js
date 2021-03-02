@@ -150,22 +150,19 @@ async function saveRegisterInfoInDB(account) {
 //addProject
 async function addProject(title, budget, deadLine, skillsArr) {
     let messagesDuringAddProject;
-    let id = await databaseClass.getNumberOfAllProjects();
     let skills = new Map;
     let deadline = stringToDateConverter(deadLine);
     messagesDuringAddProject = buildSkillsMap(skillsArr, skills);
-    let project = new projectClass(id, title, skills, budget, null, deadline, true, null);
-    await saveProjectInfo(project);
+    await saveProjectInfo(title, budget, deadline, true, null, skills);
     messagesDuringAddProject[messagesDuringAddProject.length] = ("project built successfully!\n".green);
     return messagesDuringAddProject;
 }
 
-async function saveProjectInfo(project) {
-    await databaseClass.saveProject(project);
-    let counter = await databaseClass.getNumberOfAllSkills();
-    for (const [key, value] of project.skills) {
-        await databaseClass.saveProjectSkill(counter, key, value, project.id);
-        counter++
+async function saveProjectInfo(title, budget, deadline, isAvailable, assignedAccountId, skills) {
+    await databaseClass.saveProject(title, budget, deadline, isAvailable, assignedAccountId);
+    let project = await databaseClass.getProjectByProjectTitle(title);
+    for (const [key, value] of skills) {
+        await databaseClass.saveProjectSkill(key, value, project.id);
     }
 }
 

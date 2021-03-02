@@ -278,7 +278,9 @@ async function getConfirmationUsingSkillIdAndAccountId(skillId, accountId) {
     let confirmation = await Confirmation.query().where('skillId', skillId).where('sourceAccountId', accountId).throwIfNotFound(undefined);
     return confirmation;
 }
-
+(async () => {
+    console.log(await Skill.query())
+})()
 
 module.exports = {
     saveProject,
