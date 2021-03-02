@@ -1,4 +1,3 @@
-const databaseClass = require('../../DataBase/database');
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 

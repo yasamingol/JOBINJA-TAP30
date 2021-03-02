@@ -284,8 +284,15 @@ async function getConfirmationUsingSkillIdAndAccountId(skillId, accountId) {
     }
 
 }
+
+
+
+
+
+
+
 (async () => {
-    console.log(await getConfirmationUsingSkillIdAndAccountId(8,5));
+    console.log(await Bid.query())
 })()
 
 module.exports = {

@@ -609,15 +609,6 @@ function deserializeAllSkills(body) {
 
 
 module.exports = {
-    holdAuction,
-    calculateBestBid: findTheBestUserIdBidingOnProject,
-    calculateUserSkill,
-    checkIfSkilledEnough,
-    checkIfBidEnough
-};
-
-
-module.exports = {
     getProjectById,
     getAccountById,
     viewAllAccounts,
@@ -635,6 +626,11 @@ module.exports = {
     login,
     validateTokenFromServer,
     saveAccount,
+    holdAuction,
+    calculateBestBid: findTheBestUserIdBidingOnProject,
+    calculateUserSkill,
+    checkIfSkilledEnough,
+    checkIfBidEnough
 
 
 

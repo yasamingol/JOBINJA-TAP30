@@ -1,5 +1,4 @@
 /***************************************************SettingUpDataBase**************************************************/
-const databaseClass = require('../DataBase/database');
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const controllerClass = require("../Controller/Controller.js");
@@ -294,34 +293,5 @@ async function checkIfAnyErrorsApearedDuringTokenValidation(token){
 
 /************************************************TestExamplesFormDB***************************************************/
 
-async function createAllDataBases() {
-    await databaseClass.createProjectsTable();
-    await databaseClass.createBidsTable();
-    await databaseClass.createAuctionsTable();
-    await databaseClass.createSkillsTable();
-    await databaseClass.createConfirmationsTable();
-    await databaseClass.createLoginsTable();
-    console.log("DataBase created successfully :)".green)
-}
-
-
-async function createSomeExampleCases() {
-    let project = new projectClass(0, "tap30", -1, 900, -1, "2022/03/03", true);
-    let tap30Skill1 = await databaseClass.saveProjectSkill(0, "A", 20, 0);
-    let tap30Skill2 = await databaseClass.saveProjectSkill(1, "B", 10, 0);
-    await databaseClass.saveProject(project);
-    let account = new accountClass(0, "yasamingol","2431380", -1, -1, -1);
-    await controllerClass.saveAccount(account.username,account.password);
-    let account1 = new accountClass(1, "jafar","1234", -1, -1, -1);
-    await controllerClass.saveAccount(account1.username,account1.password);
-    await databaseClass.saveAccountSkill(2, "A", 200, 0);
-    await databaseClass.saveAccountSkill(3, "B", 400, 0);
-    await databaseClass.saveAccountSkill(4, "A", 2000, 1);
-    await databaseClass.saveAccountSkill(5, "B", 4000, 1);
-    let bid1 = new bidClass(0, 0, 0, 20);
-    let bid2 = new bidClass(1, 1, 0, 30);
-    await databaseClass.saveBid(bid1);
-    await databaseClass.saveBid(bid2);
-}
 
 
