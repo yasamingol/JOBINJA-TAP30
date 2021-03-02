@@ -1,19 +1,11 @@
-const {Model} = require('objection');
-const knex = require('/home/tapsi/IdeaProjects/concurency/knex.js')
-Model.knex(knex);
+const Project = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Project.js');
+const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
+const Confirmation = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Confirmation.js');
+const Bid = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Bid.js');
+const Auction = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Auction.js');
 
 /*****************************************************Project*********************************************************/
 const projectClass = require('/home/tapsi/IdeaProjects/concurency/Client/Model/Classes/Project.js')
-class Project extends Model {
-    static get tableName() {
-        return 'Projects';
-    }
-
-    static get relationalMappings() {
-
-    }
-
-}
 
 //projects functions
 async function saveProject(project) {
@@ -59,28 +51,6 @@ async function getNumberOfAllProjects() {
 
 
 /******************************************************Skill**********************************************************/
-class Skill extends Model {
-    static get tableName() {
-        return 'Skills';
-    }
-
-    static get relationalMappings() {
-        // const Project = require('./Project');
-        return {
-            projectID: {
-                relation: Model.HasOneRelation,
-                modelClass: Project,
-                join: {
-                    from: 'Skills.projectID',
-                    to: 'Projects.id'
-                }
-            }
-
-        }
-    }
-
-}
-
 //Skill
 async function saveAccountSkill(skillName, skillPoint, accountId) {
     await Skill.query().insert(
@@ -143,26 +113,6 @@ async function getNumberOfAllSkills() {
 
 /*****************************************************Auction*********************************************************/
 const auctionClass = require('/home/tapsi/IdeaProjects/concurency/Client/Model/Classes/Auction.js')
-class Auction extends Model {
-    static get tableName() {
-        return 'Auctions';
-    }
-
-    static get relationalMappings() {
-        // const Project = require('./Project');
-        return {
-            projectID: {
-                relation: Model.HasOneRelation,
-                modelClass: Project,
-                join: {
-                    from: 'Auctions.projectID',
-                    to: 'Projects.id'
-                }
-            }
-        }
-    }
-
-}
 
 async function saveAuction(auction) {
     await Auction.query().insert(
@@ -191,26 +141,6 @@ async function getNumberOfAllAuctions() {
 
 /*******************************************************Bid***********************************************************/
 const bidClass = require('/home/tapsi/IdeaProjects/concurency/Client/Model/Classes/Bid.js')
-class Bid extends Model {
-    static get tableName() {
-        return 'Bids';
-    }
-
-    static get relationalMappings() {
-        // const Project = require('./Project');
-        return {
-            projectID: {
-                relation: Model.HasOneRelation,
-                modelClass: Project,
-                join: {
-                    from: 'Bids.projectID',
-                    to: 'Projects.id'
-                }
-            }
-
-        }
-    }
-}
 
 // Bids functions
 async function saveBid(bid) {
@@ -242,28 +172,6 @@ async function getBidsOfProjectByProjectId(projectId) {
 
 
 /**************************************************Confirmation*******************************************************/
-
-class Confirmation extends Model {
-    static get tableName() {
-        return 'Confirmations';
-    }
-
-    static get relationalMappings() {
-        // const Skill = require('./Skill');
-        return {
-            projectID: {
-                relation: Model.HasOneRelation,
-                modelClass: Skill,
-                join: {
-                    from: 'Skills.id',
-                    to: 'Confirmations.skillId'
-                }
-            }
-
-        }
-    }
-}
-
 //Confirmation
 async function saveConfirmation(skillId, sourceAccountId) {
     await Confirmation.query().insert(

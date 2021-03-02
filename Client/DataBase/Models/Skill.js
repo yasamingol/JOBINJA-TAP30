@@ -1,6 +1,29 @@
-const { Model } = require('objection');
+const {Model} = require('objection');
 const knex = require('/home/tapsi/IdeaProjects/concurency/knex.js')
 Model.knex(knex);
 
-// module.exports = Skill
+
+class Skill extends Model {
+    static get tableName() {
+        return 'Skills';
+    }
+
+    static get relationalMappings() {
+        // const Project = require('./Project');
+        return {
+            projectID: {
+                relation: Model.HasOneRelation,
+                modelClass: Project,
+                join: {
+                    from: 'Skills.projectID',
+                    to: 'Projects.id'
+                }
+            }
+
+        }
+    }
+}
+
+
+module.exports = Skill
 
