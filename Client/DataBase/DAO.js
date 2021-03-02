@@ -189,7 +189,7 @@ async function getNumberOfAllAuctions() {
 /*******************************************************Bid***********************************************************/
 class Bid extends Model {
     static get tableName() {
-        return 'Skills';
+        return 'Bids';
     }
 
     static get relationalMappings() {
@@ -212,8 +212,8 @@ class Bid extends Model {
 async function saveBid(userId, projectId, bidAmount) {
     await Bid.query().insert(
         {
-            accountID: userId,
-            projectID: projectId,
+            userId: userId,
+            projectId: projectId,
             bidAmount: bidAmount
         }
     )
@@ -279,7 +279,7 @@ async function getConfirmationUsingSkillIdAndAccountId(skillId, accountId) {
     return confirmation;
 }
 (async () => {
-    console.log(await Skill.query())
+    console.log(await Bid.query())
 })()
 
 module.exports = {

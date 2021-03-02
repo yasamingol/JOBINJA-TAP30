@@ -210,8 +210,7 @@ async function handlingAddBidErrors( biddingUserId, projectId, bidAmount) {
 }
 
 async function createBid(biddingUserId, projectId, bidAmount) {
-    let bid = new bidClass(-1, biddingUserId, projectId, bidAmount);
-    await databaseClass.saveBid(bid);
+    await databaseClass.saveBid(biddingUserId, projectId, bidAmount);
     return "bid created successfully!\n".green;
 
 }
