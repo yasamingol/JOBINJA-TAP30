@@ -204,8 +204,8 @@ async function handlingAddBidErrors( bid) {
         return "cannot bid! not skilled enough.".red;
     } else if (!(await checkIfBidEnough(bid.projectID, bid.bidAmount))) {
         return "cannot bid! bid amount not acceptable".red;
-    } else if (!(await checkIfValidDateToBid(bid.projectID))) {
-        return "you cannot bid on this project! it has ended".red;
+    // } else if (!(await checkIfValidDateToBid(bid.projectID))) {
+    //     return "you cannot bid on this project! it has ended".red;
     } else {
         return (await createBid(bid));
     }
@@ -339,9 +339,8 @@ async function assignProject(userID, projectID) {
 //add/remove
 async function addSkill(username, skillName, skillPoint) {
     let accountID = await getAccountIDUsingAccountUsername(username);
-    let skillID = await databaseClass.getNumberOfAllSkills();
     if (checkIfSkillIsValid(skillName)) {
-        await databaseClass.saveAccountSkill(skillID, skillName, skillPoint, accountID);
+        await databaseClass.saveAccountSkill(skillName, skillPoint, accountID);
         return ("skill added successfully!\n".green);
     } else {
         return ("such skill does not exist!".red);

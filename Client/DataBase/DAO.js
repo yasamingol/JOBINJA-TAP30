@@ -166,7 +166,7 @@ async function getBidByUserId(userId) {
 }
 
 async function getBidsOfProjectByProjectId(projectId) {
-    let bidsOfProject = await Bid.query().where('projectID', projectId);
+    let bidsOfProject = await Bid.query().where('projectId', projectId);
     return bidsOfProject;
 }
 
@@ -205,7 +205,7 @@ async function getConfirmationUsingSkillIdAndAccountId(skillId, accountId) {
 
 
 (async () => {
-    console.log(await Bid.query())
+    console.log(await Skill.query())
 })()
 
 module.exports = {

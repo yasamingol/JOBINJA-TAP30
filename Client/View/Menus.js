@@ -208,7 +208,7 @@ async function loadAddSkillMenu() {
         let arrSkills = inputArr[2].split(":");
         let skillName = arrSkills[0];
         let skillPoint = arrSkills[1];
-        console.log(await controllerClass.addSkill(username, skillName, skillPoint));
+        console.log(await controllerClass.addSkill(username, skillName, parseInt(skillPoint)));
     }
 }
 
