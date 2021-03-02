@@ -153,16 +153,17 @@ async function addProject(title, budget, deadLine, skillsArr) {
     let skills = new Map;
     let deadline = stringToDateConverter(deadLine);
     messagesDuringAddProject = buildSkillsMap(skillsArr, skills);
-    await saveProjectInfo(title, budget, deadline, true, null, skills);
+    let project = new projectClass(null,title,skills,budget,[],deadline,true,null)
+    await saveProjectInfo(project);
     messagesDuringAddProject[messagesDuringAddProject.length] = ("project built successfully!\n".green);
     return messagesDuringAddProject;
 }
 
-async function saveProjectInfo(title, budget, deadline, isAvailable, assignedAccountId, skills) {
-    await databaseClass.saveProject(title, budget, deadline, isAvailable, assignedAccountId);
-    let project = await databaseClass.getProjectByProjectTitle(title);
-    for (const [key, value] of skills) {
-        await databaseClass.saveProjectSkill(key, value, project.id);
+async function saveProjectInfo(project) {
+    await databaseClass.saveProject(project);
+    let projectCreate = await databaseClass.getProjectByProjectTitle(project.title);
+    for (const [key, value] of project.skills) {
+        await databaseClass.saveProjectSkill(key, value, projectCreate.id);
     }
 }
 

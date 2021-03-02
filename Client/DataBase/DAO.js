@@ -3,6 +3,7 @@ const knex = require('/home/tapsi/IdeaProjects/concurency/knex.js')
 Model.knex(knex);
 
 /*****************************************************Project*********************************************************/
+const projectClass = require('/home/tapsi/IdeaProjects/concurency/Client/Model/Classes/Project.js')
 class Project extends Model {
     static get tableName() {
         return 'Projects';
@@ -15,14 +16,15 @@ class Project extends Model {
 }
 
 //projects functions
-async function saveProject(title, budget, deadline, isAvailable, assignedAccountId) {
+async function saveProject(project) {
+
     await Project.query().insert(
         {
-            title: title,
-            budget: budget,
-            deadline: deadline,
-            isAvailable: isAvailable,
-            assignedAccountId: assignedAccountId
+            title: project.title,
+            budget: project.budget,
+            deadline: project.deadline,
+            isAvailable: project.isAvailable,
+            assignedAccountId: project.assignedAccountId
         })
     console.log("project saved successfully!")
 }
