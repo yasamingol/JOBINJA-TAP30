@@ -232,6 +232,7 @@ async function getBidByUserId(userId) {
 
 async function getBidsOfProjectByProjectId(projectId) {
     let bidsOfProject = await Bid.query().where('projectID', projectId);
+    return bidsOfProject;
 }
 
 
@@ -239,7 +240,7 @@ async function getBidsOfProjectByProjectId(projectId) {
 
 class Confirmation extends Model {
     static get tableName() {
-        return 'Skills';
+        return 'Confirmations';
     }
 
     static get relationalMappings() {
@@ -275,11 +276,16 @@ async function getConfirmationById(id) {
 }
 
 async function getConfirmationUsingSkillIdAndAccountId(skillId, accountId) {
-    let confirmation = await Confirmation.query().where('skillId', skillId).where('sourceAccountId', accountId).throwIfNotFound(undefined);
-    return confirmation;
+    try {
+        let confirmation = await Confirmation.query().where('skillId', skillId).where('sourceAccountId',accountId)
+        return confirmation;
+    }catch (e) {
+        return undefined
+    }
+
 }
 (async () => {
-    console.log(await Bid.query())
+    console.log(await getConfirmationUsingSkillIdAndAccountId(8,5));
 })()
 
 module.exports = {

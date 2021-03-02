@@ -57,8 +57,8 @@ async function buildFullProjectByGettingID(id) {
 
 async function buildFullBidUsingBidID(bidID) {
     let bid = await databaseClass.getBidById(bidID)
-    let userId = bid.userID;
-    let projectId = bid.projectID;
+    let userId = bid.userId;
+    let projectId = bid.projectId;
     let bidAmount = bid.bidAmount;
     return new bidClass(bidID, userId, projectId, bidAmount);
 }
@@ -408,11 +408,12 @@ async function addPointTOSkillForConfirmation(skillId) {
 
 async function createNewConfirmation(skillId, sourceUserId) {
     await databaseClass.saveConfirmation(skillId, sourceUserId);
+
 }
 
 async function checkIfConfirmedBefore(userSourceID, skillID) {
     let confirmationId = await databaseClass.getConfirmationUsingSkillIdAndAccountId(skillID, userSourceID);
-    if (confirmationId === undefined) return false;
+    if (confirmationId === undefined  || confirmationId.length === 0) return false;
     else return true;
 }
 
