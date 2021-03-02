@@ -142,9 +142,10 @@ async function getNumberOfAllSkills() {
 
 
 /*****************************************************Auction*********************************************************/
+const auctionClass = require('/home/tapsi/IdeaProjects/concurency/Client/Model/Classes/Auction.js')
 class Auction extends Model {
     static get tableName() {
-        return 'Skills';
+        return 'Auctions';
     }
 
     static get relationalMappings() {
@@ -163,11 +164,11 @@ class Auction extends Model {
 
 }
 
-async function saveAuction(projectId, winnerId) {
+async function saveAuction(auction) {
     await Auction.query().insert(
         {
-            projectID: projectId,
-            winnerID: winnerId
+            projectID: auction.projectID,
+            winnerID: auction.accountID
         }
     )
     console.log("auction saved successfully!")
@@ -189,6 +190,7 @@ async function getNumberOfAllAuctions() {
 
 
 /*******************************************************Bid***********************************************************/
+const bidClass = require('/home/tapsi/IdeaProjects/concurency/Client/Model/Classes/Bid.js')
 class Bid extends Model {
     static get tableName() {
         return 'Bids';
@@ -211,12 +213,13 @@ class Bid extends Model {
 }
 
 // Bids functions
-async function saveBid(userId, projectId, bidAmount) {
+async function saveBid(bid) {
+
     await Bid.query().insert(
         {
-            userId: userId,
-            projectId: projectId,
-            bidAmount: bidAmount
+            userId: bid.userID,
+            projectId: bid.projectID,
+            bidAmount: bid.bidAmount
         }
     )
     console.log("bid saved successfully!")

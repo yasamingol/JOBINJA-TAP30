@@ -190,28 +190,29 @@ async function addBid(biddingUsername, projectTitle, bidAmount) {
     let project = await databaseClass.getProjectByProjectTitle(projectTitle)
     let projectId = project.id;
     let accountId = await getAccountIDUsingAccountUsername(biddingUsername);
-    addBidsFinalMessage = await handlingAddBidErrors(accountId, projectId, bidAmount);
+    let bid = new bidClass(null,accountId,projectId,bidAmount);
+    addBidsFinalMessage = await handlingAddBidErrors(bid);
     return addBidsFinalMessage;
 }
 
 
-async function handlingAddBidErrors( biddingUserId, projectId, bidAmount) {
-    let project = await databaseClass.getProjectById(projectId);
+async function handlingAddBidErrors( bid) {
+    let project = await databaseClass.getProjectById(bid.projectID);
     if (!(project.isAvailable)) {
         return "cannot bid! project has already been taken.".red;
-    } else if (!(await checkIfSkilledEnough(biddingUserId, projectId))) {
+    } else if (!(await checkIfSkilledEnough(bid.userID, bid.projectID))) {
         return "cannot bid! not skilled enough.".red;
-    } else if (!(await checkIfBidEnough(projectId, bidAmount))) {
+    } else if (!(await checkIfBidEnough(bid.projectID, bid.bidAmount))) {
         return "cannot bid! bid amount not acceptable".red;
-    } else if (!(await checkIfValidDateToBid(projectId))) {
+    } else if (!(await checkIfValidDateToBid(bid.projectID))) {
         return "you cannot bid on this project! it has ended".red;
     } else {
-        return (await createBid( biddingUserId, projectId, bidAmount));
+        return (await createBid(bid));
     }
 }
 
-async function createBid(biddingUserId, projectId, bidAmount) {
-    await databaseClass.saveBid(biddingUserId, projectId, bidAmount);
+async function createBid(bid) {
+    await databaseClass.saveBid(bid);
     return "bid created successfully!\n".green;
 
 }
@@ -259,7 +260,8 @@ async function handlingAuctionProcess(projectId) {
     let messageOfHoldAuction = "";
     let accountWinnerID = await findTheBestUserIdBidingOnProject(projectId);
     if (accountWinnerID !== null) {
-        await createNewAuction(accountWinnerID, projectId);
+        let auction = new auctionClass(null,accountWinnerID,projectId)
+         await databaseClass.saveAuction(auction);
         await databaseClass.updateProjectAvailability(projectId);
         await assignProject(accountWinnerID, projectId);
         messageOfHoldAuction = ("\nThe winner of the auction is : ".green
@@ -271,9 +273,8 @@ async function handlingAuctionProcess(projectId) {
 }
 
 
-async function createNewAuction(winnerID, projectID) {
-    let auctionID = await databaseClass.getNumberOfAllAuctions();
-    return new auctionClass(auctionID, projectID, winnerID);
+async function createNewAuction(auction) {
+    return new auctionClass(auction);
 }
 
 
@@ -298,8 +299,9 @@ async function findTheBestUserIdBidingOnProject(projectId) {
 async function calculateToFindTheBestBid(listOfBidIDsForProject) {
     let bestBid = 0;
     let bestUserId;
-    for (let i = 1; i <= listOfBidIDsForProject.length; i++) {
-        let bid = await buildFullBidUsingBidID(i);
+    for (let i = 0; i < listOfBidIDsForProject.length; i++) {
+        let bidId = listOfBidIDsForProject[i].id
+        let bid = await buildFullBidUsingBidID(bidId);
         let userSkill = parseInt(await calculateUserSkill(bid));
         if (userSkill > bestBid) {
             bestBid = userSkill;
