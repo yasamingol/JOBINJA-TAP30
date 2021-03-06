@@ -32,8 +32,9 @@ async function getAccountById(id) {
 
 async function buildFullAccountByGettingID(id) {
     let accountFullString = await getFullAccountById(id);
-    let username = await getAccountUsernameUsingAccountId(id);
-    let password = String(await getAccountPasswordUsingAccountId(id));
+    let inputArr = accountFullString.split("/")
+    let username = inputArr[0]
+    let password = inputArr[1]
     let skills = await getAllSkillsMapOfAccount(id);
     let assignedProjectList = await databaseClass.getAllProjectsAssignedToAnAccountUsingAccountId(id);
     return new accountClass(id, username, password, skills, assignedProjectList, null);

@@ -204,9 +204,6 @@ async function getConfirmationUsingSkillIdAndAccountId(skillId, accountId) {
 
 
 
-(async () => {
-    console.log(await Skill.query())
-})()
 
 module.exports = {
     saveProject,
