@@ -59,6 +59,7 @@ async function loadMenus() {
             await loadGetAccountByIdMenu()
 
 
+
         } else if (selectedMenu === "6") {
             await loadAddBidMenu();
 

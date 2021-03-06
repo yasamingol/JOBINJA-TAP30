@@ -67,8 +67,8 @@ async function buildFullBidUsingBidID(bidID) {
 async function viewAllAccounts() {
     let allAccountsArr = [];
     let numberOfAccounts = await getNumberOfRowsOfAccountsTable();
-    for (let i = 0; i < numberOfAccounts; i++) {
-        let accountName = await getAccountUsernameUsingAccountId(i);
+    for (let i = 1; i <= numberOfAccounts; i++) {
+        let accountName = await getAccountUsernameUsingAccountId(i+"");
         allAccountsArr[i] = (i + "." + accountName);
     }
     return allAccountsArr;
