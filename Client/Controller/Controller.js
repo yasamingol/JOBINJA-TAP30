@@ -68,7 +68,7 @@ async function viewAllAccounts() {
     let allAccountsArr = [];
     let numberOfAccounts = await getNumberOfRowsOfAccountsTable();
     for (let i = 1; i <= numberOfAccounts; i++) {
-        let accountName = await getAccountUsernameUsingAccountId(i+"");
+        let accountName = await getAccountUsernameUsingAccountId(i);
         allAccountsArr[i] = (i + "." + accountName);
     }
     return allAccountsArr;
@@ -389,8 +389,8 @@ async function checkIfAccountHasSkill(accountID, skillID) {
 
 //confirm Skill
 async function confirmSkill(conformerAccountUsername, targetAccountUsername, skillName) {
-    let sourceUserID = await getAccountIDUsingAccountUsername(conformerAccountUsername);
-    let otherUserID = await getAccountIDUsingAccountUsername(targetAccountUsername);
+    let sourceUserID = parseInt(await getAccountIDUsingAccountUsername(conformerAccountUsername));
+    let otherUserID = parseInt(await getAccountIDUsingAccountUsername(targetAccountUsername));
     let skill = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, otherUserID);
     let skillID = skill.id
     let hasConfirmedBefore = await checkIfConfirmedBefore(sourceUserID, skillID);
