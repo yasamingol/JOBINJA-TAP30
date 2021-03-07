@@ -130,7 +130,7 @@ async function buildAvailableProjects(accountID, numberOfProjects) {
 //register
 async function register(username, skillsArr, password) {
     let messagesDuringRegistration;
-    let id = await getNumberOfRowsOfAccountsTable();
+    let id = await getNumberOfRowsOfAccountsTable()+1;
     let skills = new Map;
     messagesDuringRegistration = buildSkillsMap(skillsArr, skills);
     let account = new accountClass(id, username, password, skills, [], new Map);

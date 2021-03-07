@@ -202,9 +202,9 @@ async function getConfirmationUsingSkillIdAndAccountId(skillId, accountId) {
 
 
 (async () => {
-
-    let skill = await getSkillIdUsingSkillNameAndAccountID("C",2);
-    console.log(skill)
+    console.log(await Skill.query())
+     // let skill = await getSkillIdUsingSkillNameAndAccountID("C",2);
+    // console.log(skill)
 
 })()
 
