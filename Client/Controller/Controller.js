@@ -633,7 +633,8 @@ module.exports = {
     calculateBestBid: findTheBestUserIdBidingOnProject,
     calculateUserSkill,
     checkIfSkilledEnough,
-    checkIfBidEnough
+    checkIfBidEnough,
+    getFullAccountById
 
 
 
