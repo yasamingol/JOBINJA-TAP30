@@ -319,8 +319,8 @@ async function createListOfBidsForProject(projectID) {
 }
 
 async function calculateUserSkill(bid) {
-    let project = await buildFullProjectByGettingID(bid.projectID);
-    let account = await buildFullAccountByGettingID(bid.userID);
+    let project = await this.buildFullProjectByGettingID(bid.projectID);
+    let account = await this.buildFullAccountByGettingID(bid.userID);
     let jobOffer = project.budget;
     let userOffer = bid.bidAmount;
     let skillSum = 0;
@@ -634,10 +634,9 @@ module.exports = {
     calculateUserSkill,
     checkIfSkilledEnough,
     checkIfBidEnough,
-    getFullAccountById
-
-
-
+    getFullAccountById,
+    buildFullProjectByGettingID,
+    buildFullAccountByGettingID
 }
 
 
