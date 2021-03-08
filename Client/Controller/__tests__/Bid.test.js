@@ -1,5 +1,7 @@
 
 
+
+
 test('checking checkIfSkilledEnoughenough to bid - ali should be skilled enough',() => {
     expect(clientClass.checkIfSkilledEnough("ali","tap30")).toBe(true);
 })
