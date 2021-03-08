@@ -6,7 +6,7 @@ const dao = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js'
         dao.getProjectById = jest.fn().mockResolvedValueOnce({title:"tapsi",budget:200})
         let project = dao.getProjectById(1);
         project.then(function (result){
-           console.log('result',result)
+           expect(result.title).toEqual("tapsi")
         })
 
 
