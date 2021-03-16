@@ -18,9 +18,7 @@ class Project {
         Project.allProjects[Project.allProjects.length] = this;
     }
 
-    static async getProjectByTitle(title) {
 
-    }
 
     static async getProjectById(id) {
         let project = await Project.buildFullProjectByGettingID(id);
@@ -40,7 +38,60 @@ class Project {
         return new Project(id, title, skills, budget, listOfBids,
             deadLine, isAvailable, assignedAccountId);
 
+
     }
+
+
+    static async viewAllProjects() {
+        let allProjectsArray = [];
+        let numberOfProjects = await databaseClass.getNumberOfAllProjects();
+        for (let i = 1; i <= numberOfProjects; i++) {
+            let project = await databaseClass.getProjectById(i);
+            let projectsTitle = project.title;
+            allProjectsArray[i] = (i + "." + projectsTitle);
+        }
+        return allProjectsArray;
+    }
+
+    static async saveProjectInfo(project) {
+        await databaseClass.saveProject(project);
+        let projectCreate = await databaseClass.getProjectByProjectTitle(project.title);
+        for (const [key, value] of project.skills) {
+            await databaseClass.saveProjectSkill(key, value, projectCreate.id);
+        }
+    }
+
+    static async createListOfBidsForProject(projectID) {
+        let listOfBids = await databaseClass.getBidsOfProjectByProjectId(projectID);
+        return listOfBids;
+
+    }
+
+    static async getAllSkillsMapOfProject(projectID) {
+        let skillsArray = await databaseClass.getProjectSkills(projectID);
+        return await controller.convertSkillsArrayToSkillsMap(skillsArray);
+    }
+
+    static async addProject(title, budget, deadLine, skillsArr) {
+        let messagesDuringAddProject;
+        let skills = new Map;
+        let deadline = controller.stringToDateConverter(deadLine);
+        messagesDuringAddProject = controller.buildSkillsMap(skillsArr, skills);
+        let project = new Project(null,title,skills,budget,[],deadline,true,null)
+        await Project.saveProjectInfo(project);
+        messagesDuringAddProject[messagesDuringAddProject.length] = ("project built successfully!\n".green);
+        return messagesDuringAddProject;
+    }
+
+
+
+    static async assignProject(userID, projectID) {
+        await databaseClass.updateProjectAssignedAccountId(projectID, userID);
+    }
+
+
+
+
 
 }
 module.exports = Project;

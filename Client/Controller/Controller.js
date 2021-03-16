@@ -18,28 +18,6 @@ const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBa
 
 /***********************************************MainFunctionsInMenu***************************************************/
 
-
-
-
-async function getAccountById(id) {
-    let account = await buildFullAccountByGettingID(id);
-    return account;
-
-}
-
-async function buildFullAccountByGettingID(id) {
-    let accountFullString = await getFullAccountById(id);
-    let inputArr = accountFullString.split("/")
-    let username = inputArr[0]
-    let password = inputArr[1]
-    let skills = await getAllSkillsMapOfAccount(id);
-    let assignedProjectList = await databaseClass.getAllProjectsAssignedToAnAccountUsingAccountId(id);
-    return new accountClass(id, username, password, skills, assignedProjectList, null);
-
-}
-
-
-
 async function buildFullBidUsingBidID(bidID) {
     let bid = await databaseClass.getBidById(bidID)
     let userId = bid.userId;
@@ -48,109 +26,20 @@ async function buildFullBidUsingBidID(bidID) {
     return new bidClass(bidID, userId, projectId, bidAmount);
 }
 
-async function viewAllAccounts() {
-    let allAccountsArr = [];
-    let numberOfAccounts = await getNumberOfRowsOfAccountsTable();
-    for (let i = 1; i <= numberOfAccounts; i++) {
-        let accountName = await getAccountUsernameUsingAccountId(i);
-        allAccountsArr[i] = (i + "." + accountName);
-    }
-    return allAccountsArr;
-}
 
-async function viewAllProjects() {
-    let allProjectsArray = [];
-    let numberOfProjects = await databaseClass.getNumberOfAllProjects();
-    for (let i = 1; i <= numberOfProjects; i++) {
-        let project = await databaseClass.getProjectById(i);
-        let projectsTitle = project.title;
-        allProjectsArray[i] = (i + "." + projectsTitle);
-    }
-    return allProjectsArray;
-}
+
 
 async function getAllSkillsMapOfAccount(accountID) {
     let skillArray = await databaseClass.getAccountSkills(accountID);
     return await convertSkillsArrayToSkillsMap(skillArray);
 }
 
-async function getAllSkillsMapOfProject(projectID) {
-    let skillsArray = await databaseClass.getProjectSkills(projectID);
-    return await convertSkillsArrayToSkillsMap(skillsArray);
-}
+
 
 /*****************************************Logical/Computational-Functions*********************************************/
 
-async function viewAvailableProjects(username) {
-    let error = [];
-    let accountID = await getAccountIDUsingAccountUsername(username);
-    let numberOfProjects = await databaseClass.getNumberOfAllProjects();
-    let {availableProjectArr, hasMinOneAvailable} = await buildAvailableProjects(accountID, numberOfProjects);
-    if (hasMinOneAvailable) {
-        return availableProjectArr;
-    } else {
-        error[0] = "There are no projects available for you now!".red;
-        return error;
-    }
-}
-
-async function buildAvailableProjects(accountID, numberOfProjects) {
-    let availableProjectArr = [];
-    let hasMinOneAvailable = false;
-    for (let i = 1; i <= numberOfProjects; i++) {
-        let project = await databaseClass.getProjectById(i);
-        let projectsTitle = project.title;
-        if (await checkIfSkilledEnough(accountID, i)) {
-            availableProjectArr[i] = (i + "." + projectsTitle);
-            hasMinOneAvailable = true;
-        }
-    }
-    return {
-        availableProjectArr: availableProjectArr,
-        hasMinOneAvailable: hasMinOneAvailable
-    };
-}
-
 //register
-async function register(username, skillsArr, password) {
-    let messagesDuringRegistration;
-    let id = await getNumberOfRowsOfAccountsTable()+1;
-    let skills = new Map;
-    messagesDuringRegistration = buildSkillsMap(skillsArr, skills);
-    let account = new accountClass(id, username, password, skills, [], new Map);
-    await saveRegisterInfoInDB(account);
-    messagesDuringRegistration[messagesDuringRegistration.length] = ("registered successfully!\n".green);
-    return messagesDuringRegistration;
 
-}
-
-async function saveRegisterInfoInDB(account) {
-    await saveAccount(account.username,account.password);
-    for (const [key, value] of account.skills) {
-        await databaseClass.saveAccountSkill(key, value, account.id);
-    }
-}
-
-
-//addProject
-async function addProject(title, budget, deadLine, skillsArr) {
-    let messagesDuringAddProject;
-    let skills = new Map;
-    let deadline = stringToDateConverter(deadLine);
-    messagesDuringAddProject = buildSkillsMap(skillsArr, skills);
-    let project = new projectClass(null,title,skills,budget,[],deadline,true,null)
-    await saveProjectInfo(project);
-    messagesDuringAddProject[messagesDuringAddProject.length] = ("project built successfully!\n".green);
-    return messagesDuringAddProject;
-}
-
-async function saveProjectInfo(project) {
-    await databaseClass.saveProject(project);
-    let projectCreate = await databaseClass.getProjectByProjectTitle(project.title);
-    for (const [key, value] of project.skills) {
-        await databaseClass.saveProjectSkill(key, value, projectCreate.id);
-    }
-}
 
 function buildSkillsMap(skillsArr, skills) {
     let arrOfMessagesWhileBuildingSKillsMap = [];
@@ -170,7 +59,7 @@ function buildSkillsMap(skillsArr, skills) {
 }
 
 
-//addBid
+
 async function addBid(biddingUsername, projectTitle, bidAmount) {
     let addBidsFinalMessage;
     let project = await databaseClass.getProjectByProjectTitle(projectTitle)
@@ -299,11 +188,7 @@ async function calculateToFindTheBestBid(listOfBidIDsForProject) {
     return bestUserId;
 }
 
-async function createListOfBidsForProject(projectID) {
-    let listOfBids = await databaseClass.getBidsOfProjectByProjectId(projectID);
-    return listOfBids;
 
-}
 
 async function calculateUserSkill(bid) {
     let project = await this.buildFullProjectByGettingID(bid.projectID);
@@ -317,10 +202,6 @@ async function calculateUserSkill(bid) {
         skillSum += 1000 * ((userSkill - jobSkill) * (userSkill - jobSkill));
     })
     return skillSum + (jobOffer - userOffer);
-}
-
-async function assignProject(userID, projectID) {
-    await databaseClass.updateProjectAssignedAccountId(projectID, userID);
 }
 
 
@@ -439,19 +320,6 @@ async function convertSkillsArrayToSkillsMap(arr) {
 
 
 //login
-async function login(username, password) {
-    let accountId = await getAccountIDUsingAccountUsername(username);
-    let account = await buildFullAccountByGettingID(accountId);
-    let time = Date.now();
-    if (account.password === password) {
-        let token = await sendLoginInfoAndReciveTokenFromServer(username, password);
-        return "login successfully! your loginToken : ".green + token;
-    } else {
-        return "incorrect password! please try again.".red;
-    }
-
-
-}
 
 
 /***********************************************Tool-Functions*********************************************************/
@@ -601,18 +469,13 @@ function deserializeAllSkills(body) {
 
 
 module.exports = {
-    getAccountById,
     viewAllAccounts,
-    viewAllProjects,
-    viewAvailableProjects,
+    viewAvailableProjects: viewAvailableProjectsForAccount,
     register,
-    addProject,
     addBid,
-    holdAuctionsForAllProjects,
     addSkill,
     removeSkill,
     confirmSkill,
-    getAllSkillsFromServer,
     holdAuction,
     login,
     validateTokenFromServer,
@@ -622,12 +485,21 @@ module.exports = {
     calculateUserSkill,
     checkIfSkilledEnough,
     checkIfBidEnough,
-    getFullAccountById,
-    buildFullAccountByGettingID,
     buildFullBidUsingBidID,
     calculateToFindTheBestBid,
-    getAllSkillsMapOfProject,
-    createListOfBidsForProject
+    convertSkillsArrayToSkillsMap,
+    stringToDateConverter,
+    buildSkillsMap,
+    projectClass,
+    getAllSkillsMapOfAccount,
+    getFullAccountById,
+    getAccountIDUsingAccountUsername,
+    getNumberOfRowsOfAccountsTable,
+    getAccountUsernameUsingAccountId,
+    sendLoginInfoAndReciveTokenFromServer
+
+
+
 }
 
 
