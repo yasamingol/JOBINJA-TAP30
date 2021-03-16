@@ -1,9 +1,9 @@
 // const dao = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js')
-const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Controller/Controller.js')
-const Bid = require('/home/tapsi/IdeaProjects/concurency/Client/Model/Classes/Bid.js')
+const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Controller.js')
+const Bid = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Bid.js')
 
-const Project = require('../../Model/Classes/Project')
-const Account = require('../../Model/Classes/Account')
+const Project = require('../Model/Classes/Project')
+const Account = require('../Model/Classes/Account')
 
 
 

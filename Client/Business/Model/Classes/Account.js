@@ -1,7 +1,7 @@
 // const databaseClass = require('../DataBase/database');
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Controller/Controller.js');
+const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Controller.js');
 const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
 
 
@@ -111,6 +111,26 @@ class Account {
 
 
     }
+
+
+    static async checkIfAccountHasSkill(accountID, skillID) {
+        let hasThisSkill = false;
+        let skillsMap = await getAllSkillsMapOfAccount(accountID);
+        let skill = await databaseClass.getSkillById(skillID);
+        let skillName = skill.skillName;
+        skillsMap.forEach((value, key) => {
+            if (key === skillName) {
+                hasThisSkill = true;
+            }
+        })
+        return hasThisSkill;
+
+    }
+    static async getAllSkillsMapOfAccount(accountID) {
+        let skillArray = await databaseClass.getAccountSkills(accountID);
+        return await controller.convertSkillsArrayToSkillsMap(skillArray);
+    }
+
 
 
 

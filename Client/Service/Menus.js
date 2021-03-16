@@ -1,7 +1,7 @@
 /***************************************************SettingUpDataBase**************************************************/
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const controllerClass = require("../Controller/Controller.js");
+const controllerClass = require("../Business/Controller.js");
 
 /****************************************************requirements******************************************************/
 //requirements
@@ -12,10 +12,10 @@ const prompt = require('prompt-sync')();
 const colors = require('colors');
 
 //importing classes
-const accountClass = require("../Model/Classes/Account");
-const projectClass = require("../Model/Classes/Project");
-const bidClass = require("../Model/Classes/Bid");
-const auctionClass = require("../Model/Classes/Auction");
+const accountClass = require("../Business/Model/Classes/Account");
+const projectClass = require("../Business/Model/Classes/Project");
+const bidClass = require("../Business/Model/Classes/Bid");
+const auctionClass = require("../Business/Model/Classes/Auction");
 
 
 

@@ -5,7 +5,7 @@ const Bid = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/
 const Auction = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Auction.js');
 
 /*****************************************************Project*********************************************************/
-const projectClass = require('/home/tapsi/IdeaProjects/concurency/Client/Model/Classes/Project.js')
+const projectClass = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js')
 
 //projects functions
 async function saveProject(project) {
@@ -112,7 +112,7 @@ async function getNumberOfAllSkills() {
 
 
 /*****************************************************Auction*********************************************************/
-const auctionClass = require('/home/tapsi/IdeaProjects/concurency/Client/Model/Classes/Auction.js')
+const auctionClass = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Auction.js')
 
 async function saveAuction(auction) {
     await Auction.query().insert(
@@ -140,7 +140,7 @@ async function getNumberOfAllAuctions() {
 
 
 /*******************************************************Bid***********************************************************/
-const bidClass = require('/home/tapsi/IdeaProjects/concurency/Client/Model/Classes/Bid.js')
+const bidClass = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Bid.js')
 
 // Bids functions
 async function saveBid(bid) {

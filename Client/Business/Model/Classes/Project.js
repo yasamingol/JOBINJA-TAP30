@@ -1,8 +1,8 @@
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
-const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Controller/Controller.js');
+const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Controller.js');
 const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
-
+const Bid = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Bid.js');
 
 class Project {
     static allProjects = [];
@@ -87,6 +87,16 @@ class Project {
 
     static async assignProject(userID, projectID) {
         await databaseClass.updateProjectAssignedAccountId(projectID, userID);
+    }
+
+    static async findTheBestUserIdBidingOnProject(projectId) {
+        let listOfBidIDsForProject = await Project.createListOfBidsForProject(projectId);
+        if (listOfBidIDsForProject.length !== 0) {
+            return await Bid.calculateToFindTheBestBid(listOfBidIDsForProject);
+
+        } else {
+            return null;
+        }
     }
 
 
