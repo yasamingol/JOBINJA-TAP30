@@ -1,5 +1,7 @@
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
+const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Controller/Controller.js');
+const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
 
 
 class Project {
@@ -17,6 +19,26 @@ class Project {
     }
 
     static async getProjectByTitle(title) {
+
+    }
+
+    static async getProjectById(id) {
+        let project = await Project.buildFullProjectByGettingID(id);
+        return project;
+    }
+
+    static async buildFullProjectByGettingID(id) {
+        let projectFullString = await databaseClass.getProjectById(id);
+        let title = projectFullString.title
+        let skills = await controller.getAllSkillsMapOfProject(id);
+        let budget = projectFullString.budget;
+        let deadLine = projectFullString.deadline;
+        let isAvailable = projectFullString.isAvailable;
+        let assignedAccountId = projectFullString.assignedAccountId;
+        let listOfBids = await controller.createListOfBidsForProject(id);
+
+        return new Project(id, title, skills, budget, listOfBids,
+            deadLine, isAvailable, assignedAccountId);
 
     }
 

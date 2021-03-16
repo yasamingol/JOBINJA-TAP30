@@ -18,10 +18,7 @@ const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBa
 
 /***********************************************MainFunctionsInMenu***************************************************/
 
-async function getProjectById(id) {
-    let project = await buildFullProjectByGettingID(id);
-    return project;
-}
+
 
 
 async function getAccountById(id) {
@@ -41,20 +38,7 @@ async function buildFullAccountByGettingID(id) {
 
 }
 
-async function buildFullProjectByGettingID(id) {
-    let projectFullString = await databaseClass.getProjectById(id);
-    let title = projectFullString.title
-    let skills = await getAllSkillsMapOfProject(id);
-    let budget = projectFullString.budget;
-    let deadLine = projectFullString.deadline;
-    let isAvailable = projectFullString.isAvailable;
-    let assignedAccountId = projectFullString.assignedAccountId;
-    let listOfBids = await createListOfBidsForProject(id);
 
-    return new projectClass(id, title, skills, budget, listOfBids,
-        deadLine, isAvailable, assignedAccountId);
-
-}
 
 async function buildFullBidUsingBidID(bidID) {
     let bid = await databaseClass.getBidById(bidID)
@@ -185,6 +169,7 @@ function buildSkillsMap(skillsArr, skills) {
     return arrOfMessagesWhileBuildingSKillsMap;
 }
 
+
 //addBid
 async function addBid(biddingUsername, projectTitle, bidAmount) {
     let addBidsFinalMessage;
@@ -233,6 +218,8 @@ async function checkIfValidDateToBid(projectId) {
     return parseInt(projectDeadline) >= parseInt(localDate/10000000000);
 
 }
+
+
 
 //holdAuctions
 async function holdAuctionsForAllProjects() {
@@ -302,8 +289,8 @@ async function calculateToFindTheBestBid(listOfBidIDsForProject) {
     let bestUserId;
     for (let i = 0; i < listOfBidIDsForProject.length; i++) {
         let bidId = listOfBidIDsForProject[i].id
-        let bid = await buildFullBidUsingBidID(bidId);
-        let userSkill = parseInt(await calculateUserSkill(bid));
+        let bid = await this.buildFullBidUsingBidID(bidId);
+        let userSkill = parseInt(await this.calculateUserSkill(bid));
         if (userSkill > bestBid) {
             bestBid = userSkill;
             bestUserId = bid.userID;
@@ -449,13 +436,14 @@ async function convertSkillsArrayToSkillsMap(arr) {
     return skillMap;
 }
 
+
+
 //login
 async function login(username, password) {
     let accountId = await getAccountIDUsingAccountUsername(username);
     let account = await buildFullAccountByGettingID(accountId);
     let time = Date.now();
     if (account.password === password) {
-        //inja bayad baraye khate baad az server token begirim
         let token = await sendLoginInfoAndReciveTokenFromServer(username, password);
         return "login successfully! your loginToken : ".green + token;
     } else {
@@ -490,6 +478,7 @@ function stringToDateConverter(string) {
     console.log(date);
     return date;
 }
+
 /**********************************************PythonServer-Methods*********************************************/
 async function sendLoginInfoAndReciveTokenFromServer(username,password) {
     try {
@@ -612,7 +601,6 @@ function deserializeAllSkills(body) {
 
 
 module.exports = {
-    getProjectById,
     getAccountById,
     viewAllAccounts,
     viewAllProjects,
@@ -635,8 +623,11 @@ module.exports = {
     checkIfSkilledEnough,
     checkIfBidEnough,
     getFullAccountById,
-    buildFullProjectByGettingID,
-    buildFullAccountByGettingID
+    buildFullAccountByGettingID,
+    buildFullBidUsingBidID,
+    calculateToFindTheBestBid,
+    getAllSkillsMapOfProject,
+    createListOfBidsForProject
 }
 
 

@@ -21,11 +21,14 @@ const auctionClass = require("../Model/Classes/Auction");
 
 //global vars
 let allSkills = [];
-//using database
+
+
+
+//loading menus...
 (async () => {
 
-    await controllerClass.getAllSkillsFromServer(request);
-    await loadMenus();
+    // await controllerClass.getAllSkillsFromServer(request);
+    // await loadMenus();
 
 
 })()
@@ -115,6 +118,7 @@ function showAvailableMenus() {
 async function loadAllProjectsMenu() {
     console.log("\n View all projects menu : ".cyan + "<token>".green);
     let token = prompt("");
+
     if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))){
         let projectsArray = await controllerClass.viewAllProjects();
         projectsArray.forEach((project) => {
@@ -129,6 +133,7 @@ async function loadViewAvailableProjectsMenu() {
     let inputArr = prompt("").split(" ");
     let username = inputArr[0];
     let token = inputArr[1];
+
     if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log("\n Available projects : ".green);
         let availableProjectsArr = await controllerClass.viewAvailableProjects(username);
@@ -143,6 +148,7 @@ async function loadGetProjectByIdMenu() {
     let inputArr = prompt("").split(" ");
     let projectId = parseInt(inputArr[0]);
     let token = inputArr[1];
+
     if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.getProjectById(projectId));
     }
@@ -152,6 +158,7 @@ async function loadGetProjectByIdMenu() {
 async function loadViewAllAccountsMenu() {
     console.log("\nView all accounts menu".cyan + "<token>".green);
     let token = prompt("");
+
     if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         let allAccountsArr = await controllerClass.viewAllAccounts();
         allAccountsArr.forEach((account) => {
@@ -166,6 +173,7 @@ async function loadGetAccountByIdMenu() {
     let inputArr = prompt("").split(" ");
     let accountId = parseInt(inputArr[0]);
     let token = inputArr[1];
+
     if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.getAccountById(accountId));
     }
@@ -180,6 +188,7 @@ async function loadAddBidMenu() {
     let projectTitle = inputArr[2];
     let bidAmount = parseInt(inputArr[3]);
     let token = inputArr[4];
+
     if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.addBid(biddingUsername, projectTitle, bidAmount));
     }
@@ -194,6 +203,7 @@ async function loadConfirmSkillMenu() {
     let targetAccountUsername = inputArr[2];
     let skillName = inputArr[3];
     let token = inputArr[4];
+
     if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.confirmSkill(conformerAccountUsername, targetAccountUsername, skillName));
     }
@@ -205,6 +215,7 @@ async function loadAddSkillMenu() {
     const inputArr = prompt("").split(" ");
     let username = inputArr[1];
     let token = inputArr[3];
+
     if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         let arrSkills = inputArr[2].split(":");
         let skillName = arrSkills[0];
@@ -221,6 +232,7 @@ async function loadRemoveSkillMenu() {
     let username = inputArr[1];
     let skillName = inputArr[2];
     let token = inputArr[3];
+
     if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.removeSkill(username, skillName));
     }
@@ -250,6 +262,7 @@ async function loadAddProjectMenu() {
     let deadLine = inputArr[inputArr.length - 2];
     let skillsArr = inputArr.slice(2, inputArr.length - 3);
     let token = inputArr[inputArr.length-1]
+
     if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         let addProjectArr = await controllerClass.addProject(title, budget, deadLine, skillsArr);
         addProjectArr.forEach((message) => {
@@ -266,6 +279,7 @@ async function loadHoldAuctionMenu() {
     let inputArr = prompt("").split(" ");
     let projectId = parseInt(inputArr[1]);
     let token = inputArr[2];
+
     if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await controllerClass.holdAuction(projectId));
     }
@@ -291,7 +305,6 @@ async function checkIfAnyErrorsApearedDuringTokenValidation(token){
         return false;
     }
 }
-
 /************************************************TestExamplesFormDB***************************************************/
 
 
