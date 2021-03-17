@@ -1,5 +1,5 @@
 const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
-const viewClass = require("../View/Menus.js");
+const viewClass = require("/home/tapsi/IdeaProjects/concurency/Client/Service/Menus.js");
 const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
 
 

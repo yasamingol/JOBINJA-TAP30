@@ -1,37 +1,15 @@
-/***************************************************SettingUpDataBase**************************************************/
-const sqlite3 = require('sqlite3');
-const sqlite = require('sqlite');
-const controllerClass = require("../Business/Controller.js");
-
 /****************************************************requirements******************************************************/
-//requirements
-const request = require('request');
-const util = require('util');
-const axios = require('axios');
 const prompt = require('prompt-sync')();
 const colors = require('colors');
 
 //importing classes
-const accountClass = require("../Business/Model/Classes/Account");
-const projectClass = require("../Business/Model/Classes/Project");
-const bidClass = require("../Business/Model/Classes/Bid");
-const auctionClass = require("../Business/Model/Classes/Auction");
+
 
 
 
 //global vars
 let allSkills = [];
 
-
-
-//loading menus...
-(async () => {
-
-    // await controllerClass.getAllSkillsFromServer(request);
-    // await loadMenus();
-
-
-})()
 /****************************************************Main-Menus********************************************************/
 async function loadMenus() {
 
@@ -305,7 +283,13 @@ async function checkIfAnyErrorsApearedDuringTokenValidation(token){
         return false;
     }
 }
-/************************************************TestExamplesFormDB***************************************************/
 
+
+
+
+module.exports = {
+    loadMenus,
+    allSkills
+}
 
 

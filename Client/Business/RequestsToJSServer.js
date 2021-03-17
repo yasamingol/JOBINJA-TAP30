@@ -1,4 +1,4 @@
-const viewClass = require("../View/Menus.js");
+const viewClass = require("/home/tapsi/IdeaProjects/concurency/Client/Service/Menus.js");
 const util = require('util');
 
 async function getAllSkillsFromServer(request) {
