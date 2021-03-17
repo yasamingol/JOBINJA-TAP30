@@ -25,7 +25,7 @@ class Account {
 
 
    static async buildFullAccountByGettingID(id) {
-        let accountFullString = await Account.getFullAccountById(id);
+        let accountFullString = await requestsToPyServer.getFullAccountById(id);
         let inputArr = accountFullString.split("/")
         let username = inputArr[0]
         let password = inputArr[1]

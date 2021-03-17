@@ -23,6 +23,32 @@ class Confirmation extends Model {
 
         }
     }
+
+
+    static async saveConfirmation(skillId, sourceAccountId) {
+        await Confirmation.query().insert(
+            {
+                skillId: skillId,
+                sourceAccountId: sourceAccountId
+            }
+        )
+        console.log("confirmation saved successfully!")
+    }
+
+    static async getConfirmationById(id) {
+        let confirmation = await Confirmation.query().findById(id);
+        return confirmation;
+    }
+
+    static async getConfirmationUsingSkillIdAndAccountId(skillId, accountId) {
+        try {
+            let confirmation = await Confirmation.query().where('skillId', skillId).where('sourceAccountId',accountId)
+            return confirmation;
+        }catch (e) {
+            return undefined
+        }
+
+    }
 }
 
 
