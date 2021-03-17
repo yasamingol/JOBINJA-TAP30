@@ -1,8 +1,9 @@
-const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
 const Bid = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Bid.js');
 const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Skill.js');
 const toolFunctions = require('/home/tapsi/IdeaProjects/concurency/Client/Business/ToolFunctions.js');
-
+const projectDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Project.js');
+const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
+const bidDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Bid.js');
 
 class Project {
     static allProjects = [];
@@ -26,7 +27,7 @@ class Project {
     }
 
     static async buildFullProjectByGettingID(id) {
-        let projectFullString = await databaseClass.getProjectById(id);
+        let projectFullString = await projectDAO.getProjectById(id);
         let title = projectFullString.title
         let skills = await Project.getAllSkillsMapOfProject(id);
         let budget = projectFullString.budget;
@@ -44,9 +45,9 @@ class Project {
 
     static async viewAllProjects() {
         let allProjectsArray = [];
-        let numberOfProjects = await databaseClass.getNumberOfAllProjects();
+        let numberOfProjects = await projectDAO.getNumberOfAllProjects();
         for (let i = 1; i <= numberOfProjects; i++) {
-            let project = await databaseClass.getProjectById(i);
+            let project = await projectDAO.getProjectById(i);
             let projectsTitle = project.title;
             allProjectsArray[i] = (i + "." + projectsTitle);
         }
@@ -54,21 +55,21 @@ class Project {
     }
 
     static async saveProjectInfo(project) {
-        await databaseClass.saveProject(project);
-        let projectCreate = await databaseClass.getProjectByProjectTitle(project.title);
+        await projectDAO.saveProject(project);
+        let projectCreate = await projectDAO.getProjectByProjectTitle(project.title);
         for (const [key, value] of project.skills) {
-            await databaseClass.saveProjectSkill(key, value, projectCreate.id);
+            await skillDAO.saveProjectSkill(key, value, projectCreate.id);
         }
     }
 
     static async createListOfBidsForProject(projectID) {
-        let listOfBids = await databaseClass.getBidsOfProjectByProjectId(projectID);
+        let listOfBids = await bidDAO.getBidsOfProjectByProjectId(projectID);
         return listOfBids;
 
     }
 
     static async getAllSkillsMapOfProject(projectID) {
-        let skillsArray = await databaseClass.getProjectSkills(projectID);
+        let skillsArray = await skillDAO.getProjectSkills(projectID);
         return await Skill.convertSkillsArrayToSkillsMap(skillsArray);
     }
 
@@ -86,7 +87,7 @@ class Project {
 
 
     static async assignProject(userID, projectID) {
-        await databaseClass.updateProjectAssignedAccountId(projectID, userID);
+        await projectDAO.updateProjectAssignedAccountId(projectID, userID);
     }
 
     static async findTheBestUserIdBidingOnProject(projectId) {

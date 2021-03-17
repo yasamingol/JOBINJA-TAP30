@@ -1,7 +1,9 @@
-const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
 const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
 const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Skill.js');
 const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
+const projectDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Project.js');
+const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
+
 
 
 class Account {
@@ -30,7 +32,7 @@ class Account {
         let username = inputArr[0]
         let password = inputArr[1]
         let skills = await Account.getAllSkillsMapOfAccount(id);
-        let assignedProjectList = await databaseClass.getAllProjectsAssignedToAnAccountUsingAccountId(id);
+        let assignedProjectList = await projectDAO.getAllProjectsAssignedToAnAccountUsingAccountId(id);
         return new Account(id, username, password, skills, assignedProjectList, null);
 
     }
@@ -49,7 +51,7 @@ class Account {
     static async viewAvailableProjectsForAccount(username) {
         let error = [];
         let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
-        let numberOfProjects = await databaseClass.getNumberOfAllProjects();
+        let numberOfProjects = await projectDAO.getNumberOfAllProjects();
         let {availableProjectArr, hasMinOneAvailable} = await Account.buildAvailableProjectsForAccount(accountID, numberOfProjects);
         if (hasMinOneAvailable) {
             return availableProjectArr;
@@ -64,7 +66,7 @@ class Account {
         let availableProjectArr = [];
         let hasMinOneAvailable = false;
         for (let i = 1; i <= numberOfProjects; i++) {
-            let project = await databaseClass.getProjectById(i);
+            let project = await projectDAO.getProjectById(i);
             let projectsTitle = project.title;
             if (await Account.checkIfSkilledEnough(accountID, i)) {
                 availableProjectArr[i] = (i + "." + projectsTitle);
@@ -92,7 +94,7 @@ class Account {
     static async saveRegisterInfoInDB(account) {
         await requestsToPyServer.saveAccount(account.username,account.password);
         for (const [key, value] of account.skills) {
-            await databaseClass.saveAccountSkill(key, value, account.id);
+            await skillDAO.saveAccountSkill(key, value, account.id);
         }
     }
 
@@ -115,7 +117,7 @@ class Account {
     static async checkIfAccountHasSkill(accountID, skillID) {
         let hasThisSkill = false;
         let skillsMap = await Account.getAllSkillsMapOfAccount(accountID);
-        let skill = await databaseClass.getSkillById(skillID);
+        let skill = await skillDAO.getSkillById(skillID);
         let skillName = skill.skillName;
         skillsMap.forEach((value, key) => {
             if (key === skillName) {
@@ -126,7 +128,7 @@ class Account {
 
     }
     static async getAllSkillsMapOfAccount(accountID) {
-        let skillArray = await databaseClass.getAccountSkills(accountID);
+        let skillArray = await skillDAO.getAccountSkills(accountID);
         return await Skill.convertSkillsArrayToSkillsMap(skillArray);
     }
 

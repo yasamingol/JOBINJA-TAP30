@@ -1,7 +1,5 @@
-const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
-const viewClass = require("/home/tapsi/IdeaProjects/concurency/Client/Service/Menus.js");
 const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
-
+const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
 
 
 class Skill{
@@ -44,7 +42,7 @@ class Skill{
    static async addSkill(username, skillName, skillPoint) {
         let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
         if (Skill.checkIfSkillIsValid(skillName)) {
-            await databaseClass.saveAccountSkill(skillName, skillPoint, accountID);
+            await skillDAO.saveAccountSkill(skillName, skillPoint, accountID);
             return ("skill added successfully!\n".green);
         } else {
             return ("such skill does not exist!".red);
@@ -64,10 +62,10 @@ class Skill{
 
     static async removeSkill(username, skillName) {
         let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
-        let skill = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
+        let skill = await skillDAO.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
         let skillID = skill.id;
         if (await Skill.checkIfAccountHasSkill(accountID, skillID)) {
-            await databaseClass.deleteSkillOfAccountUsingSkillName(skillID);
+            await skillDAO.deleteSkillOfAccountUsingSkillName(skillID);
             return ("skill removed successfully!\n".green);
 
         } else {
@@ -79,7 +77,7 @@ class Skill{
         let skillMap = new Map();
         for (let i = 0; i < arr.length; i++) {
             let skillID = arr[i].id;
-            let skill = await databaseClass.getSkillById(skillID)
+            let skill = await skillDAO.getSkillById(skillID)
             let skillName = skill.skillName;
             let skillPoint = skill.skillPoint;
             skillMap.set(skillName, skillPoint);

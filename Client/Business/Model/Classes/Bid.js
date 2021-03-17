@@ -1,8 +1,7 @@
-const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
 const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
 const Account = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Account.js');
-
-
+const projectDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Project.js');
+const bidDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Bid.js');
 
 class Bid {
     static allBids = [];
@@ -16,7 +15,7 @@ class Bid {
 
 
     static async buildFullBidUsingBidID(bidID) {
-        let bid = await databaseClass.getBidById(bidID)
+        let bid = await bidDAO.getBidById(bidID)
         let userId = bid.userId;
         let projectId = bid.projectId;
         let bidAmount = bid.bidAmount;
@@ -29,7 +28,7 @@ class Bid {
 
    static async addBid(biddingUsername, projectTitle, bidAmount) {
         let addBidsFinalMessage;
-        let project = await databaseClass.getProjectByProjectTitle(projectTitle)
+        let project = await projectDAO.getProjectByProjectTitle(projectTitle)
         let projectId = project.id;
         let accountId = await requestsToPyServer.getAccountIDUsingAccountUsername(biddingUsername);
         let bid = new Bid(null,accountId,projectId,bidAmount);
@@ -39,7 +38,7 @@ class Bid {
 
 
     static async handlingAddBidErrors( bid) {
-        let project = await databaseClass.getProjectById(bid.projectID);
+        let project = await projectDAO.getProjectById(bid.projectID);
         if (!(project.isAvailable)) {
             return "cannot bid! project has already been taken.".red;
         } else if (!(await Account.checkIfSkilledEnough(bid.userID, bid.projectID))) {
@@ -54,13 +53,13 @@ class Bid {
     }
 
     static async createBid(bid) {
-        await databaseClass.saveBid(bid);
+        await bidDAO.saveBid(bid);
         return "bid created successfully!\n".green;
 
     }
 
     static async checkIfBidEnough(projectId, userBidAmount) {
-        let project = await databaseClass.getProjectById(projectId);
+        let project = await projectDAO.getProjectById(projectId);
         let bidIsEnough = false;
         let mainBidAmount = project.budget;
         if (userBidAmount <= mainBidAmount) bidIsEnough = true;
@@ -68,7 +67,7 @@ class Bid {
     }
 
     static async checkIfValidDateToBid(projectId) {
-        let project = await databaseClass.getProjectById(projectId);
+        let project = await projectDAO.getProjectById(projectId);
         let projectDeadline = project.deadline;
         let localDate = Date.now();
         return parseInt(projectDeadline) >= parseInt(localDate/10000000000);
