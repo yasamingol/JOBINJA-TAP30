@@ -1,15 +1,16 @@
 /****************************************************requirements******************************************************/
 const prompt = require('prompt-sync')();
 const colors = require('colors');
+const Account  = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Account.js');
+const Auction = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Auction.js');
+const Bid = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Bid.js');
+const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
+const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Skill.js');
+const SkillConfirmation = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/SKillConfirmation.js');
+const toolFunctions = require('/home/tapsi/IdeaProjects/concurency/Client/Business/ToolFunctions.js');
 
-//importing classes
 
-
-
-
-//global vars
 let allSkills = [];
-
 /****************************************************Main-Menus********************************************************/
 async function loadMenus() {
 
@@ -79,8 +80,7 @@ async function loadMenus() {
 
     }
 
-//serializing in phase_1
-//     serializeAllData();
+
 }
 
 /****************************************************MainFunctions*****************************************************/
@@ -97,8 +97,8 @@ async function loadAllProjectsMenu() {
     console.log("\n View all projects menu : ".cyan + "<token>".green);
     let token = prompt("");
 
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))){
-        let projectsArray = await controllerClass.viewAllProjects();
+    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))){
+        let projectsArray = await Project.viewAllProjects();
         projectsArray.forEach((project) => {
             console.log(project);
         })
@@ -112,9 +112,9 @@ async function loadViewAvailableProjectsMenu() {
     let username = inputArr[0];
     let token = inputArr[1];
 
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log("\n Available projects : ".green);
-        let availableProjectsArr = await controllerClass.viewAvailableProjects(username);
+        let availableProjectsArr = await Account.viewAvailableProjectsForAccount(username);
         availableProjectsArr.forEach((project) => {
             console.log(project);
         })
@@ -127,8 +127,8 @@ async function loadGetProjectByIdMenu() {
     let projectId = parseInt(inputArr[0]);
     let token = inputArr[1];
 
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await controllerClass.getProjectById(projectId));
+    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+        console.log(await Project.getProjectById(projectId));
     }
 }
 
@@ -137,8 +137,8 @@ async function loadViewAllAccountsMenu() {
     console.log("\nView all accounts menu".cyan + "<token>".green);
     let token = prompt("");
 
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        let allAccountsArr = await controllerClass.viewAllAccounts();
+    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+        let allAccountsArr = await Account.viewAllAccounts();
         allAccountsArr.forEach((account) => {
             console.log(account);
         })
@@ -152,8 +152,8 @@ async function loadGetAccountByIdMenu() {
     let accountId = parseInt(inputArr[0]);
     let token = inputArr[1];
 
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await controllerClass.getAccountById(accountId));
+    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+        console.log(await Account.getAccountById(accountId));
     }
 }
 
@@ -167,8 +167,8 @@ async function loadAddBidMenu() {
     let bidAmount = parseInt(inputArr[3]);
     let token = inputArr[4];
 
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await controllerClass.addBid(biddingUsername, projectTitle, bidAmount));
+    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+        console.log(await Bid.addBid(biddingUsername, projectTitle, bidAmount));
     }
 }
 
@@ -182,8 +182,8 @@ async function loadConfirmSkillMenu() {
     let skillName = inputArr[3];
     let token = inputArr[4];
 
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await controllerClass.confirmSkill(conformerAccountUsername, targetAccountUsername, skillName));
+    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+        console.log(await SkillConfirmation.confirmSkill(conformerAccountUsername, targetAccountUsername, skillName));
     }
 }
 
@@ -194,11 +194,11 @@ async function loadAddSkillMenu() {
     let username = inputArr[1];
     let token = inputArr[3];
 
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         let arrSkills = inputArr[2].split(":");
         let skillName = arrSkills[0];
         let skillPoint = arrSkills[1];
-        console.log(await controllerClass.addSkill(username, skillName, parseInt(skillPoint)));
+        console.log(await Skill.addSkill(username, skillName, parseInt(skillPoint)));
     }
 }
 
@@ -211,8 +211,8 @@ async function loadRemoveSkillMenu() {
     let skillName = inputArr[2];
     let token = inputArr[3];
 
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await controllerClass.removeSkill(username, skillName));
+    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+        console.log(await Skill.removeSkill(username, skillName));
     }
 }
 
@@ -223,7 +223,7 @@ async function loadRegisterMenu() {
     let username = inputArr[1];
     let password = inputArr[2];
     let skillsArr = inputArr.slice(3,inputArr.length);
-    let registerMessagesArr = await controllerClass.register(username,skillsArr,password);
+    let registerMessagesArr = await Account.register(username,skillsArr,password);
     registerMessagesArr.forEach((message) => {
         console.log(message);
     })
@@ -241,8 +241,8 @@ async function loadAddProjectMenu() {
     let skillsArr = inputArr.slice(2, inputArr.length - 3);
     let token = inputArr[inputArr.length-1]
 
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        let addProjectArr = await controllerClass.addProject(title, budget, deadLine, skillsArr);
+    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+        let addProjectArr = await Project.addProject(title, budget, deadLine, skillsArr);
         addProjectArr.forEach((message) => {
             console.log(message);
         })
@@ -258,8 +258,8 @@ async function loadHoldAuctionMenu() {
     let projectId = parseInt(inputArr[1]);
     let token = inputArr[2];
 
-    if(!(await checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await controllerClass.holdAuction(projectId));
+    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+        console.log(await Auction.holdAuction(projectId));
     }
 
 }
@@ -268,20 +268,7 @@ async function loadLoginMenu(){
     let inputArr = prompt("").split(" ");
     let username = inputArr[1];
     let password = inputArr[2];
-    console.log(await controllerClass.login(username,password));
-}
-
-/******************************************************Tools**********************************************************/
-async function checkIfAnyErrorsApearedDuringTokenValidation(token){
-    let validationMessage = await controllerClass.validateTokenFromServer(token)
-    if(validationMessage[0][0]===false){
-        console.log(validationMessage[1].red);
-        return true;
-    }
-    else {
-        console.log(validationMessage[1].green);
-        return false;
-    }
+    console.log(await Account.login(username,password));
 }
 
 

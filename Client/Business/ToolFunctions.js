@@ -1,3 +1,14 @@
+async function checkIfAnyErrorsApearedDuringTokenValidation(token){
+    let validationMessage = await controllerClass.validateTokenFromServer(token)
+    if(validationMessage[0][0]===false){
+        console.log(validationMessage[1].red);
+        return true;
+    }
+    else {
+        console.log(validationMessage[1].green);
+        return false;
+    }
+}
 
 function mapToObj(map) {
     const obj = {}
@@ -25,7 +36,8 @@ function stringToDateConverter(string) {
 module.exports = {
     mapToObj,
     objToMap,
-    stringToDateConverter
+    stringToDateConverter,
+    checkIfAnyErrorsApearedDuringTokenValidation
 
 }
 
