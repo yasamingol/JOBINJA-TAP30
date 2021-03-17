@@ -1,3 +1,5 @@
+const axios = require('axios');
+
 async function sendLoginInfoAndReciveTokenFromServer(username,password) {
     try {
         const response = await axios.post('http://localhost:5001/login', {

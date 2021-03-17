@@ -1,5 +1,6 @@
+const requestToPyServer  = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js')
 async function checkIfAnyErrorsApearedDuringTokenValidation(token){
-    let validationMessage = await controllerClass.validateTokenFromServer(token)
+    let validationMessage = await requestToPyServer.validateTokenFromServer(token)
     if(validationMessage[0][0]===false){
         console.log(validationMessage[1].red);
         return true;

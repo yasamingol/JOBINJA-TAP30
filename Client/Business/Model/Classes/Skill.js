@@ -3,7 +3,9 @@ const viewClass = require("/home/tapsi/IdeaProjects/concurency/Client/Service/Me
 const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
 
 
+
 class Skill{
+    static allSkills = [];
 
     static buildSkillsMap(skillsArr, skills) {
         let arrOfMessagesWhileBuildingSKillsMap = [];
@@ -52,7 +54,7 @@ class Skill{
 
     static checkIfSkillIsValid(givenSkill) {
         let skillIsValid = false;
-        viewClass.allSkills.forEach((skill) => {
+        Skill.allSkills.forEach((skill) => {
             if (skill.name === givenSkill) skillIsValid = true;
         })
         return skillIsValid;

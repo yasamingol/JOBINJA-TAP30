@@ -10,7 +10,7 @@ const SkillConfirmation = require('/home/tapsi/IdeaProjects/concurency/Client/Bu
 const toolFunctions = require('/home/tapsi/IdeaProjects/concurency/Client/Business/ToolFunctions.js');
 
 
-let allSkills = [];
+
 /****************************************************Main-Menus********************************************************/
 async function loadMenus() {
 
@@ -275,8 +275,8 @@ async function loadLoginMenu(){
 
 
 module.exports = {
-    loadMenus,
-    allSkills
+    loadMenus
+
 }
 
 

@@ -1,4 +1,4 @@
-const viewClass = require("/home/tapsi/IdeaProjects/concurency/Client/Service/Menus.js");
+const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Skill.js')
 const util = require('util');
 
 async function getAllSkillsFromServer(request) {
@@ -11,7 +11,7 @@ async function getAllSkillsFromServer(request) {
 }
 
 function deserializeAllSkills(body) {
-    viewClass.allSkills = JSON.parse(body);
+    Skill.addSkill = JSON.parse(body);
 }
 
 
