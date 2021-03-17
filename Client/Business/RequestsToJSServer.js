@@ -6,12 +6,13 @@ async function getAllSkillsFromServer(request) {
     const {error, response, body} = await promisifiedRequest('http://localhost:5000/api/skills');
     console.error('error:', error);
     console.log('statusCode:', response && response.statusCode);
-    deserializeAllSkills(body);
+    Skill.allSkills = deserializeAllSkills(body);
 
 }
 
 function deserializeAllSkills(body) {
-    Skill.addSkill = JSON.parse(body);
+    let allSkills = JSON.parse(body);
+    return allSkills;
 }
 
 
