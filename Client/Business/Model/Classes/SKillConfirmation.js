@@ -1,11 +1,6 @@
-const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
-const Account = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Account.js');
 const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
-const projectDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Project.js');
 const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
 const confirmationDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Confirmation.js');
-const bidDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Bid.js');
-const auctionDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Auction.js');
 
 
 class SKillConfirmation{
