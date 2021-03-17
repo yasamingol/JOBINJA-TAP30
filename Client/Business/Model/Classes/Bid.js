@@ -1,5 +1,8 @@
-const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Controller.js');
 const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
+const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
+const Account = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Account.js');
+
+
 
 class Bid {
     static allBids = [];
@@ -28,9 +31,9 @@ class Bid {
         let addBidsFinalMessage;
         let project = await databaseClass.getProjectByProjectTitle(projectTitle)
         let projectId = project.id;
-        let accountId = await getAccountIDUsingAccountUsername(biddingUsername);
-        let bid = new bidClass(null,accountId,projectId,bidAmount);
-        addBidsFinalMessage = await handlingAddBidErrors(bid);
+        let accountId = await requestsToPyServer.getAccountIDUsingAccountUsername(biddingUsername);
+        let bid = new Bid(null,accountId,projectId,bidAmount);
+        addBidsFinalMessage = await Bid.handlingAddBidErrors(bid);
         return addBidsFinalMessage;
     }
 
@@ -39,14 +42,14 @@ class Bid {
         let project = await databaseClass.getProjectById(bid.projectID);
         if (!(project.isAvailable)) {
             return "cannot bid! project has already been taken.".red;
-        } else if (!(await checkIfSkilledEnough(bid.userID, bid.projectID))) {
+        } else if (!(await Account.checkIfSkilledEnough(bid.userID, bid.projectID))) {
             return "cannot bid! not skilled enough.".red;
-        } else if (!(await checkIfBidEnough(bid.projectID, bid.bidAmount))) {
+        } else if (!(await Bid.checkIfBidEnough(bid.projectID, bid.bidAmount))) {
             return "cannot bid! bid amount not acceptable".red;
             // } else if (!(await checkIfValidDateToBid(bid.projectID))) {
             //     return "you cannot bid on this project! it has ended".red;
         } else {
-            return (await createBid(bid));
+            return (await Bid.createBid(bid));
         }
     }
 
@@ -86,9 +89,6 @@ class Bid {
         }
         return bestUserId;
     }
-
-
-
 
 
 

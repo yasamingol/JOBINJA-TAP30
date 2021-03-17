@@ -10,6 +10,8 @@ async function sendLoginInfoAndReciveTokenFromServer(username,password) {
         console.log(e)
     }
 }
+
+
 async function validateTokenFromServer(token){
 
     try {
@@ -22,6 +24,8 @@ async function validateTokenFromServer(token){
         console.log(e)
     }
 }
+
+
 async function saveAccount(username,password){
     try {
         const response = await axios.post('http://localhost:5001/saveAccount', {
@@ -34,6 +38,8 @@ async function saveAccount(username,password){
         console.log(e)
     }
 }
+
+
 async function getAccountsFullDBTable(){
     try {
         const response = await axios.post('http://localhost:5001/getAccountsFullDBTable', {
@@ -44,6 +50,8 @@ async function getAccountsFullDBTable(){
         console.log(e)
     }
 }
+
+
 async function getFullAccountById(accountId){
     try {
         const response = await axios.post('http://localhost:5001/getFullAccountById', {
@@ -55,6 +63,8 @@ async function getFullAccountById(accountId){
         console.log(e)
     }
 }
+
+
 async function getAccountUsernameUsingAccountId(accountId){
     try {
         const response = await axios.post('http://localhost:5001/getAccountUsernameUsingAccountId', {
@@ -66,6 +76,8 @@ async function getAccountUsernameUsingAccountId(accountId){
         console.log(e)
     }
 }
+
+
 async function getAccountPasswordUsingAccountId(accountId){
     try {
         const response = await axios.post('http://localhost:5001/getAccountPasswordUsingAccountId', {
@@ -77,6 +89,8 @@ async function getAccountPasswordUsingAccountId(accountId){
         console.log(e)
     }
 }
+
+
 async function getAccountIDUsingAccountUsername(username){
     try {
         const response = await axios.post('http://localhost:5001/getAccountIDUsingAccountUsername', {
@@ -88,6 +102,8 @@ async function getAccountIDUsingAccountUsername(username){
         console.log(e)
     }
 }
+
+
 async function getNumberOfRowsOfAccountsTable(){
     try {
         const response = await axios.post('http://localhost:5001/getNumberOfRowsOfAccountsTable', {
@@ -97,4 +113,19 @@ async function getNumberOfRowsOfAccountsTable(){
     } catch (e) {
         console.log(e)
     }
+}
+
+
+
+
+module.exports = {
+    sendLoginInfoAndReciveTokenFromServer,
+    validateTokenFromServer,
+    saveAccount,
+    getAccountsFullDBTable,
+    getFullAccountById,
+    getAccountUsernameUsingAccountId,
+    getAccountPasswordUsingAccountId,
+    getAccountIDUsingAccountUsername,
+    getNumberOfRowsOfAccountsTable
 }

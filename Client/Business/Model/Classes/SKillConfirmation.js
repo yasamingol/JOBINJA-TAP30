@@ -1,12 +1,13 @@
-const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Controller.js');
 const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
 const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
 const Account = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Account.js');
+const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
+
 
 class SKillConfirmation{
     static async confirmSkill(conformerAccountUsername, targetAccountUsername, skillName) {
-        let sourceUserID = parseInt(await controller.getAccountIDUsingAccountUsername(conformerAccountUsername));
-        let otherUserID = parseInt(await controller.getAccountIDUsingAccountUsername(targetAccountUsername));
+        let sourceUserID = parseInt(await requestsToPyServer.getAccountIDUsingAccountUsername(conformerAccountUsername));
+        let otherUserID = parseInt(await requestsToPyServer.getAccountIDUsingAccountUsername(targetAccountUsername));
         let skill = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, otherUserID);
         let skillID = skill.id
         let hasConfirmedBefore = await SKillConfirmation.checkIfConfirmedBefore(sourceUserID, skillID);
@@ -37,33 +38,7 @@ class SKillConfirmation{
     }
 
 
-    static async checkIfSkilledEnough(accountID, projectID) {
-        let isSkilled = true;
-        let projectsSkillsMap = await Project.getAllSkillsMapOfProject(projectID);
-        let accountsSkillsMap = await Skill.getAllSkillsMapOfAccount(accountID);
-        projectsSkillsMap.forEach((value1, key1) => {
-            if (accountsSkillsMap.has(key1)) {
-                if (parseInt(accountsSkillsMap.get(key1)) < parseInt(value1)) {
-                    isSkilled = false;
-                }
-            } else isSkilled = false;
-        })
-        return isSkilled;
-
-    }
-
-
-    static async convertSkillsArrayToSkillsMap(arr) {
-        let skillMap = new Map();
-        for (let i = 0; i < arr.length; i++) {
-            let skillID = arr[i].id;
-            let skill = await databaseClass.getSkillById(skillID)
-            let skillName = skill.skillName;
-            let skillPoint = skill.skillPoint;
-            skillMap.set(skillName, skillPoint);
-        }
-        return skillMap;
-    }
-
 
 }
+
+module.exports = SKillConfirmation;

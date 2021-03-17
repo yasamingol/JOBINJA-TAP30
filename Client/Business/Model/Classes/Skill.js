@@ -1,8 +1,9 @@
-const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Controller.js');
 const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
 const viewClass = require("../View/Menus.js");
+const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
 
-class SKill{
+
+class Skill{
 
     static buildSkillsMap(skillsArr, skills) {
         let arrOfMessagesWhileBuildingSKillsMap = [];
@@ -10,7 +11,7 @@ class SKill{
             let arrSkills = skillsArr[i].split(":");
             let skillName = arrSkills[0];
             let skillPoint = arrSkills[1];
-            if (SKill.checkIfSkillIsValid(skillName)) {
+            if (Skill.checkIfSkillIsValid(skillName)) {
                 skills.set(skillName, skillPoint);
                 arrOfMessagesWhileBuildingSKillsMap[i] = ("skill ".green + skillName.green + " added successfully".green);
             } else {
@@ -39,8 +40,8 @@ class SKill{
 
 
    static async addSkill(username, skillName, skillPoint) {
-        let accountID = await controller.getAccountIDUsingAccountUsername(username);
-        if (SKill.checkIfSkillIsValid(skillName)) {
+        let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
+        if (Skill.checkIfSkillIsValid(skillName)) {
             await databaseClass.saveAccountSkill(skillName, skillPoint, accountID);
             return ("skill added successfully!\n".green);
         } else {
@@ -60,10 +61,10 @@ class SKill{
 
 
     static async removeSkill(username, skillName) {
-        let accountID = await controller.getAccountIDUsingAccountUsername(username);
+        let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
         let skill = await databaseClass.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
         let skillID = skill.id;
-        if (await SKill.checkIfAccountHasSkill(accountID, skillID)) {
+        if (await Skill.checkIfAccountHasSkill(accountID, skillID)) {
             await databaseClass.deleteSkillOfAccountUsingSkillName(skillID);
             return ("skill removed successfully!\n".green);
 
@@ -72,5 +73,18 @@ class SKill{
         }
     }
 
+    static async convertSkillsArrayToSkillsMap(arr) {
+        let skillMap = new Map();
+        for (let i = 0; i < arr.length; i++) {
+            let skillID = arr[i].id;
+            let skill = await databaseClass.getSkillById(skillID)
+            let skillName = skill.skillName;
+            let skillPoint = skill.skillPoint;
+            skillMap.set(skillName, skillPoint);
+        }
+        return skillMap;
+    }
+
 
 }
+module.exports = Skill;

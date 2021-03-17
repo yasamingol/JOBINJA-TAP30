@@ -22,3 +22,10 @@ function stringToDateConverter(string) {
     return date;
 }
 
+module.exports = {
+    mapToObj,
+    objToMap,
+    stringToDateConverter
+
+}
+

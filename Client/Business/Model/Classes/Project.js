@@ -1,8 +1,8 @@
-const sqlite3 = require('sqlite3');
-const sqlite = require('sqlite');
-const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Controller.js');
 const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
 const Bid = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Bid.js');
+const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Skill.js');
+const toolFunctions = require('/home/tapsi/IdeaProjects/concurency/Client/Business/ToolFunctions.js');
+
 
 class Project {
     static allProjects = [];
@@ -28,12 +28,12 @@ class Project {
     static async buildFullProjectByGettingID(id) {
         let projectFullString = await databaseClass.getProjectById(id);
         let title = projectFullString.title
-        let skills = await controller.getAllSkillsMapOfProject(id);
+        let skills = await Project.getAllSkillsMapOfProject(id);
         let budget = projectFullString.budget;
         let deadLine = projectFullString.deadline;
         let isAvailable = projectFullString.isAvailable;
         let assignedAccountId = projectFullString.assignedAccountId;
-        let listOfBids = await controller.createListOfBidsForProject(id);
+        let listOfBids = await Project.createListOfBidsForProject(id);
 
         return new Project(id, title, skills, budget, listOfBids,
             deadLine, isAvailable, assignedAccountId);
@@ -69,14 +69,14 @@ class Project {
 
     static async getAllSkillsMapOfProject(projectID) {
         let skillsArray = await databaseClass.getProjectSkills(projectID);
-        return await controller.convertSkillsArrayToSkillsMap(skillsArray);
+        return await Skill.convertSkillsArrayToSkillsMap(skillsArray);
     }
 
     static async addProject(title, budget, deadLine, skillsArr) {
         let messagesDuringAddProject;
         let skills = new Map;
-        let deadline = controller.stringToDateConverter(deadLine);
-        messagesDuringAddProject = controller.buildSkillsMap(skillsArr, skills);
+        let deadline = toolFunctions.stringToDateConverter(deadLine);
+        messagesDuringAddProject = Skill.buildSkillsMap(skillsArr, skills);
         let project = new Project(null,title,skills,budget,[],deadline,true,null)
         await Project.saveProjectInfo(project);
         messagesDuringAddProject[messagesDuringAddProject.length] = ("project built successfully!\n".green);

@@ -1,8 +1,7 @@
-// const databaseClass = require('../DataBase/database');
-const sqlite3 = require('sqlite3');
-const sqlite = require('sqlite');
-const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Controller.js');
 const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
+const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
+const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Skill.js');
+const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
 
 
 class Account {
@@ -26,11 +25,11 @@ class Account {
 
 
    static async buildFullAccountByGettingID(id) {
-        let accountFullString = await controller.getFullAccountById(id);
+        let accountFullString = await Account.getFullAccountById(id);
         let inputArr = accountFullString.split("/")
         let username = inputArr[0]
         let password = inputArr[1]
-        let skills = await controller.getAllSkillsMapOfAccount(id);
+        let skills = await Account.getAllSkillsMapOfAccount(id);
         let assignedProjectList = await databaseClass.getAllProjectsAssignedToAnAccountUsingAccountId(id);
         return new Account(id, username, password, skills, assignedProjectList, null);
 
@@ -38,9 +37,9 @@ class Account {
 
     static async viewAllAccounts() {
         let allAccountsArr = [];
-        let numberOfAccounts = await controller.getNumberOfRowsOfAccountsTable();
+        let numberOfAccounts = await requestsToPyServer.getNumberOfRowsOfAccountsTable();
         for (let i = 1; i <= numberOfAccounts; i++) {
-            let accountName = await controller.getAccountUsernameUsingAccountId(i);
+            let accountName = await requestsToPyServer.getAccountUsernameUsingAccountId(i);
             allAccountsArr[i] = (i + "." + accountName);
         }
         return allAccountsArr;
@@ -49,7 +48,7 @@ class Account {
 
     static async viewAvailableProjectsForAccount(username) {
         let error = [];
-        let accountID = await controller.getAccountIDUsingAccountUsername(username);
+        let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
         let numberOfProjects = await databaseClass.getNumberOfAllProjects();
         let {availableProjectArr, hasMinOneAvailable} = await Account.buildAvailableProjectsForAccount(accountID, numberOfProjects);
         if (hasMinOneAvailable) {
@@ -67,7 +66,7 @@ class Account {
         for (let i = 1; i <= numberOfProjects; i++) {
             let project = await databaseClass.getProjectById(i);
             let projectsTitle = project.title;
-            if (await controller.checkIfSkilledEnough(accountID, i)) {
+            if (await Account.checkIfSkilledEnough(accountID, i)) {
                 availableProjectArr[i] = (i + "." + projectsTitle);
                 hasMinOneAvailable = true;
             }
@@ -80,9 +79,9 @@ class Account {
 
     static async register(username, skillsArr, password) {
         let messagesDuringRegistration;
-        let id = await controller.getNumberOfRowsOfAccountsTable()+1;
+        let id = await requestsToPyServer.getNumberOfRowsOfAccountsTable()+1;
         let skills = new Map;
-        messagesDuringRegistration = controller.buildSkillsMap(skillsArr, skills);
+        messagesDuringRegistration = Skill.buildSkillsMap(skillsArr, skills);
         let account = new Account(id, username, password, skills, [], new Map);
         await Account.saveRegisterInfoInDB(account);
         messagesDuringRegistration[messagesDuringRegistration.length] = ("registered successfully!\n".green);
@@ -91,7 +90,7 @@ class Account {
     }
 
     static async saveRegisterInfoInDB(account) {
-        await controller.saveAccount(account.username,account.password);
+        await requestsToPyServer.saveAccount(account.username,account.password);
         for (const [key, value] of account.skills) {
             await databaseClass.saveAccountSkill(key, value, account.id);
         }
@@ -99,11 +98,11 @@ class Account {
 
 
     static async login(username, password) {
-        let accountId = await controller.getAccountIDUsingAccountUsername(username);
+        let accountId = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
         let account = await Account.buildFullAccountByGettingID(accountId);
         let time = Date.now();
         if (account.password === password) {
-            let token = await controller.sendLoginInfoAndReciveTokenFromServer(username, password);
+            let token = await requestsToPyServer.sendLoginInfoAndReciveTokenFromServer(username, password);
             return "login successfully! your loginToken : ".green + token;
         } else {
             return "incorrect password! please try again.".red;
@@ -115,7 +114,7 @@ class Account {
 
     static async checkIfAccountHasSkill(accountID, skillID) {
         let hasThisSkill = false;
-        let skillsMap = await getAllSkillsMapOfAccount(accountID);
+        let skillsMap = await Account.getAllSkillsMapOfAccount(accountID);
         let skill = await databaseClass.getSkillById(skillID);
         let skillName = skill.skillName;
         skillsMap.forEach((value, key) => {
@@ -128,7 +127,23 @@ class Account {
     }
     static async getAllSkillsMapOfAccount(accountID) {
         let skillArray = await databaseClass.getAccountSkills(accountID);
-        return await controller.convertSkillsArrayToSkillsMap(skillArray);
+        return await Skill.convertSkillsArrayToSkillsMap(skillArray);
+    }
+
+
+    static async checkIfSkilledEnough(accountID, projectID) {
+        let isSkilled = true;
+        let projectsSkillsMap = await Project.getAllSkillsMapOfProject(projectID);
+        let accountsSkillsMap = await Account.getAllSkillsMapOfAccount(accountID);
+        projectsSkillsMap.forEach((value1, key1) => {
+            if (accountsSkillsMap.has(key1)) {
+                if (parseInt(accountsSkillsMap.get(key1)) < parseInt(value1)) {
+                    isSkilled = false;
+                }
+            } else isSkilled = false;
+        })
+        return isSkilled;
+
     }
 
 

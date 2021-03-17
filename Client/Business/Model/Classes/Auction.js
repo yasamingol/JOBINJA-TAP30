@@ -1,7 +1,7 @@
-const controller = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Controller.js');
 const databaseClass = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/DAO.js');
 const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
 const Account = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Account.js');
+const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
 
 
 class Auction{
@@ -37,14 +37,14 @@ class Auction{
 
     static async handlingAuctionProcess(projectId) {
         let messageOfHoldAuction = "";
-        let accountWinnerID = await controller.findTheBestUserIdBidingOnProject(projectId);
+        let accountWinnerID = await Project.findTheBestUserIdBidingOnProject(projectId);
         if (accountWinnerID !== null) {
             let auction = new Auction(null,accountWinnerID,projectId)
             await databaseClass.saveAuction(auction);
             await databaseClass.updateProjectAvailability(projectId);
             await Project.assignProject(accountWinnerID, projectId);
             messageOfHoldAuction = ("\nThe winner of the auction is : ".green
-                + await controller.getAccountUsernameUsingAccountId(accountWinnerID));
+                + await requestsToPyServer.getAccountUsernameUsingAccountId(accountWinnerID));
         } else {
             messageOfHoldAuction = ("there are no bids on this project! cannot hold auction".red);
         }
