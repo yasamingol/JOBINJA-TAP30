@@ -67,30 +67,29 @@ class Account {
     }
 
 
-    static async viewAvailableProjectsForAccount(username) {
-        let error = [];
+    static async getAvailableProjectsForAccount(username) {
         let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
-        let numberOfProjects = await projectDAO.getNumberOfAllProjects();
-        let {
-            availableProjectArr,
-            hasMinOneAvailable
-        } = await Account.buildAvailableProjectsForAccount(accountID, numberOfProjects);
+        let account = await this.buildFullAccountByGettingID(accountID);
+        let {availableProjectArr, hasMinOneAvailable}
+        = await account.buildAvailableProjectsForAccount();
+
         if (hasMinOneAvailable) {
             return availableProjectArr;
         } else {
-            error[0] = "There are no projects available for you now!".red;
-            return error;
+            return Messages.NoProjectIsAvailableError;
         }
     }
 
 
-    static async buildAvailableProjectsForAccount(accountID, numberOfProjects) {
+    async buildAvailableProjectsForAccount() {
         let availableProjectArr = [];
         let hasMinOneAvailable = false;
+        let numberOfProjects = await projectDAO.getNumberOfAllProjects();
+
         for (let i = 1; i <= numberOfProjects; i++) {
             let project = await projectDAO.getProjectById(i);
             let projectsTitle = project.title;
-            if (await Account.checkIfSkilledEnough(accountID, i)) {
+            if (await this.checkIfSkilledEnough(i)) {
                 availableProjectArr[i] = (i + "." + projectsTitle);
                 hasMinOneAvailable = true;
             }
@@ -155,10 +154,10 @@ class Account {
     }
 
 
-    static async checkIfSkilledEnough(accountID, projectID) {
+    async checkIfSkilledEnough(projectID) {
         let isSkilled = true;
         let projectsSkillsMap = await Project.getAllSkillsMapOfProject(projectID);
-        let accountsSkillsMap = await Account.getAllSkillsMapOfAccount(accountID);
+        let accountsSkillsMap = await Account.getAllSkillsMapOfAccount(this._id);
         projectsSkillsMap.forEach((value1, key1) => {
             if (accountsSkillsMap.has(key1)) {
                 if (parseInt(accountsSkillsMap.get(key1)) < parseInt(value1)) {

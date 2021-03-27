@@ -55,9 +55,12 @@ class Project {
         let assignedAccountId = projectFullString.assignedAccountId;
         let listOfBids = await Project.createListOfBidsForProject(id);
 
-        return new Project(id, title, skills, budget, listOfBids,
-            deadLine, isAvailable, assignedAccountId);
+        let project =  new Project(title, skills, budget, deadLine, isAvailable);
+        project._id = id;
+        project._assignedAccountId = assignedAccountId;
+        project._listOfBids = listOfBids;
 
+        return project;
 
     }
 

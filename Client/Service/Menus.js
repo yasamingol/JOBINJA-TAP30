@@ -62,7 +62,8 @@ async function loadMenus() {
 
 
         } else if (selectedMenu === "11") {
-            await loadAddProjectMenu();
+            let addProjectMessage = await loadAddProjectMenu();
+            console.log(addProjectMessage);
 
 
         } else if (selectedMenu === "12") {
@@ -92,7 +93,7 @@ function showAvailableMenus() {
 
 
 async function loadAllProjectsMenu() {
-    console.log("\n View all projects menu : ".cyan + "<token>".green);
+    console.log(Messages.ViewAllProjectsMenu);
     let token = prompt("");
 
     if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
@@ -105,17 +106,26 @@ async function loadAllProjectsMenu() {
 }
 
 async function loadViewAvailableProjectsMenu() {
-    console.log("\nWelcome to ((view available projects)) menu!".cyan + " command : <username> <token>".green);
-    let inputArr = prompt("").split(" ");
-    let username = inputArr[0];
-    let token = inputArr[1];
-
-    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log("\n Available projects : ".green);
-        let availableProjectsArr = await Account.viewAvailableProjectsForAccount(username);
+    let availableProjectsRequirements = prepareAddProjectRequitments();
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(availableProjectsRequirements.token))) {
+        let availableProjectsArr = await Account.getAvailableProjectsForAccount(availableProjectsRequirements.username);
         availableProjectsArr.forEach((project) => {
             console.log(project);
         })
+    }
+}
+
+async function prepareAvailableProjectsRequirements(){
+    console.log(Messages.WelcomeToViewAvailableProjectsMenu);
+    console.log("\n Available projects : ".green);
+
+    let inputArr = prompt("").split(" ");
+    let username = inputArr[0];
+    let token = inputArr[1];
+    return {
+        username: username,
+        token: token
+
     }
 }
 
@@ -275,7 +285,6 @@ async function loadAddProjectMenu() {
 
     if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(addProjectRequirements.token))) {
         let addProjectMessage = await project.addProject();
-
         return {
             addProjectMessage: addProjectMessage,
             messagesOfBuildSkillMap:messagesOfBuildSkillMap
