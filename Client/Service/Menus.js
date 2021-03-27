@@ -10,7 +10,6 @@ const SkillConfirmation = require('/home/tapsi/IdeaProjects/concurency/Client/Bu
 const toolFunctions = require('/home/tapsi/IdeaProjects/concurency/Client/Business/ToolFunctions.js');
 
 
-
 /****************************************************Main-Menus********************************************************/
 async function loadMenus() {
 
@@ -18,7 +17,6 @@ async function loadMenus() {
     while (true) {
 
         //Menus
-        let arr = [];
         showAvailableMenus()
         const selectedMenu = prompt("");
 
@@ -59,8 +57,7 @@ async function loadMenus() {
 
 
         } else if (selectedMenu === "10") {
-            await loadRegisterMenu();
-
+             await loadRegisterMenu();
 
         } else if (selectedMenu === "11") {
             await loadAddProjectMenu();
@@ -217,18 +214,38 @@ async function loadRemoveSkillMenu() {
 }
 
 
-async function loadRegisterMenu() {
+
+async function loadRegisterMenu(){
+    let registerRequirements = prepareRegisterRequirements();
+    await register(registerRequirements.username,registerRequirements.password,registerRequirements.skillsArr);
+}
+
+ function prepareRegisterRequirements() {
     console.log("Welcome to ((register)) menu!".cyan + "command : register <username> <password> <skill:point>".green);
     let inputArr = prompt("").split(" ");
     let username = inputArr[1];
     let password = inputArr[2];
     let skillsArr = inputArr.slice(3,inputArr.length);
-    let registerMessagesArr = await Account.register(username,skillsArr,password);
-    registerMessagesArr.forEach((message) => {
-        console.log(message);
-    })
+
+    return {
+        username: username,
+        password: password,
+        skillsArr: skillsArr
+    }
+
 
 }
+
+
+async function register(username,password,skillsArr){
+    let skills = Skill.buildSkillsMap()
+    // let registerMessagesArr = await Account.register(username,skillsArr,password);
+    // registerMessagesArr.forEach((message) => {
+    //     console.log(message);
+    // })
+
+}
+
 
 
 async function loadAddProjectMenu() {

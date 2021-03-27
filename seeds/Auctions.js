@@ -5,7 +5,7 @@ exports.seed = function (knex, Promise) {
             // Inserts seed entries
             return knex('Auctions').insert([
                 {
-                    projectID:2,
+                    projectID:10,
                     winnerID:0
                 }
             ]);
