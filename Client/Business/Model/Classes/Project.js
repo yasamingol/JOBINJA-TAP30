@@ -4,20 +4,39 @@ const toolFunctions = require('/home/tapsi/IdeaProjects/concurency/Client/Busine
 const projectDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Project.js');
 const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
 const bidDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Bid.js');
+const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
+
 
 class Project {
+    _id;
+    _listOfBids;
+    _assignedAccountId;
+
     static allProjects = [];
-    constructor(id,title, skills, budget, listOfBids,deadline,isAvailable,assignedAccountId) {
-        this.id = id;
+    constructor(title, skills, budget,deadline,isAvailable) {
         this.title = title;
         this.skills = skills;
         this.budget = budget;
-        this.listOfBids = listOfBids;
         this.deadline = deadline;
         this.isAvailable = isAvailable;
-        this.assignedAccountId = assignedAccountId;
         Project.allProjects[Project.allProjects.length] = this;
+
     }
+
+
+    set id(value) {
+        this._id = value;
+    }
+
+    set listOfBids(value) {
+        this._listOfBids = value;
+    }
+
+    set assignedAccountId(value) {
+        this._assignedAccountId = value;
+    }
+
+
 
 
 
@@ -54,13 +73,15 @@ class Project {
         return allProjectsArray;
     }
 
-    static async saveProjectInfo(project) {
-        await projectDAO.saveProject(project);
-        let projectCreate = await projectDAO.getProjectByProjectTitle(project.title);
-        for (const [key, value] of project.skills) {
-            await skillDAO.saveProjectSkill(key, value, projectCreate.id);
+     async saveProjectInfo() {
+        await projectDAO.saveProject(this);
+        let projectCreated = await projectDAO.getProjectByProjectTitle(this.title);
+        for (const [key, value] of this.skills) {
+            await skillDAO.saveProjectSkill(key, value, projectCreated.id);
         }
+        return projectCreated;
     }
+
 
     static async createListOfBidsForProject(projectID) {
         let listOfBids = await bidDAO.getBidsOfProjectByProjectId(projectID);
@@ -68,20 +89,19 @@ class Project {
 
     }
 
+
     static async getAllSkillsMapOfProject(projectID) {
         let skillsArray = await skillDAO.getProjectSkills(projectID);
         return await Skill.convertSkillsArrayToSkillsMap(skillsArray);
     }
 
-    static async addProject(title, budget, deadLine, skillsArr) {
-        let messagesDuringAddProject;
-        let skills = new Map;
-        let deadline = toolFunctions.stringToDateConverter(deadLine);
-        messagesDuringAddProject = Skill.buildSkillsMap(skillsArr, skills);
-        let project = new Project(null,title,skills,budget,[],deadline,true,null)
-        await Project.saveProjectInfo(project);
-        messagesDuringAddProject[messagesDuringAddProject.length] = ("project built successfully!\n".green);
+
+     async addProject() {
+        let savedProject = await this.saveProjectInfo();
+        this._id = savedProject.id;
+        let messagesDuringAddProject = (Messages.ProjectBuiltSuccessfully);
         return messagesDuringAddProject;
+
     }
 
 

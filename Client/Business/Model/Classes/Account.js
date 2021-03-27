@@ -34,9 +34,6 @@ class Account {
     }
 
 
-
-
-
     static async getAccountById(id) {
         let account = await Account.buildFullAccountByGettingID(id);
         return account;
@@ -51,7 +48,11 @@ class Account {
         let password = inputArr[1]
         let skills = await Account.getAllSkillsMapOfAccount(id);
         let assignedProjectList = await projectDAO.getAllProjectsAssignedToAnAccountUsingAccountId(id);
-        return new Account(id, username, password, skills, assignedProjectList, null);
+        let account = new Account(username, password, skills);
+        account._id = id;
+        account._assignedProjectList = assignedProjectList;
+        return account;
+
 
     }
 
@@ -101,7 +102,7 @@ class Account {
     }
 
 
-     async register() {
+    async register() {
         let savedAccount = await Account.saveRegisterInfoInDB(this);
         this._id = savedAccount.id;
         let message = (Messages.RegisteredSuccessfully);
@@ -121,14 +122,15 @@ class Account {
     static async login(username, password) {
         let accountId = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
         let account = await Account.buildFullAccountByGettingID(accountId);
-        let time = Date.now();
         if (account.password === password) {
             let token = await requestsToPyServer.sendLoginInfoAndReciveTokenFromServer(username, password);
-            return "login successfully! your loginToken : ".green + token;
+            return {
+                message: Messages.LoginSuccessfully,
+                token: token
+            };
         } else {
-            return "incorrect password! please try again.".red;
+            return Messages.IncorrectPassword;
         }
-
 
     }
 

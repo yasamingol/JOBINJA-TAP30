@@ -68,8 +68,10 @@ async function loadMenus() {
         } else if (selectedMenu === "12") {
             await loadHoldAuctionMenu();
 
+
         } else if (selectedMenu === "13") {
-            await loadLoginMenu();
+            let loginMessage = await loadLoginMenu();
+            console.log(loginMessage);
 
         } else if (selectedMenu === "14") {
             console.log("exit");
@@ -85,10 +87,7 @@ async function loadMenus() {
 /****************************************************MainFunctions*****************************************************/
 
 function showAvailableMenus() {
-    console.log("\n MENUS : ".cyan + "\n 1.view all projects \n 2.view available projects \n 3.view project by id " +
-        "\n 4.view all accounts \n 5.view account by id \n 6.bid on a project " +
-        "\n 7.confirmSkills \n 8.addSkill \n 9.removeSkill \n 10.register \n 11.addProject \n 12.holdAuction" +
-        " \n 13.login \n 14.exit \n Please enter the menu number you want to enter : ");
+    console.log(Messages.AvailableMenus)
 }
 
 
@@ -243,27 +242,67 @@ function prepareRegistrationRequirements() {
         skillsArr: skillsArr
     }
 
+}
+
+
+async function loadLoginMenu() {
+    let loginRequirements = await prepareLoginRequirements();
+    let loginMessage = await Account.login(loginRequirements.username, loginRequirements.password);
+    return loginMessage;
+}
+
+
+async function prepareLoginRequirements() {
+    console.log(Messages.WelcomeToLoginMenu);
+    let inputArr = prompt("").split(" ");
+    let username = inputArr[1];
+    let password = inputArr[2];
+    return {
+        username: username,
+        password: password
+    }
 
 }
 
 
 async function loadAddProjectMenu() {
-    console.log("\nwelcome to  addProject menu!\nyou can add a new project using : "
-        + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)> <token>".green);
+
+    let addProjectRequirements = prepareAddProjectRequitments();
+
+    let {skills, messagesOfBuildSkillMap} = Skill.buildSkillsMap(addProjectRequirements.skillsArr);
+    let project = new Project(addProjectRequirements.title, skills, addProjectRequirements.budget,
+                                addProjectRequirements.deadline, addProjectRequirements.isAvailable);
+
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(addProjectRequirements.token))) {
+        let addProjectMessage = await project.addProject();
+
+        return {
+            addProjectMessage: addProjectMessage,
+            messagesOfBuildSkillMap:messagesOfBuildSkillMap
+        }
+    }
+
+}
+
+
+async function prepareAddProjectRequitments() {
+    console.log(Messages.WelcomeToAddProjectMenu);
     let inputArr = prompt("").split(" ");
     let title = inputArr[1];
     let budget = inputArr[inputArr.length - 3];
-    let deadLine = inputArr[inputArr.length - 2];
+    let deadLine = toolFunctions.stringToDateConverter(inputArr[inputArr.length - 2]);
     let skillsArr = inputArr.slice(2, inputArr.length - 3);
     let token = inputArr[inputArr.length - 1]
 
-    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        let addProjectArr = await Project.addProject(title, budget, deadLine, skillsArr);
-        addProjectArr.forEach((message) => {
-            console.log(message);
-        })
-    }
+    return {
+        title: title,
+        budget: budget,
+        deadLine: deadLine,
+        skillsArr: skillsArr,
+        isAvailable: true,
+        token: token
 
+    }
 }
 
 
@@ -278,14 +317,6 @@ async function loadHoldAuctionMenu() {
         console.log(await Auction.holdAuction(projectId));
     }
 
-}
-
-async function loadLoginMenu() {
-    console.log("\nwelcome to Login menu!\n you can login: " + "login <username> <password>".green);
-    let inputArr = prompt("").split(" ");
-    let username = inputArr[1];
-    let password = inputArr[2];
-    console.log(await Account.login(username, password));
 }
 
 
