@@ -1,25 +1,29 @@
 const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
 const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
-
+const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
 
 class Skill{
     static allSkills = [];
 
-    static buildSkillsMap(skillsArr, skills) {
+    static buildSkillsMap(skillsArr) {
         let arrOfMessagesWhileBuildingSKillsMap = [];
+        let skillsMap = new Map;
         for (let i = 0; i < skillsArr.length; i++) {
             let arrSkills = skillsArr[i].split(":");
             let skillName = arrSkills[0];
             let skillPoint = arrSkills[1];
             if (Skill.checkIfSkillIsValid(skillName)) {
-                skills.set(skillName, skillPoint);
-                arrOfMessagesWhileBuildingSKillsMap[i] = ("skill ".green + skillName.green + " added successfully".green);
+                skillsMap.set(skillName, skillPoint);
+                arrOfMessagesWhileBuildingSKillsMap[i] = (Messages.SkillAddedSuccessfully);
             } else {
-                arrOfMessagesWhileBuildingSKillsMap[i] = ("skill ".red + skillName.red + " is invalid".red);
+                arrOfMessagesWhileBuildingSKillsMap[i] = (Messages.SkillIsInValid);
             }
 
         }
-        return arrOfMessagesWhileBuildingSKillsMap;
+        return {
+            skillsMap: skillsMap,
+            message: arrOfMessagesWhileBuildingSKillsMap
+        };
     }
 
 

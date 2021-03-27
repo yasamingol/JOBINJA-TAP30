@@ -3,6 +3,7 @@ const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model
 const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
 const projectDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Project.js');
 const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
+const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
 
 
 class Account {
@@ -99,23 +100,21 @@ class Account {
         };
     }
 
-    static async register(username, skillsArr, password) {
-        let messagesDuringRegistration;
-        let id = await requestsToPyServer.getNumberOfRowsOfAccountsTable() + 1;
-        let skills = new Map;
-        messagesDuringRegistration = Skill.buildSkillsMap(skillsArr, skills);
-        let account = new Account(id, username, password, skills, [], new Map);
-        await Account.saveRegisterInfoInDB(account);
-        messagesDuringRegistration[messagesDuringRegistration.length] = ("registered successfully!\n".green);
-        return messagesDuringRegistration;
+
+     async register() {
+        let savedAccount = await Account.saveRegisterInfoInDB(this);
+        this._id = savedAccount.id;
+        let message = (Messages.RegisteredSuccessfully);
+        return message;
 
     }
 
     static async saveRegisterInfoInDB(account) {
-        await requestsToPyServer.saveAccount(account.username, account.password);
+        let savedAccount = await requestsToPyServer.saveAccount(account.username, account.password);
         for (const [key, value] of account.skills) {
             await skillDAO.saveAccountSkill(key, value, account._id);
         }
+        return savedAccount;
     }
 
 

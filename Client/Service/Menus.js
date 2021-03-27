@@ -1,13 +1,14 @@
 /****************************************************requirements******************************************************/
 const prompt = require('prompt-sync')();
 const colors = require('colors');
-const Account  = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Account.js');
+const Account = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Account.js');
 const Auction = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Auction.js');
 const Bid = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Bid.js');
 const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
 const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Skill.js');
 const SkillConfirmation = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/SKillConfirmation.js');
 const toolFunctions = require('/home/tapsi/IdeaProjects/concurency/Client/Business/ToolFunctions.js');
+const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
 
 
 /****************************************************Main-Menus********************************************************/
@@ -39,7 +40,6 @@ async function loadMenus() {
             await loadGetAccountByIdMenu()
 
 
-
         } else if (selectedMenu === "6") {
             await loadAddBidMenu();
 
@@ -57,7 +57,9 @@ async function loadMenus() {
 
 
         } else if (selectedMenu === "10") {
-             await loadRegisterMenu();
+            let registrationMessage = await loadRegisterMenu();
+            console.log(registrationMessage);
+
 
         } else if (selectedMenu === "11") {
             await loadAddProjectMenu();
@@ -94,7 +96,7 @@ async function loadAllProjectsMenu() {
     console.log("\n View all projects menu : ".cyan + "<token>".green);
     let token = prompt("");
 
-    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))){
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         let projectsArray = await Project.viewAllProjects();
         projectsArray.forEach((project) => {
             console.log(project);
@@ -109,7 +111,7 @@ async function loadViewAvailableProjectsMenu() {
     let username = inputArr[0];
     let token = inputArr[1];
 
-    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log("\n Available projects : ".green);
         let availableProjectsArr = await Account.viewAvailableProjectsForAccount(username);
         availableProjectsArr.forEach((project) => {
@@ -124,7 +126,7 @@ async function loadGetProjectByIdMenu() {
     let projectId = parseInt(inputArr[0]);
     let token = inputArr[1];
 
-    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await Project.getProjectById(projectId));
     }
 }
@@ -134,7 +136,7 @@ async function loadViewAllAccountsMenu() {
     console.log("\nView all accounts menu".cyan + "<token>".green);
     let token = prompt("");
 
-    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         let allAccountsArr = await Account.viewAllAccounts();
         allAccountsArr.forEach((account) => {
             console.log(account);
@@ -149,7 +151,7 @@ async function loadGetAccountByIdMenu() {
     let accountId = parseInt(inputArr[0]);
     let token = inputArr[1];
 
-    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await Account.getAccountById(accountId));
     }
 }
@@ -164,7 +166,7 @@ async function loadAddBidMenu() {
     let bidAmount = parseInt(inputArr[3]);
     let token = inputArr[4];
 
-    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await Bid.addBid(biddingUsername, projectTitle, bidAmount));
     }
 }
@@ -179,7 +181,7 @@ async function loadConfirmSkillMenu() {
     let skillName = inputArr[3];
     let token = inputArr[4];
 
-    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await SkillConfirmation.confirmSkill(conformerAccountUsername, targetAccountUsername, skillName));
     }
 }
@@ -191,7 +193,7 @@ async function loadAddSkillMenu() {
     let username = inputArr[1];
     let token = inputArr[3];
 
-    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         let arrSkills = inputArr[2].split(":");
         let skillName = arrSkills[0];
         let skillPoint = arrSkills[1];
@@ -208,24 +210,32 @@ async function loadRemoveSkillMenu() {
     let skillName = inputArr[2];
     let token = inputArr[3];
 
-    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await Skill.removeSkill(username, skillName));
     }
 }
 
 
+async function loadRegisterMenu() {
+    let registerRequirements = prepareRegistrationRequirements();
+    let {skills, buildSkillMessage} = Skill.buildSkillsMap(registerRequirements.skillsArr);
+    let account = new Account(registerRequirements.username, registerRequirements.password, skills);
+    let registerMessage = await account.register();
 
-async function loadRegisterMenu(){
-    let registerRequirements = prepareRegisterRequirements();
-    await register(registerRequirements.username,registerRequirements.password,registerRequirements.skillsArr);
+    return {
+        buildSkillMessage: buildSkillMessage,
+        registerMessage: registerMessage
+    }
+
 }
 
- function prepareRegisterRequirements() {
-    console.log("Welcome to ((register)) menu!".cyan + "command : register <username> <password> <skill:point>".green);
+
+function prepareRegistrationRequirements() {
+    console.log(Messages.WelcomeToRegisterMenu);
     let inputArr = prompt("").split(" ");
     let username = inputArr[1];
     let password = inputArr[2];
-    let skillsArr = inputArr.slice(3,inputArr.length);
+    let skillsArr = inputArr.slice(3, inputArr.length);
 
     return {
         username: username,
@@ -237,17 +247,6 @@ async function loadRegisterMenu(){
 }
 
 
-async function register(username,password,skillsArr){
-    let skills = Skill.buildSkillsMap()
-    // let registerMessagesArr = await Account.register(username,skillsArr,password);
-    // registerMessagesArr.forEach((message) => {
-    //     console.log(message);
-    // })
-
-}
-
-
-
 async function loadAddProjectMenu() {
     console.log("\nwelcome to  addProject menu!\nyou can add a new project using : "
         + "addProject <projectTitle> <skill:rate> <budget> <deadline(year/month/day)> <token>".green);
@@ -256,9 +255,9 @@ async function loadAddProjectMenu() {
     let budget = inputArr[inputArr.length - 3];
     let deadLine = inputArr[inputArr.length - 2];
     let skillsArr = inputArr.slice(2, inputArr.length - 3);
-    let token = inputArr[inputArr.length-1]
+    let token = inputArr[inputArr.length - 1]
 
-    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         let addProjectArr = await Project.addProject(title, budget, deadLine, skillsArr);
         addProjectArr.forEach((message) => {
             console.log(message);
@@ -275,20 +274,19 @@ async function loadHoldAuctionMenu() {
     let projectId = parseInt(inputArr[1]);
     let token = inputArr[2];
 
-    if(!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
         console.log(await Auction.holdAuction(projectId));
     }
 
 }
-async function loadLoginMenu(){
-    console.log("\nwelcome to Login menu!\n you can login: "+"login <username> <password>".green);
+
+async function loadLoginMenu() {
+    console.log("\nwelcome to Login menu!\n you can login: " + "login <username> <password>".green);
     let inputArr = prompt("").split(" ");
     let username = inputArr[1];
     let password = inputArr[2];
-    console.log(await Account.login(username,password));
+    console.log(await Account.login(username, password));
 }
-
-
 
 
 module.exports = {

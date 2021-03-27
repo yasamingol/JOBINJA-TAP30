@@ -1,4 +1,6 @@
-const requestToPyServer  = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js')
+const requestToPyServer  = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
+
+
 async function checkIfAnyErrorsApearedDuringTokenValidation(token){
     let validationMessage = await requestToPyServer.validateTokenFromServer(token)
     if(validationMessage[0][0]===false){
@@ -34,11 +36,13 @@ function stringToDateConverter(string) {
     return date;
 }
 
+
+
 module.exports = {
-    mapToObj,
     objToMap,
     stringToDateConverter,
     checkIfAnyErrorsApearedDuringTokenValidation
+
 
 }
 
