@@ -29,6 +29,12 @@ const messages = {
     WelcomeToViewAvailableProjectsMenu: "\nWelcome to ((view available projects)) menu!".cyan + " command : <username> <token>".green,
 
     NoProjectIsAvailableError: "There are no projects available for you now!".red,
+
+    WelcomeToViewProjectMenu: "\nWelcome to ((view project)) menu!".cyan + "command : <project-id> <token>".green,
+
+    ViewAllAccountsMenu: "\nView all accounts menu".cyan + "<token>".green,
+
+    WelcomeToViewAccountMenu: "Welcome to ((view account)) menu!".cyan + "command : <account-id> <token>".green,
 }
 
 module.exports = messages;

@@ -106,7 +106,7 @@ async function loadAllProjectsMenu() {
 }
 
 async function loadViewAvailableProjectsMenu() {
-    let availableProjectsRequirements = prepareAddProjectRequitments();
+    let availableProjectsRequirements = await prepareAvailableProjectsRequirements();
     if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(availableProjectsRequirements.token))) {
         let availableProjectsArr = await Account.getAvailableProjectsForAccount(availableProjectsRequirements.username);
         availableProjectsArr.forEach((project) => {
@@ -130,19 +130,27 @@ async function prepareAvailableProjectsRequirements(){
 }
 
 async function loadGetProjectByIdMenu() {
-    console.log("\nWelcome to ((view project)) menu!".cyan + "command : <project-id> <token>".green);
+    let getProjectByIdRequirements = await prepareGetProjectByIdRequirements();
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(getProjectByIdRequirements.token))) {
+        console.log(await Project.getProjectById(getProjectByIdRequirements.projectId));
+    }
+}
+
+async function prepareGetProjectByIdRequirements(){
+    console.log(Messages.WelcomeToViewProjectMenu);
     let inputArr = prompt("").split(" ");
     let projectId = parseInt(inputArr[0]);
     let token = inputArr[1];
 
-    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await Project.getProjectById(projectId));
+    return {
+        projectId: projectId,
+        token: token
     }
 }
 
 
 async function loadViewAllAccountsMenu() {
-    console.log("\nView all accounts menu".cyan + "<token>".green);
+    console.log(Messages.ViewAllAccountsMenu);
     let token = prompt("");
 
     if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
@@ -155,13 +163,21 @@ async function loadViewAllAccountsMenu() {
 
 
 async function loadGetAccountByIdMenu() {
-    console.log("Welcome to ((view account)) menu!".cyan + "command : <account-id> <token>".green);
+    let getAccountByIdRequirements = await prepareGetAccountByIdRequirements();
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(getAccountByIdRequirements.token))) {
+        console.log(await Account.getAccountById(getAccountByIdRequirements.accountId));
+    }
+}
+
+async function prepareGetAccountByIdRequirements(){
+    console.log(Messages.WelcomeToViewAccountMenu);
     let inputArr = prompt("").split(" ");
     let accountId = parseInt(inputArr[0]);
     let token = inputArr[1];
 
-    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await Account.getAccountById(accountId));
+    return{
+        accountId: accountId,
+        token: token
     }
 }
 

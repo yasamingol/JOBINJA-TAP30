@@ -68,8 +68,7 @@ class Account {
 
 
     static async getAvailableProjectsForAccount(username) {
-        let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
-        let account = await this.buildFullAccountByGettingID(accountID);
+        let account = await Account.getFullAccountByUsername(username)
         let {availableProjectArr, hasMinOneAvailable}
         = await account.buildAvailableProjectsForAccount();
 
@@ -78,6 +77,12 @@ class Account {
         } else {
             return Messages.NoProjectIsAvailableError;
         }
+    }
+
+    static async getFullAccountByUsername(username){
+        let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
+        let account = await this.buildFullAccountByGettingID(accountID);
+        return account
     }
 
 
