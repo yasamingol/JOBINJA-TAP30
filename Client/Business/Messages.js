@@ -74,6 +74,8 @@ const messages = {
 
     ProjectHasNoBid: "there are no bids on this project! cannot hold auction".red,
 
+    CommandIsInvalidError: "command is invalid! try again".red,
+
 }
 
 module.exports = messages;
