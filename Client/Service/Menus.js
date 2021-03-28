@@ -14,7 +14,7 @@ const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Me
 /****************************************************Main-Menus********************************************************/
 async function loadMenus() {
 
-    console.log("Welcome to JobInja!".red)
+    console.log(Messages.WelcomToJobinja)
     while (true) {
 
         //Menus
@@ -45,15 +45,18 @@ async function loadMenus() {
 
 
         } else if (selectedMenu === "7") {
-            await loadConfirmSkillMenu();
+            let confirmationMessage = await loadConfirmSkillMenu();
+            console.log(confirmationMessage);
 
 
         } else if (selectedMenu === "8") {
-            await loadAddSkillMenu();
+            let addSkillMessage = await loadAddSkillMenu();
+            console.log(addSkillMessage);
 
 
         } else if (selectedMenu === "9") {
-            await loadRemoveSkillMenu()
+            let removeSkillMessage = await loadRemoveSkillMenu();
+            console.log(removeSkillMessage);
 
 
         } else if (selectedMenu === "10") {
@@ -67,7 +70,8 @@ async function loadMenus() {
 
 
         } else if (selectedMenu === "12") {
-            await loadHoldAuctionMenu();
+            let holdAuctionMessage = await loadHoldAuctionMenu();
+            console.log(holdAuctionMessage);
 
 
         } else if (selectedMenu === "13") {
@@ -81,7 +85,6 @@ async function loadMenus() {
         } else console.log("command is invalid! try again".red);
 
     }
-
 
 }
 
@@ -115,7 +118,7 @@ async function loadViewAvailableProjectsMenu() {
     }
 }
 
-async function prepareAvailableProjectsRequirements(){
+async function prepareAvailableProjectsRequirements() {
     console.log(Messages.WelcomeToViewAvailableProjectsMenu);
     console.log("\n Available projects : ".green);
 
@@ -136,7 +139,7 @@ async function loadGetProjectByIdMenu() {
     }
 }
 
-async function prepareGetProjectByIdRequirements(){
+async function prepareGetProjectByIdRequirements() {
     console.log(Messages.WelcomeToViewProjectMenu);
     let inputArr = prompt("").split(" ");
     let projectId = parseInt(inputArr[0]);
@@ -169,13 +172,13 @@ async function loadGetAccountByIdMenu() {
     }
 }
 
-async function prepareGetAccountByIdRequirements(){
+async function prepareGetAccountByIdRequirements() {
     console.log(Messages.WelcomeToViewAccountMenu);
     let inputArr = prompt("").split(" ");
     let accountId = parseInt(inputArr[0]);
     let token = inputArr[1];
 
-    return{
+    return {
         accountId: accountId,
         token: token
     }
@@ -183,60 +186,142 @@ async function prepareGetAccountByIdRequirements(){
 
 
 async function loadAddBidMenu() {
-    console.log("\nwelcome to  bid menu!\nyou can add a new bid using : "
-        + "bid <username> <projectTitle> <bidAmount> <token>".green);
+    let addBidRequirements = await prepareAddBidRequirements();
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(addBidRequirements.token))) {
+        let bid = await Bid.createBidObject(addBidRequirements.biddingUsername, addBidRequirements.projectTitle, addBidRequirements.bidAmount);
+        let {message, isBidValid} = await bid.checkIfBidIsValid();
+
+        if (isBidValid === true) {
+            let addBidMessage = await Bid.createBid(bid);
+            return addBidMessage
+        } else {
+            return message;
+        }
+        ;
+
+    }
+}
+
+async function prepareAddBidRequirements() {
+    console.log(Messages.WelcomeToAddBidMenu);
     let inputArr = prompt("").split(" ");
     let biddingUsername = inputArr[1];
     let projectTitle = inputArr[2];
     let bidAmount = parseInt(inputArr[3]);
     let token = inputArr[4];
 
-    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await Bid.addBid(biddingUsername, projectTitle, bidAmount));
+    return {
+        biddingUsername: biddingUsername,
+        projectTitle: projectTitle,
+        bidAmount: bidAmount,
+        token: token
     }
+
 }
 
 
 async function loadConfirmSkillMenu() {
-    console.log("\nwelcome to confirmSkill menu!\nyou can confirm a skill using" +
-        "confirmSkill <your_username> <other_username> <skill> <token>".green);
+    let skillConfirmationRequirements = await prepareConfirmingSkillRequirements();
+
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(skillConfirmationRequirements.token))) {
+        let hasConfirmedBefore = await SkillConfirmation.checkIfConfirmedBefore(skillConfirmationRequirements.conformerAccountUsername,
+            skillConfirmationRequirements.targetAccountUsername, skillConfirmationRequirements.skillName);
+        if (!hasConfirmedBefore) {
+            let confirmationMessage =
+                await SkillConfirmation.confirmSkill(skillConfirmationRequirements.conformerAccountUsername,
+                    skillConfirmationRequirements.targetAccountUsername, skillConfirmationRequirements.skillName)
+            return confirmationMessage;
+
+        } else return (Messages.SkillHasBeenConfirmedBeforeError);
+
+    }
+
+}
+
+async function prepareConfirmingSkillRequirements() {
+    console.log(Messages.WelcomeToConfirmSkillMenu);
     const inputArr = prompt("").split(" ");
     let conformerAccountUsername = inputArr[1];
     let targetAccountUsername = inputArr[2];
     let skillName = inputArr[3];
     let token = inputArr[4];
 
-    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await SkillConfirmation.confirmSkill(conformerAccountUsername, targetAccountUsername, skillName));
+    return {
+        conformerAccountUsername: conformerAccountUsername,
+        targetAccountUsername: targetAccountUsername,
+        skillName: skillName,
+        token: token
+
     }
 }
 
 
 async function loadAddSkillMenu() {
-    console.log("\nwelcome to addSkill menu!\nyou can add a skill using" + "addSkill <username> <skill:rate> <token>".green);
+    let addSkillRequirements = await prepareAddSkillRequirements();
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(addSkillRequirements.token))) {
+        let newSkill = await prepareNewSkill();
+
+        if (Skill.checkIfSkillIsValid(newSkill.skillName)) {
+            let addSkillMessage = await Skill.addSkill(addSkillRequirements.username, newSkill.skillName, parseInt(newSkill.skillPoint))
+            return addSkillMessage;
+
+        } else {
+            return (Messages.SkillDoesNotExistError);
+        }
+    }
+}
+
+
+async function prepareAddSkillRequirements() {
+    console.log(Messages.WelcomeToAddSkillMenu);
     const inputArr = prompt("").split(" ");
     let username = inputArr[1];
     let token = inputArr[3];
 
-    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        let arrSkills = inputArr[2].split(":");
-        let skillName = arrSkills[0];
-        let skillPoint = arrSkills[1];
-        console.log(await Skill.addSkill(username, skillName, parseInt(skillPoint)));
+    return {
+        username: username,
+        token: token
+    }
+
+}
+
+async function prepareNewSkill() {
+    let arrSkills = inputArr[2].split(":");
+    let skillName = arrSkills[0];
+    let skillPoint = arrSkills[1];
+
+    return {
+        skillName: skillName,
+        skillPoint: skillPoint
     }
 }
 
 
 async function loadRemoveSkillMenu() {
-    console.log("\nwelcome to removeSkill menu!\nyou can remove a skill using"
-        + "removeSkill <username> <skill> <token>".green);
+    let removeSkillRequirements = await prepareRemoveSkillRequirements();
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(removeSkillRequirements.token))) {
+
+        if (await Account.checkIfAccountHasSkill(removeSkillRequirements.username, removeSkillRequirements.skillName)) {
+            let removeSkillMessage = await Skill.removeSkill(removeSkillRequirements.username, removeSkillRequirements.skillName)
+            return removeSkillMessage;
+        } else {
+            return (Messages.UserDoesNotHaveSKillError);
+        }
+    }
+
+}
+
+async function prepareRemoveSkillRequirements() {
+    console.log(Messages.WelcomeToRemoveSkillMenu);
     const inputArr = prompt("").split(" ");
     let username = inputArr[1];
     let skillName = inputArr[2];
     let token = inputArr[3];
 
-    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await Skill.removeSkill(username, skillName));
+    return {
+        username: username,
+        skillName: skillName,
+        token: token
     }
 }
 
@@ -297,13 +382,13 @@ async function loadAddProjectMenu() {
 
     let {skills, messagesOfBuildSkillMap} = Skill.buildSkillsMap(addProjectRequirements.skillsArr);
     let project = new Project(addProjectRequirements.title, skills, addProjectRequirements.budget,
-                                addProjectRequirements.deadline, addProjectRequirements.isAvailable);
+        addProjectRequirements.deadline, addProjectRequirements.isAvailable);
 
     if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(addProjectRequirements.token))) {
         let addProjectMessage = await project.addProject();
         return {
             addProjectMessage: addProjectMessage,
-            messagesOfBuildSkillMap:messagesOfBuildSkillMap
+            messagesOfBuildSkillMap: messagesOfBuildSkillMap
         }
     }
 
@@ -332,16 +417,30 @@ async function prepareAddProjectRequitments() {
 
 
 async function loadHoldAuctionMenu() {
-    console.log("\nwelcome to  Auction menu!\nyou can hold an Auction for a project: "
-        + "holdAuction <projectId> <token>".green);
+    let holdAuctionRequirements = await prepareAuctionRequirements();
+    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(holdAuctionRequirements.token))) {
+
+        let projectIsAvailable = Project.checkIfProjectIsAvailable(holdAuctionRequirements.projectId)
+        if (projectIsAvailable) {
+            return await Auction.holdAuctionForProject(holdAuctionRequirements.projectId);
+        } else {
+            return Messages.ProjectIsNotAvailableError;
+        }
+    }
+
+}
+
+
+async function prepareAuctionRequirements() {
+    console.log(Messages.WelcomeToAuctionMenu);
     let inputArr = prompt("").split(" ");
     let projectId = parseInt(inputArr[1]);
     let token = inputArr[2];
 
-    if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(token))) {
-        console.log(await Auction.holdAuction(projectId));
+    return {
+        projectId: projectId,
+        token: token
     }
-
 }
 
 

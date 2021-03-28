@@ -113,14 +113,19 @@ class Project {
         await projectDAO.updateProjectAssignedAccountId(projectID, userID);
     }
 
-    static async findTheBestUserIdBidingOnProject(projectId) {
-        let listOfBidIDsForProject = await Project.createListOfBidsForProject(projectId);
+    async findTheBestUserIdBidingOnProject() {
+        let listOfBidIDsForProject = await Project.createListOfBidsForProject(this);
         if (listOfBidIDsForProject.length !== 0) {
             return await Bid.calculateToFindTheBestBid(listOfBidIDsForProject);
 
         } else {
             return null;
         }
+    }
+
+    static async checkIfProjectIsAvailable(projectId) {
+        let project = await projectDAO.getProjectById(projectId);
+        return project.isAvailable;
     }
 
 

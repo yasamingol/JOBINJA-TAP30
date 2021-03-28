@@ -2,7 +2,7 @@ const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/B
 const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
 const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
 
-class Skill{
+class Skill {
     static allSkills = [];
 
     static buildSkillsMap(skillsArr) {
@@ -42,15 +42,11 @@ class Skill{
     }
 
 
-
-   static async addSkill(username, skillName, skillPoint) {
+    static async addSkill(username, skillName, skillPoint) {
         let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
-        if (Skill.checkIfSkillIsValid(skillName)) {
-            await skillDAO.saveAccountSkill(skillName, skillPoint, accountID);
-            return ("skill added successfully!\n".green);
-        } else {
-            return ("such skill does not exist!".red);
-        }
+        await skillDAO.saveAccountSkill(skillName, skillPoint, accountID);
+        return (Messages.SkillAddedSuccessfully);
+
     }
 
 
@@ -63,17 +59,17 @@ class Skill{
     }
 
 
-
     static async removeSkill(username, skillName) {
         let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
         let skill = await skillDAO.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
-        let skillID = skill.id;
-        if (await Skill.checkIfAccountHasSkill(accountID, skillID)) {
+
+        if (await Skill.checkIfAccountHasSkill(skill)) {
+            let skillID = skill.id;
             await skillDAO.deleteSkillOfAccountUsingSkillName(skillID);
-            return ("skill removed successfully!\n".green);
+            return (Messages.SkillRemovedSuccessfully);
 
         } else {
-            return ("user does not have such skill!".red);
+            return (Messages.UserDoesNotHaveSKillError);
         }
     }
 
@@ -91,4 +87,5 @@ class Skill{
 
 
 }
+
 module.exports = Skill;

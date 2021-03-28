@@ -2,6 +2,7 @@ const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Mod
 const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
 const projectDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Project.js');
 const auctionDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Auction.js');
+const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
 
 
 class Auction{
@@ -23,37 +24,21 @@ class Auction{
         }
     }
 
-    static async holdAuction(projectId) {
-        let messageOfHoldAuction = "";
-        let project = await projectDAO.getProjectById(projectId);
-        if (!(project.isAvailable)) {
-            messageOfHoldAuction = ("project is not available! already taken.".red);
-        } else {
-            messageOfHoldAuction = await Auction.handlingAuctionProcess(projectId);
-        }
-        return messageOfHoldAuction;
-    }
 
 
-    static async handlingAuctionProcess(projectId) {
-        let messageOfHoldAuction = "";
-        let accountWinnerID = await Project.findTheBestUserIdBidingOnProject(projectId);
+    static async holdAuctionForProject(projectId) {
+        let project = await Project.buildFullProjectByGettingID(projectId)
+        let accountWinnerID = await project.findTheBestUserIdBidingOnProject();
         if (accountWinnerID !== null) {
             let auction = new Auction(null,accountWinnerID,projectId)
             await auctionDAO.saveAuction(auction);
             await projectDAO.updateProjectAvailability(projectId);
             await Project.assignProject(accountWinnerID, projectId);
-            messageOfHoldAuction = ("\nThe winner of the auction is : ".green
-                + await requestsToPyServer.getAccountUsernameUsingAccountId(accountWinnerID));
+            return "\nThe winner of the auction is : ".green
+                + await requestsToPyServer.getAccountUsernameUsingAccountId(accountWinnerID);
         } else {
-            messageOfHoldAuction = ("there are no bids on this project! cannot hold auction".red);
+            return Messages.ProjectHasNoBid;
         }
-        return messageOfHoldAuction;
-    }
-
-
-    static async createNewAuction(auction) {
-        return new Auction(auction);
     }
 
 

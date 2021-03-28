@@ -139,19 +139,18 @@ class Account {
     }
 
 
-    static async checkIfAccountHasSkill(accountID, skillID) {
-        let hasThisSkill = false;
-        let skillsMap = await Account.getAllSkillsMapOfAccount(accountID);
-        let skill = await skillDAO.getSkillById(skillID);
-        let skillName = skill.skillName;
-        skillsMap.forEach((value, key) => {
-            if (key === skillName) {
-                hasThisSkill = true;
-            }
-        })
-        return hasThisSkill;
+    static async checkIfAccountHasSkill(username, skillName) {
+        let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
+        let skill = await skillDAO.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
 
+        if(skill==undefined){
+            return false;
+        }
+        else {
+            return false;
+        }
     }
+
 
     static async getAllSkillsMapOfAccount(accountID) {
         let skillArray = await skillDAO.getAccountSkills(accountID);

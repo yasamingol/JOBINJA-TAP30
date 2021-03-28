@@ -1,21 +1,21 @@
 const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
 const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
 const confirmationDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Confirmation.js');
+const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
 
 
-class SKillConfirmation{
+class SKillConfirmation {
+
     static async confirmSkill(conformerAccountUsername, targetAccountUsername, skillName) {
         let sourceUserID = parseInt(await requestsToPyServer.getAccountIDUsingAccountUsername(conformerAccountUsername));
         let otherUserID = parseInt(await requestsToPyServer.getAccountIDUsingAccountUsername(targetAccountUsername));
         let skill = await skillDAO.getSkillIdUsingSkillNameAndAccountID(skillName, otherUserID);
         let skillID = skill.id
-        let hasConfirmedBefore = await SKillConfirmation.checkIfConfirmedBefore(sourceUserID, skillID);
-        if (!hasConfirmedBefore) {
-            await SKillConfirmation.addPointTOSkillForConfirmation(skillID);
-            await SKillConfirmation.createNewConfirmation(skillID, sourceUserID);
-            return (conformerAccountUsername + " confirmed " + targetAccountUsername + " s ((" + skillName + ")) skill\n ");
 
-        } else return ("cannot confirm this skillSet! you have done it once before!".red);
+        await SKillConfirmation.addPointTOSkillForConfirmation(skillID);
+        await SKillConfirmation.createNewConfirmation(skillID, sourceUserID);
+
+        return (conformerAccountUsername + " confirmed " + targetAccountUsername + " s ((" + skillName + ")) skill\n ");
 
     }
 
@@ -30,12 +30,15 @@ class SKillConfirmation{
 
     }
 
-    static async checkIfConfirmedBefore(userSourceID, skillID) {
-        let confirmationId = await confirmationDAO.getConfirmationUsingSkillIdAndAccountId(skillID, userSourceID);
-        if (confirmationId === undefined  || confirmationId.length === 0) return false;
+    static async checkIfConfirmedBefore(conformerAccountUsername, targetAccountUsername, skillName) {
+        let sourceUserID = parseInt(await requestsToPyServer.getAccountIDUsingAccountUsername(conformerAccountUsername));
+        let otherUserID = parseInt(await requestsToPyServer.getAccountIDUsingAccountUsername(targetAccountUsername));
+        let skill = await skillDAO.getSkillIdUsingSkillNameAndAccountID(skillName, otherUserID);
+        let skillID = skill.id
+        let confirmationId = await confirmationDAO.getConfirmationUsingSkillIdAndAccountId(skillID, sourceUserID);
+        if (confirmationId === undefined || confirmationId.length === 0) return false;
         else return true;
     }
-
 
 
 }

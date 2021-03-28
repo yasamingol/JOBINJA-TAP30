@@ -2,6 +2,8 @@ const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/B
 const Account = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Account.js');
 const projectDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Project.js');
 const bidDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Bid.js');
+const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
+
 
 class Bid {
     static allBids = [];
@@ -23,40 +25,51 @@ class Bid {
     }
 
 
-
-
-
-   static async addBid(biddingUsername, projectTitle, bidAmount) {
-        let addBidsFinalMessage;
-        let project = await projectDAO.getProjectByProjectTitle(projectTitle)
+    static async createBidObject(biddingUsername, projectTitle, bidAmount){
+        let project = await projectDAO.getProjectByProjectTitle(projectTitle);
         let projectId = project.id;
         let accountId = await requestsToPyServer.getAccountIDUsingAccountUsername(biddingUsername);
         let bid = new Bid(null,accountId,projectId,bidAmount);
-        addBidsFinalMessage = await Bid.handlingAddBidErrors(bid);
-        return addBidsFinalMessage;
+        return bid;
     }
 
 
-    static async handlingAddBidErrors( bid) {
-        let project = await projectDAO.getProjectById(bid.projectID);
+    async checkIfBidIsValid() {
+        let project = await projectDAO.getProjectById(this.projectID);
+        let account = await Account.getAccountById(this.userID);
         if (!(project.isAvailable)) {
-            return "cannot bid! project has already been taken.".red;
-        } else if (!(await Account.checkIfSkilledEnough(bid.userID, bid.projectID))) {
-            return "cannot bid! not skilled enough.".red;
-        } else if (!(await Bid.checkIfBidEnough(bid.projectID, bid.bidAmount))) {
-            return "cannot bid! bid amount not acceptable".red;
-            // } else if (!(await checkIfValidDateToBid(bid.projectID))) {
-            //     return "you cannot bid on this project! it has ended".red;
-        } else {
-            return (await Bid.createBid(bid));
+            return {
+                message: Messages.ProjectIsNotAvailableError,
+                isBidValid: false
+            };
+        }
+        else if (!(await account.checkIfSkilledEnough(this.projectID))) {
+            return {
+                message: Messages.NotSkilledEnoughError,
+                isBidValid: false
+            };
+        }
+        else if (!(await Bid.checkIfBidEnough(this.projectID, this.bidAmount))) {
+            return {
+                message: Messages.BidIsNotEnoughError,
+                isBidValid: false
+            };
+        }
+        else {
+            return {
+                message: Messages.BidIsValid,
+                isBidValid: true
+            }
         }
     }
 
+
     static async createBid(bid) {
         await bidDAO.saveBid(bid);
-        return "bid created successfully!\n".green;
+        return Messages.BidAddedSuccessfully;
 
     }
+
 
     static async checkIfBidEnough(projectId, userBidAmount) {
         let project = await projectDAO.getProjectById(projectId);
