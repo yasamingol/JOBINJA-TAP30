@@ -1,10 +1,9 @@
 const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/Business/RequestsToPyServer.js');
 const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Skill.js');
-const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
 const projectDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Project.js');
 const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
 const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
-
+const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
 
 class Account {
     _id;
@@ -160,8 +159,8 @@ class Account {
 
     async checkIfSkilledEnough(projectId) {
         let isSkilled = true;
-        let projectsSkillsMap = await Project.getAllSkillsMapOfProject(projectId);
         let accountsSkillsMap = await Account.getAllSkillsMapOfAccount(this._id);
+        let projectsSkillsMap = await Project.getAllSkillsMapOfProject(projectId);
         projectsSkillsMap.forEach((value1, key1) => {
             if (accountsSkillsMap.has(key1)) {
                 if (parseInt(accountsSkillsMap.get(key1)) < parseInt(value1)) {
@@ -172,6 +171,9 @@ class Account {
         return isSkilled;
 
     }
+
+
+
 
 
 }

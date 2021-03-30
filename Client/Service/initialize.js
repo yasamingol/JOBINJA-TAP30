@@ -8,10 +8,8 @@ const Account = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Mod
 
 (async () => {
     await requestToJSServer.getAllSkillsFromServer(request);
-    // let account = await Account.getAccountById(1);
-    // let fullAccount = await Account.getFullAccountByUsername('yasamingol');
-    // let result = await account.checkIfSkilledEnough(1);
+    // let account = await Account.getFullAccountByUsername('yasamingol');
+    // let result =  account.checkIfSkilledEnough(1);
      await menu.loadMenus();
-    // let projectsSkillsMap = await Project.getAllSkillsMapOfProject();
-    // console.log(projectsSkillsMap)
+    // console.log(result);
 })()

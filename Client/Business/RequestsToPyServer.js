@@ -2,7 +2,7 @@ const axios = require('axios');
 
 async function sendLoginInfoAndReciveTokenFromServer(username,password) {
     try {
-        const response = await axios.post('http://localhost:6002/login', {
+        const response = await axios.post('http://localhost:7000/login', {
             username: username,
             password: password
         });
@@ -17,7 +17,7 @@ async function sendLoginInfoAndReciveTokenFromServer(username,password) {
 async function validateTokenFromServer(token){
 
     try {
-        const response = await axios.post('http://localhost:6002/validateToken', {
+        const response = await axios.post('http://localhost:7000/validateToken', {
             token: token
         });
         return response.data;
@@ -30,7 +30,7 @@ async function validateTokenFromServer(token){
 
 async function saveAccount(username,password){
     try {
-        const response = await axios.post('http://localhost:6002/saveAccount', {
+        const response = await axios.post('http://localhost:7000/saveAccount', {
             username: username,
             password:password
         });
@@ -44,7 +44,7 @@ async function saveAccount(username,password){
 
 async function getAccountsFullDBTable(){
     try {
-        const response = await axios.post('http://localhost:6002/getAccountsFullDBTable', {
+        const response = await axios.post('http://localhost:7000/getAccountsFullDBTable', {
         });
         return response.data;
 
@@ -56,7 +56,7 @@ async function getAccountsFullDBTable(){
 
 async function getFullAccountById(accountId){
     try {
-        const response = await axios.post('http://localhost:6002/getFullAccountById', {
+        const response = await axios.post('http://localhost:7000/getFullAccountById', {
             id:accountId
         });
         return response.data;
@@ -69,7 +69,7 @@ async function getFullAccountById(accountId){
 
 async function getAccountUsernameUsingAccountId(accountId){
     try {
-        const response = await axios.post('http://localhost:6002/getAccountUsernameUsingAccountId', {
+        const response = await axios.post('http://localhost:7000/getAccountUsernameUsingAccountId', {
             id:accountId
         });
         return response.data;
@@ -82,7 +82,7 @@ async function getAccountUsernameUsingAccountId(accountId){
 
 async function getAccountPasswordUsingAccountId(accountId){
     try {
-        const response = await axios.post('http://localhost:6002/getAccountPasswordUsingAccountId', {
+        const response = await axios.post('http://localhost:7000/getAccountPasswordUsingAccountId', {
             id:accountId
         });
         return response.data;
@@ -95,7 +95,7 @@ async function getAccountPasswordUsingAccountId(accountId){
 
 async function getAccountIDUsingAccountUsername(username){
     try {
-        const response = await axios.post('http://localhost:6002/getAccountIDUsingAccountUsername', {
+        const response = await axios.post('http://localhost:7000/getAccountIDUsingAccountUsername', {
             username:username
         });
         return response.data;
@@ -108,7 +108,7 @@ async function getAccountIDUsingAccountUsername(username){
 
 async function getNumberOfRowsOfAccountsTable(){
     try {
-        const response = await axios.post('http://localhost:6002/getNumberOfRowsOfAccountsTable', {
+        const response = await axios.post('http://localhost:7000/getNumberOfRowsOfAccountsTable', {
         });
         return response.data;
 

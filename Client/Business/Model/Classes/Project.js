@@ -38,8 +38,6 @@ class Project {
 
 
 
-
-
     static async getProjectById(id) {
         let project = await Project.buildFullProjectByGettingID(id);
         return project;
