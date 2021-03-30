@@ -2,6 +2,7 @@ const requestsToPyServer = require('/home/tapsi/IdeaProjects/concurency/Client/B
 const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
 const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
 
+
 class Skill {
     static allSkills = [];
 
@@ -61,16 +62,12 @@ class Skill {
 
     static async removeSkill(username, skillName) {
         let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
-        let skill = await skillDAO.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
+        let skill = await skillDAO.getSkillUsingSkillNameAndAccountID(skillName, accountID);
 
-        if (await Skill.checkIfAccountHasSkill(skill)) {
             let skillID = skill.id;
             await skillDAO.deleteSkillOfAccountUsingSkillName(skillID);
             return (Messages.SkillRemovedSuccessfully);
 
-        } else {
-            return (Messages.UserDoesNotHaveSKillError);
-        }
     }
 
     static async convertSkillsArrayToSkillsMap(arr) {

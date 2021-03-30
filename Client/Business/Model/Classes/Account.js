@@ -115,11 +115,11 @@ class Account {
     }
 
     static async saveRegisterInfoInDB(account) {
-        let savedAccount = await requestsToPyServer.saveAccount(account.username, account.password);
+        let savedAccountId = await requestsToPyServer.saveAccount(account.username, account.password);
         for (const [key, value] of account.skills) {
-            await skillDAO.saveAccountSkill(key, value, account._id);
+            await skillDAO.saveAccountSkill(key, value, savedAccountId);
         }
-        return savedAccount;
+        return savedAccountId;
     }
 
 
@@ -141,13 +141,13 @@ class Account {
 
     static async checkIfAccountHasSkill(username, skillName) {
         let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
-        let skill = await skillDAO.getSkillIdUsingSkillNameAndAccountID(skillName, accountID);
+        let skill = await skillDAO.getSkillUsingSkillNameAndAccountID(skillName, accountID);
 
         if(skill==undefined){
             return false;
         }
         else {
-            return false;
+            return true;
         }
     }
 
@@ -158,9 +158,9 @@ class Account {
     }
 
 
-    async checkIfSkilledEnough(projectID) {
+    async checkIfSkilledEnough(projectId) {
         let isSkilled = true;
-        let projectsSkillsMap = await Project.getAllSkillsMapOfProject(projectID);
+        let projectsSkillsMap = await Project.getAllSkillsMapOfProject(projectId);
         let accountsSkillsMap = await Account.getAllSkillsMapOfAccount(this._id);
         projectsSkillsMap.forEach((value1, key1) => {
             if (accountsSkillsMap.has(key1)) {

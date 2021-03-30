@@ -9,7 +9,7 @@ class SKillConfirmation {
     static async confirmSkill(conformerAccountUsername, targetAccountUsername, skillName) {
         let sourceUserID = parseInt(await requestsToPyServer.getAccountIDUsingAccountUsername(conformerAccountUsername));
         let otherUserID = parseInt(await requestsToPyServer.getAccountIDUsingAccountUsername(targetAccountUsername));
-        let skill = await skillDAO.getSkillIdUsingSkillNameAndAccountID(skillName, otherUserID);
+        let skill = await skillDAO.getSkillUsingSkillNameAndAccountID(skillName, otherUserID);
         let skillID = skill.id
 
         await SKillConfirmation.addPointTOSkillForConfirmation(skillID);
@@ -33,7 +33,7 @@ class SKillConfirmation {
     static async checkIfConfirmedBefore(conformerAccountUsername, targetAccountUsername, skillName) {
         let sourceUserID = parseInt(await requestsToPyServer.getAccountIDUsingAccountUsername(conformerAccountUsername));
         let otherUserID = parseInt(await requestsToPyServer.getAccountIDUsingAccountUsername(targetAccountUsername));
-        let skill = await skillDAO.getSkillIdUsingSkillNameAndAccountID(skillName, otherUserID);
+        let skill = await skillDAO.getSkillUsingSkillNameAndAccountID(skillName, otherUserID);
         let skillID = skill.id
         let confirmationId = await confirmationDAO.getConfirmationUsingSkillIdAndAccountId(skillID, sourceUserID);
         if (confirmationId === undefined || confirmationId.length === 0) return false;

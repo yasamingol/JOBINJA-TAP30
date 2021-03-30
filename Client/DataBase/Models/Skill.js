@@ -71,7 +71,7 @@ class Skill extends Model {
         console.log("account skill removed from DB successfully");
     }
 
-    static async getSkillIdUsingSkillNameAndAccountID(skillName, accountId) {
+    static async getSkillUsingSkillNameAndAccountID(skillName, accountId) {
         let skill = await Skill.query().where('skillName', skillName).andWhere('accountID', accountId).first();
         return skill
     }
