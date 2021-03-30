@@ -6,10 +6,10 @@ const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model
 
 async function loadAddProjectMenu() {
 
-    let addProjectRequirements = prepareAddProjectRequirements();
+    let addProjectRequirements = await prepareAddProjectRequirements();
 
-    let {skills, messagesOfBuildSkillMap} = Skill.buildSkillsMap(addProjectRequirements.skillsArr);
-    let project = new Project(addProjectRequirements.title, skills, addProjectRequirements.budget,
+    let {skillsMap, messagesOfBuildSkillMap} = Skill.buildSkillsMap(addProjectRequirements.skillsArr);
+    let project = new Project(addProjectRequirements.title, skillsMap, addProjectRequirements.budget,
         addProjectRequirements.deadline, addProjectRequirements.isAvailable);
 
     if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(addProjectRequirements.token))) {

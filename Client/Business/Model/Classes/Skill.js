@@ -23,7 +23,7 @@ class Skill {
         }
         return {
             skillsMap: skillsMap,
-            message: arrOfMessagesWhileBuildingSKillsMap
+            messagesOfBuildSkillMap: arrOfMessagesWhileBuildingSKillsMap
         };
     }
 
