@@ -107,8 +107,8 @@ class Account {
 
 
     async register() {
-        let savedAccount = await Account.saveRegisterInfoInDB(this);
-        this._id = savedAccount.id;
+        let savedAccountId = await Account.saveRegisterInfoInDB(this);
+        this._id = savedAccountId;
         let message = (Messages.RegisteredSuccessfully);
         return message;
 

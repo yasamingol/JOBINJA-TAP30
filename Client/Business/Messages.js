@@ -1,3 +1,5 @@
+const colors = require('colors');
+
 const messages = {
 
     WelcomToJobinja: "Welcome to JobInja!".red,
@@ -74,7 +76,7 @@ const messages = {
 
     ProjectHasNoBid: "there are no bids on this project! cannot hold auction".red,
 
-    CommandIsInvalidError: "command is invalid! try again".red,
+    CommandIsInvalidError: "command is invalid! try again".red
 
 }
 

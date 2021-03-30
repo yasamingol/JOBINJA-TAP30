@@ -6,12 +6,12 @@ const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Me
 
 async function loadRegisterMenu() {
     let registerRequirements = prepareRegistrationRequirements();
-    let {skills, buildSkillMessage} = Skill.buildSkillsMap(registerRequirements.skillsArr);
-    let account = new Account(registerRequirements.username, registerRequirements.password, skills);
+    let {skillsMap, message} = Skill.buildSkillsMap(registerRequirements.skillsArr);
+    let account = new Account(registerRequirements.username, registerRequirements.password, skillsMap);
     let registerMessage = await account.register();
 
     return {
-        buildSkillMessage: buildSkillMessage,
+        buildSkillMessage: message,
         registerMessage: registerMessage
     }
 

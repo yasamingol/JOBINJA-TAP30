@@ -1,4 +1,5 @@
 /****************************************************requirements******************************************************/
+const prompt = require('prompt-sync')();
 const AllProjects = require('/home/tapsi/IdeaProjects/concurency/Client/Service/AllServices/AllProjects.js');
 const AvailableProjects = require('/home/tapsi/IdeaProjects/concurency/Client/Service/AllServices/AvailableProjects.js');
 const GetProjectById = require('/home/tapsi/IdeaProjects/concurency/Client/Service/AllServices/GetProjectById.js');
