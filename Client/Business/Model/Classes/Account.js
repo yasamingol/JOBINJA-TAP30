@@ -153,6 +153,7 @@ class Account {
     }
 
 
+    // what the hell is wrong with this function i dont know and i can not understand!
     async checkIfSkilledEnough(projectId) {
         const ProjectX = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
         let isSkilled = true;
