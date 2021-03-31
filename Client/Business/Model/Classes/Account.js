@@ -154,10 +154,10 @@ class Account {
 
 
     async checkIfSkilledEnough(projectId) {
-        const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
+        const ProjectXX = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
         let isSkilled = true;
         let accountsSkillsMap = await Account.getAllSkillsMapOfAccount(this._id);
-        let projectsSkillsMap = await Project.getAllSkillsMapOfProject(projectId);
+        let projectsSkillsMap = await ProjectXX.getAllSkillsMapOfProject(projectId);
         projectsSkillsMap.forEach((value1, key1) => {
             if (accountsSkillsMap.has(key1)) {
                 if (parseInt(accountsSkillsMap.get(key1)) < parseInt(value1)) {

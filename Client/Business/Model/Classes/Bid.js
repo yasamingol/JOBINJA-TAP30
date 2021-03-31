@@ -34,9 +34,9 @@ class Bid {
     }
 
 
-    async checkIfBidIsValid() {
-        let project = await projectDAO.getProjectById(this.projectID);
-        let account = await Account.getAccountById(this.userID);
+    static async checkIfBidIsValid(bid) {
+        let project = await projectDAO.getProjectById(bid.projectID);
+        let account = await Account.getAccountById(bid.userID);
         if (!(project.isAvailable)) {
             return {
                 message: Messages.ProjectIsNotAvailableError,
