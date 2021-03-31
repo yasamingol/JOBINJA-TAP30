@@ -8,8 +8,8 @@ async function loadAddBidMenu() {
     let addBidRequirements = await prepareAddBidRequirements();
     if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(addBidRequirements.token))) {
         let bid = await Bid.createBidObject(addBidRequirements.biddingUsername, addBidRequirements.projectTitle, addBidRequirements.bidAmount);
-        let {message, isBidValid} = await bid.checkIfBidIsValid();
-
+        let x = await bid.checkIfBidIsValid();
+        let {message, isBidValid} = x;
         if (isBidValid === true) {
             let addBidMessage = await Bid.createBid(bid);
             return addBidMessage

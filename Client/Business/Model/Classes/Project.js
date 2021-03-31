@@ -111,8 +111,8 @@ class Project {
         await projectDAO.updateProjectAssignedAccountId(projectID, userID);
     }
 
-    async findTheBestUserIdBidingOnProject() {
-        let listOfBidIDsForProject = await Project.createListOfBidsForProject(this);
+    static async findTheBestUserIdBidingOnProject(projectId) {
+        let listOfBidIDsForProject = await Project.createListOfBidsForProject(projectId);
         if (listOfBidIDsForProject.length !== 0) {
             return await Bid.calculateToFindTheBestBid(listOfBidIDsForProject);
 

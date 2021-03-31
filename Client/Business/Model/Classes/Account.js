@@ -169,6 +169,21 @@ class Account {
 
     }
 
+    static async calculateBidUserOverAllBidWorth(bid) {
+        const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
+        let project = await Project.buildFullProjectByGettingID(bid.projectID);
+        let account = await Account.buildFullAccountByGettingID(bid.userID);
+        let jobOffer = project.budget;
+        let userOffer = bid.bidAmount;
+        let skillSum = 0;
+        project.skills.forEach((value, key) => {
+            let jobSkill = parseInt(value);
+            let userSkill = parseInt(account.skills.get(key));
+            skillSum += 1000 * ((userSkill - jobSkill) * (userSkill - jobSkill));
+        })
+        return skillSum + (jobOffer - userOffer);
+    }
+
 
 }
 

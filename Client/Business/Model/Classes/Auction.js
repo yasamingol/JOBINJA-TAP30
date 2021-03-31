@@ -27,8 +27,7 @@ class Auction{
 
 
     static async holdAuctionForProject(projectId) {
-        let project = await Project.buildFullProjectByGettingID(projectId)
-        let accountWinnerID = await project.findTheBestUserIdBidingOnProject();
+        let accountWinnerID = await Project.findTheBestUserIdBidingOnProject(projectId);
         if (accountWinnerID !== null) {
             let auction = new Auction(null,accountWinnerID,projectId)
             await auctionDAO.saveAuction(auction);

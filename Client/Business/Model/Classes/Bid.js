@@ -93,7 +93,7 @@ class Bid {
         for (let i = 0; i < listOfBidIDsForProject.length; i++) {
             let bidId = listOfBidIDsForProject[i].id
             let bid = await this.buildFullBidUsingBidID(bidId);
-            let userSkill = parseInt(await this.calculateUserSkill(bid));
+            let userSkill = parseInt(await Account.calculateBidUserOverAllBidWorth(bid));
             if (userSkill > bestBid) {
                 bestBid = userSkill;
                 bestUserId = bid.userID;
@@ -101,6 +101,8 @@ class Bid {
         }
         return bestUserId;
     }
+
+
 
 
 
