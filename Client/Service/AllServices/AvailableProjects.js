@@ -2,11 +2,13 @@ const prompt = require('prompt-sync')();
 const Account = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Account.js');
 const toolFunctions = require('/home/tapsi/IdeaProjects/concurency/Client/Business/ToolFunctions.js');
 const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
+const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
 
 
 async function loadViewAvailableProjectsMenu() {
     let availableProjectsRequirements = await prepareAvailableProjectsRequirements();
     if (!(await toolFunctions.checkIfAnyErrorsApearedDuringTokenValidation(availableProjectsRequirements.token))) {
+        // let project = await Project.getAllSkillsMapOfProject(1); the function works here!
         let availableProjectsArr = await Account.getAvailableProjectsForAccount(availableProjectsRequirements.username);
         availableProjectsArr.forEach((project) => {
             console.log(project);

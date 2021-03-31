@@ -3,7 +3,6 @@ const Skill = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model
 const projectDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Project.js');
 const skillDAO = require('/home/tapsi/IdeaProjects/concurency/Client/DataBase/Models/Skill.js');
 const Messages = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Messages.js');
-const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
 
 class Account {
     _id;
@@ -69,8 +68,7 @@ class Account {
     static async getAvailableProjectsForAccount(username) {
         let account = await Account.getFullAccountByUsername(username)
         let {availableProjectArr, hasMinOneAvailable}
-        = await account.buildAvailableProjectsForAccount();
-
+            = await account.buildAvailableProjectsForAccount();
         if (hasMinOneAvailable) {
             return availableProjectArr;
         } else {
@@ -78,7 +76,7 @@ class Account {
         }
     }
 
-    static async getFullAccountByUsername(username){
+    static async getFullAccountByUsername(username) {
         let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
         let account = await this.buildFullAccountByGettingID(accountID);
         return account
@@ -89,7 +87,6 @@ class Account {
         let availableProjectArr = [];
         let hasMinOneAvailable = false;
         let numberOfProjects = await projectDAO.getNumberOfAllProjects();
-
         for (let i = 1; i <= numberOfProjects; i++) {
             let project = await projectDAO.getProjectById(i);
             let projectsTitle = project.title;
@@ -142,10 +139,9 @@ class Account {
         let accountID = await requestsToPyServer.getAccountIDUsingAccountUsername(username);
         let skill = await skillDAO.getSkillUsingSkillNameAndAccountID(skillName, accountID);
 
-        if(skill==undefined){
+        if (skill == undefined) {
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }
@@ -158,6 +154,7 @@ class Account {
 
 
     async checkIfSkilledEnough(projectId) {
+        const Project = require('/home/tapsi/IdeaProjects/concurency/Client/Business/Model/Classes/Project.js');
         let isSkilled = true;
         let accountsSkillsMap = await Account.getAllSkillsMapOfAccount(this._id);
         let projectsSkillsMap = await Project.getAllSkillsMapOfProject(projectId);
@@ -171,9 +168,6 @@ class Account {
         return isSkilled;
 
     }
-
-
-
 
 
 }
