@@ -3,7 +3,7 @@ const requestToPyServer  = require('/home/tapsi/IdeaProjects/concurency/Client/B
 
 async function checkIfAnyErrorsApearedDuringTokenValidation(token){
     let validationMessage = await requestToPyServer.validateTokenFromServer(token)
-    if(validationMessage[0][0]===false){
+    if(validationMessage[0]==false){
         console.log(validationMessage[1].red);
         return true;
     }
